@@ -1,16 +1,24 @@
 /* =============================================================================
  * components/prompt/MessageBubble.tsx
  *
- * Composant "bulle de message" pour l'interface de chat Dixipolis.
+ * Composant "bulle de message" premium pour l'interface de chat Dixipolis.
  *
  * Gere l'affichage d'un message unique dans la conversation :
- *   - Messages utilisateur : alignes a droite, fond bleu, texte blanc
- *   - Messages assistant   : alignes a gauche, fond blanc, icone bot Dixipolis
- *   - Etat de chargement   : animation de trois points pulses
- *   - Sources              : cartes cliquables affichees sous le texte assistant
+ *   - Messages UTILISATEUR : alignes a droite, gradient bleu, texte blanc,
+ *     coins arrondis avec coin inferieur droit plus anguleux (rounded-br-md)
+ *   - Messages ASSISTANT  : alignes a gauche, carte blanche avec bordure
+ *     subtile, petit avatar Dixipolis a gauche, coins arrondis avec coin
+ *     inferieur gauche plus anguleux (rounded-bl-md)
+ *   - Etat CHARGEMENT     : animation de trois points pulses (.loading-dot)
+ *   - SOURCES             : cartes SourceCard affichees sous le texte assistant
  *
- * Le composant applique automatiquement l'animation CSS "animate-fade-in"
- * (definie dans globals.css) pour une apparition fluide dans le flux de chat.
+ * Le composant applique l'animation CSS "animate-fade-in-up" (definie dans
+ * globals.css) pour une apparition fluide dans le flux de chat.
+ *
+ * Regles de style :
+ *   - Toutes les couleurs utilisent des variables CSS via style={{ }}
+ *   - Pas de couleurs Tailwind brutes
+ *   - Le gradient utilisateur utilise la classe .gradient-primary de globals.css
  *
  * Utilisation :
  *   <MessageBubble message={chatMessage} />
@@ -20,7 +28,7 @@
 
 import { cn } from "@/lib/utils";
 import type { ChatMessage } from "@/types";
-import { Bot, User } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import SourceCard from "@/components/prompt/SourceCard";
 
 /* --------------------------------------------------------------------------
@@ -44,71 +52,82 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        /* Animation d'entree : apparition progressive */
-        "animate-fade-in",
-
+        /* Animation d'entree : apparition progressive depuis le bas */
+        "animate-fade-in-up",
         /* Alignement : droite pour l'utilisateur, gauche pour l'assistant */
         "flex gap-3",
         isUser ? "justify-end" : "justify-start"
       )}
     >
       {/* ================================================================
-       * AVATAR DE L'ASSISTANT (affiché uniquement pour les messages bot)
-       * Icone circulaire bleue avec le logo bot.
+       * AVATAR DE L'ASSISTANT — petit cercle avec icone Dixipolis
+       *
+       * Affiche uniquement pour les messages du bot. Cercle avec gradient
+       * primaire et icone Sparkles en blanc.
        * ================================================================ */}
       {!isUser && (
         <div
-          className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            "bg-[var(--color-primary)] text-white",
-            "mt-1"
-          )}
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full mt-1"
+          style={{
+            background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)",
+          }}
           aria-hidden="true"
         >
-          <Bot className="h-4 w-4" />
+          <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--color-text-on-primary)" }} />
         </div>
       )}
 
       {/* ================================================================
        * CONTENU DU MESSAGE
+       *
        * Structure verticale : bulle de texte + eventuelles sources.
+       * Largeur maximale limitee pour la lisibilite.
        * ================================================================ */}
       <div
         className={cn(
           "flex flex-col",
-          /* Largeur maximale pour eviter que la bulle s'etende sur toute la ligne */
           "max-w-[85%] sm:max-w-[75%] lg:max-w-[65%]"
         )}
       >
         {/* ---- Bulle de texte ---- */}
         <div
           className={cn(
-            /* Padding et arrondi de la bulle */
-            "rounded-2xl px-4 py-2.5",
-
-            /* Styles conditionnels selon le role */
-            isUser
-              ? /* Message utilisateur : fond bleu, texte blanc, coin inferieur droit plus anguleux */
-                cn(
-                  "bg-[var(--color-primary)] text-white",
-                  "rounded-br-md"
-                )
-              : /* Message assistant : fond blanc, texte sombre, bordure subtile, coin inferieur gauche anguleux */
-                cn(
-                  "bg-[var(--color-bg-card)] text-[var(--color-text-primary)]",
-                  "border border-[var(--color-border)]",
-                  "shadow-[var(--shadow-sm)]",
-                  "rounded-bl-md"
-                )
+            "rounded-2xl px-4 py-3",
+            isUser ? "rounded-br-md" : "rounded-bl-md"
           )}
+          style={
+            isUser
+              ? {
+                  /* Message utilisateur : gradient bleu, texte blanc */
+                  background: "linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-700) 100%)",
+                  color: "var(--color-text-on-primary)",
+                  boxShadow: "0 2px 8px rgb(37 99 235 / 0.2)",
+                }
+              : {
+                  /* Message assistant : fond blanc, texte sombre, bordure subtile */
+                  backgroundColor: "var(--color-bg-card)",
+                  color: "var(--color-text-primary)",
+                  border: "1px solid var(--color-border)",
+                  boxShadow: "var(--shadow-sm)",
+                }
+          }
         >
-          {/* ---- Contenu : texte ou animation de chargement ---- */}
+          {/* Contenu : texte ou animation de chargement */}
           {isLoading ? (
             /* Animation de chargement : trois points qui pulsent */
             <div className="flex items-center gap-1.5 py-1" aria-label="Chargement de la reponse">
-              <span className="loading-dot h-2 w-2 rounded-full bg-[var(--color-text-muted)]" />
-              <span className="loading-dot h-2 w-2 rounded-full bg-[var(--color-text-muted)]" />
-              <span className="loading-dot h-2 w-2 rounded-full bg-[var(--color-text-muted)]" />
+              <span
+                className="loading-dot h-2 w-2 rounded-full"
+                style={{ backgroundColor: "var(--color-text-muted)" }}
+              />
+              <span
+                className="loading-dot h-2 w-2 rounded-full"
+                style={{ backgroundColor: "var(--color-text-muted)" }}
+              />
+              <span
+                className="loading-dot h-2 w-2 rounded-full"
+                style={{ backgroundColor: "var(--color-text-muted)" }}
+              />
             </div>
           ) : (
             /* Texte du message avec gestion des sauts de ligne */
@@ -119,19 +138,22 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
         </div>
 
         {/* ================================================================
-         * SECTION SOURCES (uniquement pour les messages assistant avec sources)
+         * SECTION SOURCES — Uniquement pour les messages assistant avec sources
          *
          * Affiche les extraits de discours cites en reference sous la bulle,
-         * sous forme de cartes cliquables menant aux videos horodatees.
+         * sous forme de cartes cliquables (SourceCard) menant aux videos.
          * ================================================================ */}
         {!isUser && !isLoading && message.sources && message.sources.length > 0 && (
-          <div className="mt-2.5 space-y-1.5">
+          <div className="mt-3 space-y-2">
             {/* Titre de la section sources */}
-            <p className="text-xs font-medium text-[var(--color-text-muted)] ml-1">
+            <p
+              className="text-xs font-medium ml-1"
+              style={{ color: "var(--color-text-muted)" }}
+            >
               Sources ({message.sources.length})
             </p>
 
-            {/* Grille de cartes sources : une colonne sur mobile, deux sur desktop */}
+            {/* Grille de cartes sources : 1 colonne mobile, 2 colonnes desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {message.sources.map((excerpt) => (
                 <SourceCard key={excerpt.id} excerpt={excerpt} />
@@ -140,24 +162,6 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           </div>
         )}
       </div>
-
-      {/* ================================================================
-       * AVATAR DE L'UTILISATEUR (affiché uniquement pour les messages user)
-       * Icone circulaire gris clair avec silhouette utilisateur.
-       * ================================================================ */}
-      {isUser && (
-        <div
-          className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            "bg-[var(--color-bg-section)] border border-[var(--color-border)]",
-            "text-[var(--color-text-secondary)]",
-            "mt-1"
-          )}
-          aria-hidden="true"
-        >
-          <User className="h-4 w-4" />
-        </div>
-      )}
     </div>
   );
 }

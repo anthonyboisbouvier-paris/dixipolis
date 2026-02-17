@@ -9,49 +9,45 @@
  *
  * Architecture de mise en page :
  *   - La page occupe 100% de la hauteur du viewport MOINS la hauteur du header
- *     (64px, definie par --header-height dans globals.css)
+ *     (72px, definie par --header-height dans globals.css)
  *   - Aucun PageWrapper n'est utilise : l'interface de chat gere elle-meme
  *     son scroll interne et sa disposition en plein ecran
  *   - Le composant ChatInterface remplit tout l'espace disponible
+ *   - PAS de padding-top supplementaire (gere par le root layout)
  *
  * Metadonnees SEO :
- *   - Titre et description optimises pour le referencement
+ *   - Exportees dans le fichier layout.tsx voisin (car ce composant est "use client")
  *   - Le contenu dynamique du chat n'est pas indexe (cote client)
  *
  * Utilisation :
  *   Route : /prompt
- *   Rendu : Server component (page) -> Client component (ChatInterface)
+ *   Rendu : "use client" page -> ChatInterface
  * ============================================================================= */
 
-import type { Metadata } from "next";
-import ChatInterface from "@/components/prompt/ChatInterface";
+"use client";
 
-/* --------------------------------------------------------------------------
- * METADONNEES SEO — Optimisation pour les moteurs de recherche
- * -------------------------------------------------------------------------- */
-export const metadata: Metadata = {
-  title: "Prompt — Interrogez le discours politique | Dixipolis",
-  description:
-    "Posez vos questions sur les declarations des politiciens francais. " +
-    "Dixipolis retrouve les verbatims exacts avec sources video horodatees " +
-    "grace a l'intelligence artificielle.",
-};
+import ChatInterface from "@/components/prompt/ChatInterface";
 
 /* --------------------------------------------------------------------------
  * PAGE PROMPT
  *
  * Conteneur plein ecran ajuste a la hauteur du viewport moins le header.
  * Le style utilise calc() avec la variable CSS --header-height pour garantir
- * une coherence parfaite avec le composant de navigation.
+ * une coherence parfaite avec le composant de navigation fixe.
+ *
+ * IMPORTANT :
+ *   - Pas de padding-top : le root layout l'applique deja sur <main>
+ *   - Pas de PageWrapper : le chat est plein-ecran (full-width)
+ *   - Pas de Footer visible : l'interface chat occupe toute la hauteur
  * -------------------------------------------------------------------------- */
 export default function PromptPage() {
   return (
-    <main
+    <div
       className="w-full"
-      style={{ height: "calc(100vh - var(--header-height, 64px))" }}
+      style={{ height: "calc(100vh - var(--header-height, 72px))" }}
     >
       {/* Interface de chat — composant client interactif */}
       <ChatInterface />
-    </main>
+    </div>
   );
 }

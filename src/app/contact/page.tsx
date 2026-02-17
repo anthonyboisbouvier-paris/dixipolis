@@ -5,6 +5,9 @@
  * Composant client ("use client") car elle utilise useState pour gerer
  * l'etat du formulaire et l'affichage du message de succes.
  *
+ * Redesign premium avec layout a deux colonnes et design soigne.
+ * Les metadonnees SEO sont exportees dans le layout.tsx frere.
+ *
  * Structure de la page :
  *   1. Titre principal et introduction
  *   2. Grille a deux colonnes (desktop) :
@@ -19,15 +22,15 @@
  *   - Sujets disponibles : Question, Partenariat, Support technique, Autre
  *
  * Conventions :
- *   - Variables CSS du theme Dixipolis
+ *   - Variables CSS du theme Dixipolis via style={{ }}
+ *   - Pas de Tailwind brut pour les couleurs
  *   - Classe utilitaire "card" pour les panneaux blancs
  *   - Icones lucide-react pour les informations de contact
  *   - Texte en francais
  *
  * Accessibilite :
  *   - Labels explicites lies aux champs via htmlFor/id
- *   - Messages d'erreur avec aria-describedby (optionnel, non implemente ici
- *     pour simplifier mais recommande en production)
+ *   - Messages d'erreur accessibles
  *   - Focus visible natif sur tous les elements interactifs
  * ============================================================================= */
 
@@ -36,12 +39,14 @@
 import { useState } from "react";
 import {
   Mail,
-  Phone,
   MapPin,
   Send,
   Linkedin,
   Twitter,
   ExternalLink,
+  CheckCircle2,
+  Clock,
+  MessageSquare,
 } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import { cn } from "@/lib/utils";
@@ -74,6 +79,7 @@ const SUBJECT_OPTIONS = [
   { value: "question", label: "Question generale" },
   { value: "partenariat", label: "Partenariat" },
   { value: "support", label: "Support technique" },
+  { value: "presse", label: "Presse & medias" },
   { value: "autre", label: "Autre" },
 ] as const;
 
@@ -229,24 +235,53 @@ export default function ContactPage() {
   }
 
   /* -----------------------------------------------------------------------
+   * Styles communs pour les champs de formulaire
+   * Definis ici pour eviter la repetition dans le JSX
+   * ----------------------------------------------------------------------- */
+  const inputBaseStyle: React.CSSProperties = {
+    color: "var(--color-text-primary)",
+    borderColor: "var(--color-border)",
+    backgroundColor: "var(--color-bg-card)",
+  };
+
+  const inputErrorStyle: React.CSSProperties = {
+    color: "var(--color-text-primary)",
+    borderColor: "var(--color-error)",
+    backgroundColor: "var(--color-error-light)",
+  };
+
+  /* -----------------------------------------------------------------------
    * RENDU JSX
    * ----------------------------------------------------------------------- */
   return (
-    <PageWrapper className="py-12 md:py-16 lg:py-20">
+    <PageWrapper>
       {/* ================================================================
        * EN-TETE — Titre et introduction
        * ================================================================ */}
       <section className="text-center mb-12 md:mb-16" aria-label="Introduction">
         {/* Badge contextuel */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)]">
-          <Mail className="h-4 w-4" aria-hidden="true" />
+        <div
+          className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
+          style={{
+            backgroundColor: "var(--color-bg-card)",
+            color: "var(--color-text-secondary)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <MessageSquare className="h-4 w-4" aria-hidden="true" />
           Nous contacter
         </div>
 
-        <h1 className="mb-4 text-4xl font-bold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-5xl">
-          Contact
+        <h1
+          className="mb-4 text-4xl font-bold leading-tight tracking-tight sm:text-5xl"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          Contactez-nous
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-[var(--color-text-secondary)]">
+        <p
+          className="mx-auto max-w-2xl text-lg"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
           Une question, une proposition de partenariat ou un besoin
           d&apos;assistance ? N&apos;hesitez pas a nous ecrire. Nous vous
           repondrons dans les meilleurs delais.
@@ -265,23 +300,15 @@ export default function ContactPage() {
           <div className="card p-6 sm:p-8 md:p-10">
             {/* Message de succes apres soumission */}
             {isSubmitted && (
-              <div className="mb-6 flex items-center gap-3 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-[var(--color-success)]">
-                <div className="flex-shrink-0 h-5 w-5 rounded-full bg-[var(--color-success)] flex items-center justify-center">
-                  <svg
-                    className="h-3 w-3 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                </div>
+              <div
+                className="mb-6 flex items-center gap-3 rounded-lg px-4 py-3 text-sm"
+                style={{
+                  backgroundColor: "var(--color-success-light)",
+                  color: "var(--color-success)",
+                  border: "1px solid var(--color-success)",
+                }}
+              >
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
                 <p>
                   Votre message a bien ete envoye. Nous vous repondrons dans les
                   plus brefs delais.
@@ -298,9 +325,11 @@ export default function ContactPage() {
                 <div>
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    Nom complet <span className="text-[var(--color-error)]">*</span>
+                    Nom complet{" "}
+                    <span style={{ color: "var(--color-error)" }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -309,16 +338,18 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Votre nom et prenom"
-                    className={cn(
-                      "w-full rounded-lg border px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] transition-colors duration-200",
-                      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent",
-                      errors.name
-                        ? "border-[var(--color-error)] bg-red-50"
-                        : "border-[var(--color-border)] bg-white hover:border-[var(--color-text-muted)]"
-                    )}
+                    className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 focus:outline-none focus:ring-2"
+                    style={{
+                      ...(errors.name ? inputErrorStyle : inputBaseStyle),
+                      // @ts-expect-error -- CSS custom properties dans style
+                      "--tw-ring-color": "var(--color-primary)",
+                    }}
                   />
                   {errors.name && (
-                    <p className="mt-1.5 text-xs text-[var(--color-error)]">
+                    <p
+                      className="mt-1.5 text-xs"
+                      style={{ color: "var(--color-error)" }}
+                    >
                       {errors.name}
                     </p>
                   )}
@@ -330,9 +361,11 @@ export default function ContactPage() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    Adresse email <span className="text-[var(--color-error)]">*</span>
+                    Adresse email{" "}
+                    <span style={{ color: "var(--color-error)" }}>*</span>
                   </label>
                   <input
                     type="email"
@@ -341,16 +374,18 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="votre@email.fr"
-                    className={cn(
-                      "w-full rounded-lg border px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] transition-colors duration-200",
-                      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent",
-                      errors.email
-                        ? "border-[var(--color-error)] bg-red-50"
-                        : "border-[var(--color-border)] bg-white hover:border-[var(--color-text-muted)]"
-                    )}
+                    className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 focus:outline-none focus:ring-2"
+                    style={{
+                      ...(errors.email ? inputErrorStyle : inputBaseStyle),
+                      // @ts-expect-error -- CSS custom properties dans style
+                      "--tw-ring-color": "var(--color-primary)",
+                    }}
                   />
                   {errors.email && (
-                    <p className="mt-1.5 text-xs text-[var(--color-error)]">
+                    <p
+                      className="mt-1.5 text-xs"
+                      style={{ color: "var(--color-error)" }}
+                    >
                       {errors.email}
                     </p>
                   )}
@@ -362,24 +397,27 @@ export default function ContactPage() {
                 <div>
                   <label
                     htmlFor="subject"
-                    className="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    Sujet <span className="text-[var(--color-error)]">*</span>
+                    Sujet{" "}
+                    <span style={{ color: "var(--color-error)" }}>*</span>
                   </label>
                   <select
                     id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className={cn(
-                      "w-full rounded-lg border px-4 py-3 text-sm text-[var(--color-text-primary)] transition-colors duration-200 appearance-none",
-                      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent",
-                      /* Style du placeholder quand aucune option n'est selectionnee */
-                      !formData.subject && "text-[var(--color-text-muted)]",
-                      errors.subject
-                        ? "border-[var(--color-error)] bg-red-50"
-                        : "border-[var(--color-border)] bg-white hover:border-[var(--color-text-muted)]"
-                    )}
+                    className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 appearance-none focus:outline-none focus:ring-2"
+                    style={{
+                      ...(errors.subject ? inputErrorStyle : inputBaseStyle),
+                      /* Couleur du texte placeholder quand rien n'est selectionne */
+                      color: formData.subject
+                        ? "var(--color-text-primary)"
+                        : "var(--color-text-muted)",
+                      // @ts-expect-error -- CSS custom properties dans style
+                      "--tw-ring-color": "var(--color-primary)",
+                    }}
                   >
                     {SUBJECT_OPTIONS.map((option) => (
                       <option
@@ -392,7 +430,10 @@ export default function ContactPage() {
                     ))}
                   </select>
                   {errors.subject && (
-                    <p className="mt-1.5 text-xs text-[var(--color-error)]">
+                    <p
+                      className="mt-1.5 text-xs"
+                      style={{ color: "var(--color-error)" }}
+                    >
                       {errors.subject}
                     </p>
                   )}
@@ -404,9 +445,11 @@ export default function ContactPage() {
                 <div>
                   <label
                     htmlFor="message"
-                    className="block text-sm font-medium text-[var(--color-text-primary)] mb-2"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    Message <span className="text-[var(--color-error)]">*</span>
+                    Message{" "}
+                    <span style={{ color: "var(--color-error)" }}>*</span>
                   </label>
                   <textarea
                     id="message"
@@ -415,16 +458,18 @@ export default function ContactPage() {
                     onChange={handleChange}
                     placeholder="Decrivez votre demande en detail..."
                     rows={6}
-                    className={cn(
-                      "w-full rounded-lg border px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] transition-colors duration-200 resize-y",
-                      "focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent",
-                      errors.message
-                        ? "border-[var(--color-error)] bg-red-50"
-                        : "border-[var(--color-border)] bg-white hover:border-[var(--color-text-muted)]"
-                    )}
+                    className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 resize-y focus:outline-none focus:ring-2"
+                    style={{
+                      ...(errors.message ? inputErrorStyle : inputBaseStyle),
+                      // @ts-expect-error -- CSS custom properties dans style
+                      "--tw-ring-color": "var(--color-primary)",
+                    }}
                   />
                   {errors.message && (
-                    <p className="mt-1.5 text-xs text-[var(--color-error)]">
+                    <p
+                      className="mt-1.5 text-xs"
+                      style={{ color: "var(--color-error)" }}
+                    >
                       {errors.message}
                     </p>
                   )}
@@ -432,23 +477,27 @@ export default function ContactPage() {
 
                 {/* --------------------------------------------------------
                  * Bouton de soumission
-                 * Desactive pendant le chargement pour eviter les doubles
-                 * soumissions.
+                 * Utilise la classe utilitaire btn-primary du design system.
+                 * Desactive pendant le chargement.
                  * -------------------------------------------------------- */}
                 <button
                   type="submit"
                   disabled={isLoading}
                   className={cn(
-                    "inline-flex items-center justify-center gap-2 w-full sm:w-auto rounded-lg px-8 py-3 text-sm font-semibold text-white transition-all duration-200",
-                    isLoading
-                      ? "bg-[var(--color-primary)]/70 cursor-not-allowed"
-                      : "bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] hover:shadow-md active:scale-[0.98]"
+                    "btn-primary inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-3",
+                    isLoading && "opacity-70 cursor-not-allowed"
                   )}
                 >
                   {isLoading ? (
                     <>
                       {/* Spinner de chargement */}
-                      <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <div
+                        className="h-4 w-4 border-2 rounded-full animate-spin"
+                        style={{
+                          borderColor: "rgba(255,255,255,0.3)",
+                          borderTopColor: "#ffffff",
+                        }}
+                      />
                       Envoi en cours...
                     </>
                   ) : (
@@ -469,33 +518,47 @@ export default function ContactPage() {
         <div className="lg:col-span-1 space-y-6">
           {/* Carte : Coordonnees */}
           <div className="card p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-5">
+            <h2
+              className="text-lg font-bold mb-5"
+              style={{ color: "var(--color-text-primary)" }}
+            >
               Nos coordonnees
             </h2>
 
             <div className="space-y-5">
               {CONTACT_INFO.map((info) => (
                 <div key={info.label} className="flex items-start gap-4">
-                  {/* Icone dans un cercle colore */}
-                  <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-lg bg-[var(--color-primary-light)]">
+                  {/* Icone dans un carre arrondi colore */}
+                  <div
+                    className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-lg"
+                    style={{ backgroundColor: "var(--color-primary-light)" }}
+                  >
                     <info.icon
-                      className="h-5 w-5 text-[var(--color-primary)]"
+                      className="h-5 w-5"
+                      style={{ color: "var(--color-primary)" }}
                       aria-hidden="true"
                     />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)] mb-0.5">
+                    <p
+                      className="text-xs font-semibold uppercase tracking-wider mb-0.5"
+                      style={{ color: "var(--color-text-muted)" }}
+                    >
                       {info.label}
                     </p>
                     {info.href ? (
                       <a
                         href={info.href}
-                        className="text-sm text-[var(--color-text-primary)] hover:text-[var(--color-primary)] transition-colors duration-200"
+                        className="text-sm transition-colors duration-200"
+                        style={{ color: "var(--color-text-primary)" }}
                       >
                         {info.value}
                       </a>
                     ) : (
-                      <p className="text-sm text-[var(--color-text-primary)]">
+                      <p
+                        className="text-sm"
+                        style={{ color: "var(--color-text-primary)" }}
+                      >
                         {info.value}
                       </p>
                     )}
@@ -507,7 +570,10 @@ export default function ContactPage() {
 
           {/* Carte : Reseaux sociaux */}
           <div className="card p-6 sm:p-8">
-            <h2 className="text-lg font-bold text-[var(--color-text-primary)] mb-5">
+            <h2
+              className="text-lg font-bold mb-5"
+              style={{ color: "var(--color-text-primary)" }}
+            >
               Suivez-nous
             </h2>
 
@@ -518,13 +584,18 @@ export default function ContactPage() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-lg border border-[var(--color-border)] px-4 py-3 text-sm text-[var(--color-text-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors duration-200"
+                  className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm transition-colors duration-200"
+                  style={{
+                    color: "var(--color-text-primary)",
+                    border: "1px solid var(--color-border)",
+                  }}
                   aria-label={`Suivre Dixipolis sur ${social.label}`}
                 >
                   <social.icon className="h-4 w-4" aria-hidden="true" />
                   <span className="flex-1">{social.label}</span>
                   <ExternalLink
-                    className="h-3.5 w-3.5 text-[var(--color-text-muted)]"
+                    className="h-3.5 w-3.5"
+                    style={{ color: "var(--color-text-muted)" }}
                     aria-hidden="true"
                   />
                 </a>
@@ -532,12 +603,31 @@ export default function ContactPage() {
             </div>
           </div>
 
-          {/* Carte : Delai de reponse */}
-          <div className="card p-6 sm:p-8 bg-[var(--color-primary-light)] border-[var(--color-primary)]/20">
-            <h3 className="text-sm font-bold text-[var(--color-primary)] mb-2">
-              Delai de reponse
-            </h3>
-            <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+          {/* Carte : Delai de reponse — avec fond accent */}
+          <div
+            className="card p-6 sm:p-8"
+            style={{
+              backgroundColor: "var(--color-primary-light)",
+              borderColor: "var(--color-primary-200)",
+            }}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Clock
+                className="h-4 w-4"
+                style={{ color: "var(--color-primary)" }}
+                aria-hidden="true"
+              />
+              <h3
+                className="text-sm font-bold"
+                style={{ color: "var(--color-primary)" }}
+              >
+                Delai de reponse
+              </h3>
+            </div>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
               Nous nous engageons a repondre a toutes les demandes dans un
               delai de 48 heures ouvrees. Pour les demandes urgentes de
               support technique, veuillez le preciser dans votre message.

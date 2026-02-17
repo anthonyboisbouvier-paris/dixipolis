@@ -3,20 +3,28 @@
  *
  * Tableau de bord du compte utilisateur (mock) de Dixipolis.
  *
- * Sections :
+ * Sections (onglets) :
  *   1. Profil       — Informations personnelles (nom, email) en lecture seule
- *   2. Abonnement   — Plan actuel avec lien vers /tarifs
+ *   2. Abonnement   — Plan actuel avec lien vers /tarifs pour changer
  *   3. Recherches   — Liste de recherches sauvegardees (donnees fictives)
  *   4. Alertes      — Toggles d'alertes email (donnees fictives)
- *   5. Politiciens  — Liste de politiciens suivis avec liens vers leurs fiches
  *
- * Ce composant est entierement front-end avec des donnees fictives.
- * Il sera connecte a Supabase une fois l'authentification en place.
+ * Points d'attention :
+ *   - Les politiciens suivis utilisent /politicien/ (singulier) dans les liens
+ *   - Bouton "Se deconnecter" en bas de page
+ *   - Toutes les couleurs via CSS variables (pas de Tailwind raw colors)
+ *   - Ce composant est entierement front-end avec des donnees fictives
+ *   - Il sera connecte a Supabase une fois l'authentification en place
  *
  * Design :
- *   - Fond gris clair, cartes blanches avec ombre legere
- *   - Navigation par onglets horizontaux
+ *   - Fond page, cartes blanches avec ombre legere
+ *   - Navigation par onglets horizontaux style pill
  *   - Palette Dixipolis (bleu primaire, gris, blanc)
+ *
+ * Note :
+ *   - "use client" car utilise useState pour les onglets et les toggles
+ *   - Les metadata SEO sont exportees dans layout.tsx (Server Component)
+ *   - Pas de pt-offset — le root layout gere le padding pour le header
  * ============================================================================= */
 
 "use client";
@@ -33,6 +41,7 @@ import {
   LogOut,
   Shield,
   CreditCard,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -93,8 +102,10 @@ const MOCK_FOLLOWED_POLITICIANS = [
 
 /* --------------------------------------------------------------------------
  * ONGLETS — Definition des sections du tableau de bord
+ *
+ * Chaque onglet a un id unique, un label visible et une icone Lucide.
  * -------------------------------------------------------------------------- */
-type TabId = "profil" | "abonnement" | "recherches" | "alertes" | "politiciens";
+type TabId = "profil" | "abonnement" | "recherches" | "alertes";
 
 interface TabDefinition {
   id: TabId;
@@ -105,9 +116,8 @@ interface TabDefinition {
 const TABS: TabDefinition[] = [
   { id: "profil", label: "Profil", icon: User },
   { id: "abonnement", label: "Abonnement", icon: CreditCard },
-  { id: "recherches", label: "Recherches sauvegardees", icon: Bookmark },
+  { id: "recherches", label: "Recherches", icon: Bookmark },
   { id: "alertes", label: "Alertes", icon: Bell },
-  { id: "politiciens", label: "Politiciens suivis", icon: Shield },
 ];
 
 /* --------------------------------------------------------------------------
@@ -125,12 +135,13 @@ export default function ComptePage() {
   /* ---- Rendu ---- */
   return (
     <main
-      className="min-h-screen px-4 py-10 sm:py-14"
+      className="min-h-[calc(100vh-72px)] px-4 py-10 sm:py-14"
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       <div className="mx-auto max-w-3xl">
         {/* ==============================================================
          * En-tete de la page
+         * Titre "Mon Compte" avec sous-titre et lien retour accueil.
          * ============================================================== */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -150,7 +161,7 @@ export default function ComptePage() {
           {/* Lien de retour a l'accueil */}
           <Link
             href="/"
-            className="text-sm font-medium transition-colors hover:underline"
+            className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline"
             style={{ color: "var(--color-primary)" }}
           >
             Retour a l&apos;accueil
@@ -159,9 +170,10 @@ export default function ComptePage() {
 
         {/* ==============================================================
          * Carte d'information utilisateur (resume)
+         * Avatar avec initiales, nom complet, email et badge du plan.
          * ============================================================== */}
         <div className="card mb-8 flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center">
-          {/* Avatar placeholder */}
+          {/* Avatar placeholder avec initiales */}
           <div
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-bold"
             style={{
@@ -173,7 +185,7 @@ export default function ComptePage() {
             {MOCK_USER.firstName[0]}
             {MOCK_USER.lastName[0]}
           </div>
-          {/* Informations */}
+          {/* Informations textuelles */}
           <div className="flex-1">
             <p
               className="text-lg font-semibold"
@@ -188,12 +200,21 @@ export default function ComptePage() {
               {MOCK_USER.email}
             </p>
           </div>
-          {/* Badge plan */}
-          <span className="theme-badge">{MOCK_USER.plan}</span>
+          {/* Badge plan actuel */}
+          <span
+            className="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+            style={{
+              backgroundColor: "var(--color-primary-light)",
+              color: "var(--color-primary)",
+            }}
+          >
+            {MOCK_USER.plan}
+          </span>
         </div>
 
         {/* ==============================================================
          * Navigation par onglets
+         * Style pill avec fond section et onglet actif en carte blanche.
          * ============================================================== */}
         <nav
           className="mb-6 flex gap-1 overflow-x-auto rounded-lg p-1"
@@ -213,7 +234,7 @@ export default function ComptePage() {
                 aria-controls={`panel-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all",
+                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
                   "focus:outline-none focus:ring-2",
                   isActive ? "shadow-sm" : "hover:opacity-80"
                 )}
@@ -235,6 +256,7 @@ export default function ComptePage() {
 
         {/* ==============================================================
          * Contenu de l'onglet actif
+         * Chaque onglet affiche une section specifique du tableau de bord.
          * ============================================================== */}
         <div
           role="tabpanel"
@@ -243,6 +265,8 @@ export default function ComptePage() {
         >
           {/* --------------------------------------------------------
            * ONGLET : Profil
+           * Affiche les informations personnelles en lecture seule.
+           * Les champs sont pre-remplis avec les donnees mock.
            * -------------------------------------------------------- */}
           {activeTab === "profil" && (
             <section className="card p-6 sm:p-8" aria-label="Profil">
@@ -321,7 +345,7 @@ export default function ComptePage() {
                   </div>
                 </div>
 
-                {/* Email (desactive) */}
+                {/* Email (desactive — non modifiable) */}
                 <div>
                   <label
                     htmlFor="profile-email"
@@ -377,6 +401,7 @@ export default function ComptePage() {
 
           {/* --------------------------------------------------------
            * ONGLET : Abonnement
+           * Carte du plan actuel avec details et lien vers /tarifs.
            * -------------------------------------------------------- */}
           {activeTab === "abonnement" && (
             <section className="card p-6 sm:p-8" aria-label="Abonnement">
@@ -392,12 +417,12 @@ export default function ComptePage() {
                 Mon abonnement
               </h2>
 
-              {/* Carte du plan actuel */}
+              {/* Carte du plan actuel avec bordure primaire */}
               <div
-                className="rounded-lg border p-5"
+                className="rounded-lg border-2 p-5"
                 style={{
                   borderColor: "var(--color-primary)",
-                  backgroundColor: "var(--color-primary-50)",
+                  backgroundColor: "var(--color-primary-light)",
                 }}
               >
                 <div className="flex items-center justify-between">
@@ -423,7 +448,7 @@ export default function ComptePage() {
                   />
                 </div>
 
-                {/* Details du plan */}
+                {/* Details des avantages du plan */}
                 <ul
                   className="mt-4 space-y-1 text-sm"
                   style={{ color: "var(--color-text-secondary)" }}
@@ -435,17 +460,18 @@ export default function ComptePage() {
                 </ul>
               </div>
 
-              {/* Lien pour changer d'abonnement */}
+              {/* Lien pour changer d'abonnement — pointe vers /tarifs */}
               <div className="mt-6">
                 <Link
                   href="/tarifs"
-                  className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors hover:opacity-80"
+                  className="inline-flex items-center gap-2 rounded-lg border-2 px-5 py-2.5 text-sm font-semibold transition-opacity hover:opacity-80"
                   style={{
                     borderColor: "var(--color-primary)",
                     color: "var(--color-primary)",
                   }}
                 >
                   Changer d&apos;abonnement
+                  <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </section>
@@ -453,71 +479,154 @@ export default function ComptePage() {
 
           {/* --------------------------------------------------------
            * ONGLET : Recherches sauvegardees
+           * Liste des recherches avec date et bouton "Relancer".
+           * Inclut egalement la sous-section des politiciens suivis.
            * -------------------------------------------------------- */}
           {activeTab === "recherches" && (
-            <section
-              className="card p-6 sm:p-8"
-              aria-label="Recherches sauvegardees"
-            >
-              <h2
-                className="mb-6 flex items-center gap-2 text-lg font-semibold"
-                style={{ color: "var(--color-text-primary)" }}
+            <div className="space-y-6">
+              {/* Section recherches sauvegardees */}
+              <section
+                className="card p-6 sm:p-8"
+                aria-label="Recherches sauvegardees"
               >
-                <Bookmark
-                  size={20}
-                  style={{ color: "var(--color-primary)" }}
-                  aria-hidden="true"
-                />
-                Recherches sauvegardees
-              </h2>
+                <h2
+                  className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  <Bookmark
+                    size={20}
+                    style={{ color: "var(--color-primary)" }}
+                    aria-hidden="true"
+                  />
+                  Recherches sauvegardees
+                </h2>
 
-              {/* Liste des recherches */}
-              <ul className="divide-y" style={{ borderColor: "var(--color-border)" }}>
-                {MOCK_SAVED_SEARCHES.map((search) => (
-                  <li
-                    key={search.id}
-                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Search
-                        size={16}
-                        style={{ color: "var(--color-text-muted)" }}
-                        aria-hidden="true"
-                      />
-                      <div>
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: "var(--color-text-primary)" }}
-                        >
-                          {search.label}
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          Sauvegardee le {search.date}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Bouton relancer la recherche (mock) */}
-                    <button
-                      type="button"
-                      className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
-                      style={{
-                        backgroundColor: "var(--color-primary-light)",
-                        color: "var(--color-primary)",
-                      }}
+                {/* Liste des recherches */}
+                <ul
+                  className="divide-y"
+                  style={{ borderColor: "var(--color-border-light)" }}
+                >
+                  {MOCK_SAVED_SEARCHES.map((search) => (
+                    <li
+                      key={search.id}
+                      className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
                     >
-                      Relancer
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
+                      <div className="flex items-center gap-3">
+                        <Search
+                          size={16}
+                          style={{ color: "var(--color-text-muted)" }}
+                          aria-hidden="true"
+                        />
+                        <div>
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: "var(--color-text-primary)" }}
+                          >
+                            {search.label}
+                          </p>
+                          <p
+                            className="text-xs"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            Sauvegardee le {search.date}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Bouton relancer la recherche (mock) */}
+                      <button
+                        type="button"
+                        className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
+                        style={{
+                          backgroundColor: "var(--color-primary-light)",
+                          color: "var(--color-primary)",
+                        }}
+                      >
+                        Relancer
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Section politiciens suivis */}
+              <section
+                className="card p-6 sm:p-8"
+                aria-label="Politiciens suivis"
+              >
+                <h2
+                  className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  <Shield
+                    size={20}
+                    style={{ color: "var(--color-primary)" }}
+                    aria-hidden="true"
+                  />
+                  Politiciens suivis
+                </h2>
+
+                {/* Liste des politiciens avec avatar initiales */}
+                <ul
+                  className="divide-y"
+                  style={{ borderColor: "var(--color-border-light)" }}
+                >
+                  {MOCK_FOLLOWED_POLITICIANS.map((politician) => (
+                    <li
+                      key={politician.id}
+                      className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Avatar placeholder avec initiales */}
+                        <div
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                          style={{
+                            backgroundColor: "var(--color-primary-light)",
+                            color: "var(--color-primary)",
+                          }}
+                          aria-hidden="true"
+                        >
+                          {politician.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </div>
+                        <div>
+                          <p
+                            className="text-sm font-medium"
+                            style={{ color: "var(--color-text-primary)" }}
+                          >
+                            {politician.name}
+                          </p>
+                          <p
+                            className="text-xs"
+                            style={{ color: "var(--color-text-muted)" }}
+                          >
+                            {politician.party}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Lien vers la fiche du politicien — utilise /politicien/ (singulier) */}
+                      <Link
+                        href={`/politicien/${politician.slug}`}
+                        className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
+                        style={{
+                          backgroundColor: "var(--color-primary-light)",
+                          color: "var(--color-primary)",
+                        }}
+                      >
+                        Voir la fiche
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </div>
           )}
 
           {/* --------------------------------------------------------
            * ONGLET : Alertes
+           * Toggles d'alertes email pour differents types de notifications.
+           * Chaque alerte a un label, une description et un switch toggle.
            * -------------------------------------------------------- */}
           {activeTab === "alertes" && (
             <section className="card p-6 sm:p-8" aria-label="Alertes email">
@@ -541,8 +650,8 @@ export default function ComptePage() {
                 email.
               </p>
 
-              {/* Liste de toggles */}
-              <div className="space-y-5">
+              {/* Liste de toggles d'alertes */}
+              <div className="space-y-4">
                 {/* Toggle : Nouvelles analyses */}
                 <AlertToggle
                   id="alert-new-analysis"
@@ -572,84 +681,12 @@ export default function ComptePage() {
               </div>
             </section>
           )}
-
-          {/* --------------------------------------------------------
-           * ONGLET : Politiciens suivis
-           * -------------------------------------------------------- */}
-          {activeTab === "politiciens" && (
-            <section
-              className="card p-6 sm:p-8"
-              aria-label="Politiciens suivis"
-            >
-              <h2
-                className="mb-6 flex items-center gap-2 text-lg font-semibold"
-                style={{ color: "var(--color-text-primary)" }}
-              >
-                <Shield
-                  size={20}
-                  style={{ color: "var(--color-primary)" }}
-                  aria-hidden="true"
-                />
-                Politiciens suivis
-              </h2>
-
-              {/* Liste des politiciens */}
-              <ul className="divide-y" style={{ borderColor: "var(--color-border)" }}>
-                {MOCK_FOLLOWED_POLITICIANS.map((politician) => (
-                  <li
-                    key={politician.id}
-                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* Avatar placeholder */}
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
-                        style={{
-                          backgroundColor: "var(--color-primary-light)",
-                          color: "var(--color-primary)",
-                        }}
-                        aria-hidden="true"
-                      >
-                        {politician.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </div>
-                      <div>
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: "var(--color-text-primary)" }}
-                        >
-                          {politician.name}
-                        </p>
-                        <p
-                          className="text-xs"
-                          style={{ color: "var(--color-text-muted)" }}
-                        >
-                          {politician.party}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Lien vers la fiche du politicien */}
-                    <Link
-                      href={`/politiciens/${politician.slug}`}
-                      className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
-                      style={{
-                        backgroundColor: "var(--color-primary-light)",
-                        color: "var(--color-primary)",
-                      }}
-                    >
-                      Voir la fiche
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
         </div>
 
         {/* ==============================================================
          * Bouton de deconnexion
+         * Positionne en bas de page, style outline rouge pour signaler
+         * l'action destructive.
          * ============================================================== */}
         <div className="mt-10 text-center">
           <button
@@ -658,7 +695,7 @@ export default function ComptePage() {
               // TODO : Remplacer par un appel Supabase Auth (signOut)
               console.log("[Dixipolis] Deconnexion demandee");
             }}
-            className="inline-flex items-center gap-2 rounded-lg border-2 px-5 py-2.5 text-sm font-semibold transition-colors hover:opacity-80"
+            className="inline-flex items-center gap-2 rounded-lg border-2 px-5 py-2.5 text-sm font-semibold transition-opacity hover:opacity-80"
             style={{
               borderColor: "var(--color-error)",
               color: "var(--color-error)",
@@ -678,8 +715,7 @@ export default function ComptePage() {
  * AlertToggle — Composant reutilisable pour un toggle d'alerte
  *
  * Affiche un interrupteur (switch) stylise avec label et description.
- * Utilise un <input type="checkbox"> natif pour l'accessibilite,
- * avec un style custom en CSS via le pattern "peer".
+ * Utilise un <button role="switch"> natif pour l'accessibilite complete.
  *
  * @param id          - Identifiant unique pour le htmlFor / aria
  * @param label       - Titre de l'alerte
@@ -705,7 +741,7 @@ function AlertToggle({
       className="flex items-start justify-between gap-4 rounded-lg border p-4"
       style={{ borderColor: "var(--color-border)" }}
     >
-      {/* Texte */}
+      {/* Texte descriptif de l'alerte */}
       <div className="flex-1">
         <label
           htmlFor={id}
@@ -722,7 +758,9 @@ function AlertToggle({
         </p>
       </div>
 
-      {/* Switch toggle personnalise */}
+      {/* Switch toggle personnalise
+       * Utilise role="switch" et aria-checked pour l'accessibilite.
+       * Le rond interne se deplace de gauche a droite selon l'etat. */}
       <button
         id={id}
         role="switch"

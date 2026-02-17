@@ -1,10 +1,11 @@
 /* =============================================================================
  * app/inscription/page.tsx
  *
- * Page d'inscription (register) de l'application Dixipolis.
+ * Page d'inscription (register) premium de l'application Dixipolis.
  *
  * Fonctionnalites :
  *   - Formulaire d'inscription complet (prenom, nom, email, mot de passe)
+ *   - Prenom et nom cote a cote sur une meme ligne (responsive)
  *   - Indicateur de force du mot de passe (Faible / Moyen / Fort)
  *   - Confirmation du mot de passe avec verification de correspondance
  *   - Case a cocher d'acceptation des CGU (obligatoire)
@@ -12,9 +13,15 @@
  *   - Pret pour une future integration Supabase Auth (submit = log console)
  *
  * Design :
- *   - Carte blanche centree sur fond gris clair (palette Dixipolis)
- *   - Bouton primaire bleu Dixipolis
- *   - Indicateur de force colore (rouge / jaune / vert)
+ *   - Carte blanche centree sur fond page (palette Dixipolis)
+ *   - Logo Dixipolis en en-tete de la carte
+ *   - Indicateur de force colore (rouge / jaune / vert) avec barre de progression
+ *   - Toutes les couleurs via CSS variables (pas de Tailwind raw colors)
+ *
+ * Note :
+ *   - "use client" car utilise useState/useMemo pour le formulaire
+ *   - Les metadata SEO sont exportees dans layout.tsx (Server Component)
+ *   - Pas de pt-offset — le root layout gere le padding pour le header
  * ============================================================================= */
 
 "use client";
@@ -66,7 +73,7 @@ export default function InscriptionPage() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [acceptCgu, setAcceptCgu] = useState(false);
 
-  /* ---- Indicateur de force du mot de passe (memoise) ---- */
+  /* ---- Indicateur de force du mot de passe (memoise pour la performance) ---- */
   const passwordStrength = useMemo(
     () => getPasswordStrength(password),
     [password]
@@ -89,7 +96,6 @@ export default function InscriptionPage() {
   /* ---- Soumission du formulaire (placeholder pour Supabase Auth) ---- */
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!isFormValid) return;
 
     // TODO : Remplacer par un appel Supabase Auth (signUp)
@@ -103,30 +109,31 @@ export default function InscriptionPage() {
   /* ---- Rendu ---- */
   return (
     <main
-      className="flex min-h-screen items-center justify-center px-4 py-12"
+      className="flex min-h-[calc(100vh-72px)] items-center justify-center px-4 py-12"
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       {/* ================================================================
        * Carte d'inscription
+       * max-w-md pour une largeur confortable, identique a la connexion.
        * ================================================================ */}
       <div
         className="card w-full max-w-md p-8 sm:p-10"
         role="region"
         aria-label="Formulaire d'inscription"
       >
-        {/* ---- En-tete : logo / nom ---- */}
+        {/* ---- En-tete : logo Dixipolis ---- */}
         <div className="mb-8 text-center">
           <Link
             href="/"
             className="inline-block"
             aria-label="Retour a l'accueil Dixipolis"
           >
-            <h1
+            <span
               className="text-3xl font-bold tracking-tight"
               style={{ color: "var(--color-primary)" }}
             >
               Dixipolis
-            </h1>
+            </span>
           </Link>
           <p
             className="mt-2 text-sm"
@@ -170,7 +177,7 @@ export default function InscriptionPage() {
                   aria-required="true"
                   className={cn(
                     "w-full rounded-lg border py-2.5 pl-10 pr-3 text-sm transition-colors",
-                    "placeholder:text-[var(--color-text-muted)]",
+                    "placeholder:opacity-50",
                     "focus:outline-none focus:ring-2"
                   )}
                   style={{
@@ -210,7 +217,7 @@ export default function InscriptionPage() {
                   aria-required="true"
                   className={cn(
                     "w-full rounded-lg border py-2.5 pl-10 pr-3 text-sm transition-colors",
-                    "placeholder:text-[var(--color-text-muted)]",
+                    "placeholder:opacity-50",
                     "focus:outline-none focus:ring-2"
                   )}
                   style={{
@@ -251,7 +258,7 @@ export default function InscriptionPage() {
                 aria-required="true"
                 className={cn(
                   "w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm transition-colors",
-                  "placeholder:text-[var(--color-text-muted)]",
+                  "placeholder:opacity-50",
                   "focus:outline-none focus:ring-2"
                 )}
                 style={{
@@ -292,7 +299,7 @@ export default function InscriptionPage() {
                 aria-describedby="password-strength"
                 className={cn(
                   "w-full rounded-lg border py-2.5 pl-10 pr-12 text-sm transition-colors",
-                  "placeholder:text-[var(--color-text-muted)]",
+                  "placeholder:opacity-50",
                   "focus:outline-none focus:ring-2"
                 )}
                 style={{
@@ -305,7 +312,7 @@ export default function InscriptionPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 transition-colors hover:opacity-70"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 transition-opacity hover:opacity-70"
                 aria-label={
                   showPassword
                     ? "Masquer le mot de passe"
@@ -331,7 +338,7 @@ export default function InscriptionPage() {
             {/* ---- Indicateur de force du mot de passe ---- */}
             {password.length > 0 && (
               <div className="mt-2" id="password-strength">
-                {/* Barre de progression */}
+                {/* Barre de progression coloree */}
                 <div
                   className="h-1.5 w-full overflow-hidden rounded-full"
                   style={{ backgroundColor: "var(--color-border)" }}
@@ -351,7 +358,7 @@ export default function InscriptionPage() {
                     }}
                   />
                 </div>
-                {/* Label textuel */}
+                {/* Label textuel (Faible / Moyen / Fort) */}
                 <p
                   className="mt-1 text-xs font-medium"
                   style={{ color: passwordStrength.color }}
@@ -394,7 +401,7 @@ export default function InscriptionPage() {
                 }
                 className={cn(
                   "w-full rounded-lg border py-2.5 pl-10 pr-12 text-sm transition-colors",
-                  "placeholder:text-[var(--color-text-muted)]",
+                  "placeholder:opacity-50",
                   "focus:outline-none focus:ring-2"
                 )}
                 style={{
@@ -405,11 +412,11 @@ export default function InscriptionPage() {
                   color: "var(--color-text-primary)",
                 }}
               />
-              {/* Bouton toggle visibilite */}
+              {/* Bouton toggle visibilite confirmation */}
               <button
                 type="button"
                 onClick={() => setShowPasswordConfirm((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 transition-colors hover:opacity-70"
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 transition-opacity hover:opacity-70"
                 aria-label={
                   showPasswordConfirm
                     ? "Masquer la confirmation"
@@ -431,6 +438,7 @@ export default function InscriptionPage() {
                 )}
               </button>
             </div>
+
             {/* Message d'erreur si les mots de passe ne correspondent pas */}
             {!passwordsMatch && (
               <p
@@ -464,7 +472,7 @@ export default function InscriptionPage() {
               J&apos;accepte les{" "}
               <Link
                 href="/cgu"
-                className="font-medium underline transition-colors"
+                className="font-medium underline transition-opacity hover:opacity-80"
                 style={{ color: "var(--color-primary)" }}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -479,7 +487,7 @@ export default function InscriptionPage() {
             type="submit"
             disabled={!isFormValid}
             className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all",
+              "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-all duration-200",
               "focus:outline-none focus:ring-2 focus:ring-offset-2",
               isFormValid
                 ? "cursor-pointer hover:opacity-90"
@@ -497,7 +505,7 @@ export default function InscriptionPage() {
         </form>
 
         {/* ================================================================
-         * Lien vers la connexion
+         * Lien vers la page de connexion
          * ================================================================ */}
         <div className="mt-6 text-center">
           <p
@@ -507,7 +515,7 @@ export default function InscriptionPage() {
             Deja un compte ?{" "}
             <Link
               href="/connexion"
-              className="font-semibold transition-colors hover:underline"
+              className="font-semibold transition-opacity hover:opacity-80 hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
               Se connecter

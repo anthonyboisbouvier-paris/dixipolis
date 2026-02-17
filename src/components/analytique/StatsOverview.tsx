@@ -8,58 +8,64 @@
  *   3. Heures de contenu analysees
  *   4. Date de la derniere mise a jour
  *
- * Ce composant est un Server Component (pas de "use client") car il ne
- * necessite aucune interactivite cote navigateur.
+ * DESIGN PREMIUM :
+ *   - Utilise la classe .card pour le fond, bordure, ombre et coins arrondis
+ *   - Toutes les couleurs via CSS variables (pas de raw Tailwind)
+ *   - Icones dans des cercles arrondis avec fond primaire leger
+ *   - Indicateurs de variation colores selon la tendance
+ *   - Animation entree via .stagger-children
+ *
+ * Ce composant est un Server Component (pas de use client).
  * ============================================================================= */
 
 import { BarChart3, Users, Activity, Calendar } from "lucide-react";
 import { cn, formatNumber, formatDate } from "@/lib/utils";
-
 /* --------------------------------------------------------------------------
  * Interface pour une carte statistique individuelle
  * -------------------------------------------------------------------------- */
 interface StatCardProps {
-  /** Libelle descriptif de la statistique */
   label: string;
-  /** Valeur affichee en grand (nombre formate ou texte) */
   value: string;
-  /** Icone Lucide React a afficher dans la carte */
   icon: React.ReactNode;
-  /** Couleur de fond de l'icone (classe Tailwind) */
-  iconBgColor: string;
-  /** Couleur de l'icone elle-meme (classe Tailwind) */
-  iconColor: string;
+  change?: string;
+  changePositive?: boolean;
 }
 
 /* --------------------------------------------------------------------------
  * StatCard — Carte individuelle affichant une statistique
- * Design : fond blanc, ombre legere, icone coloree a gauche,
- * valeur en gros et libelle en dessous.
+ * Design : .card + icone dans cercle var(--color-primary-light)
  * -------------------------------------------------------------------------- */
-function StatCard({ label, value, icon, iconBgColor, iconColor }: StatCardProps) {
+function StatCard({ label, value, icon, change, changePositive }: StatCardProps) {
   return (
-    <div
-      className={cn(
-        "flex items-center gap-4 rounded-xl border border-gray-100",
-        "bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-      )}
-    >
-      {/* -- Conteneur de l'icone avec fond colore arrondi -- */}
+    <div className={cn("card flex items-center gap-4 p-5")}>
       <div
-        className={cn(
-          "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg",
-          iconBgColor
-        )}
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
+        style={{ backgroundColor: "var(--color-primary-light)" }}
       >
-        <div className={iconColor}>{icon}</div>
+        <div style={{ color: "var(--color-primary)" }}>{icon}</div>
       </div>
-
-      {/* -- Texte : valeur + libelle -- */}
       <div className="min-w-0">
-        <p className="text-2xl font-bold tracking-tight text-gray-900">
+        <p
+          className="text-2xl font-bold tracking-tight"
+          style={{ color: "var(--color-text-primary)" }}
+        >
           {value}
         </p>
-        <p className="text-sm text-gray-500">{label}</p>
+        <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+          {label}
+        </p>
+        {change && (
+          <p
+            className="mt-0.5 text-xs font-semibold"
+            style={{
+              color: changePositive
+                ? "var(--color-success)"
+                : "var(--color-error, #ef4444)",
+            }}
+          >
+            {change}
+          </p>
+        )}
       </div>
     </div>
   );
@@ -67,55 +73,47 @@ function StatCard({ label, value, icon, iconBgColor, iconColor }: StatCardProps)
 
 /* --------------------------------------------------------------------------
  * StatsOverview — Grille de 4 cartes statistiques
- * Affiche les metriques principales du tableau de bord analytique.
- * Responsive : 1 colonne sur mobile, 2 sur tablette, 4 sur desktop.
+ * Responsive : 1 col mobile / 2 col tablette / 4 col desktop.
+ * Animation : .stagger-children applique un delai progressif.
  * -------------------------------------------------------------------------- */
 export default function StatsOverview() {
-  /* -- Date de la derniere mise a jour (donnee mock) -- */
   const lastUpdateDate = formatDate("2025-01-15T14:30:00Z", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    year: "numeric", month: "short", day: "numeric",
+    hour: "2-digit", minute: "2-digit",
   });
 
-  /* -- Definition des 4 cartes statistiques -- */
   const stats: StatCardProps[] = [
     {
       label: "Discours indexes",
       value: formatNumber(45230),
       icon: <BarChart3 className="h-6 w-6" />,
-      iconBgColor: "bg-blue-50",
-      iconColor: "text-blue-600",
+      change: "+8.2% ce mois",
+      changePositive: true,
     },
     {
       label: "Politiciens suivis",
       value: "2 000+",
       icon: <Users className="h-6 w-6" />,
-      iconBgColor: "bg-emerald-50",
-      iconColor: "text-emerald-600",
+      change: "+24 nouveaux",
+      changePositive: true,
     },
     {
       label: "Heures analysees",
       value: "10 500+",
       icon: <Activity className="h-6 w-6" />,
-      iconBgColor: "bg-violet-50",
-      iconColor: "text-violet-600",
+      change: "+320h ce mois",
+      changePositive: true,
     },
     {
       label: "Derniere mise a jour",
       value: lastUpdateDate,
       icon: <Calendar className="h-6 w-6" />,
-      iconBgColor: "bg-amber-50",
-      iconColor: "text-amber-600",
     },
   ];
 
   return (
     <section aria-label="Statistiques generales">
-      {/* -- Grille responsive : 1 col mobile / 2 col tablette / 4 col desktop -- */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="stagger-children grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <StatCard key={stat.label} {...stat} />
         ))}

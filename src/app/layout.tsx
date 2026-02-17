@@ -2,20 +2,11 @@
  * app/layout.tsx
  *
  * Layout racine de l'application Dixipolis.
- * Ce composant enveloppe TOUTES les pages et fournit :
- *   - Les métadonnées SEO globales
- *   - Les polices de caractères (Inter via Google Fonts)
- *   - Le Header et Footer partagés
- *   - Les styles globaux (via globals.css)
+ * Fournit : métadonnées SEO, polices, Header/Footer, skip-to-content WCAG.
  *
- * Architecture :
- *   <html>
- *     <body>
- *       <Header />        ← Navigation fixe en haut
- *       <main>{page}</main>  ← Contenu de la page courante
- *       <Footer />         ← Pied de page
- *     </body>
- *   </html>
+ * Le <main id="main-content"> reçoit le padding-top correspondant à la
+ * hauteur du header fixe (72px). Cela garantit qu'aucune page ne sera
+ * jamais cachée derrière le header.
  * ============================================================================= */
 
 import type { Metadata } from "next";
@@ -25,9 +16,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 /* --------------------------------------------------------------------------
- * POLICE DE CARACTÈRES — Inter (Google Fonts)
- * Inter est une police sans-serif moderne, lisible et professionnelle,
- * parfaitement adaptée à un contexte institutionnel/politique.
+ * POLICE — Inter (Google Fonts)
  * -------------------------------------------------------------------------- */
 const inter = Inter({
   variable: "--font-inter",
@@ -37,8 +26,6 @@ const inter = Inter({
 
 /* --------------------------------------------------------------------------
  * MÉTADONNÉES SEO GLOBALES
- * Ces métadonnées sont héritées par toutes les pages sauf si elles
- * définissent leurs propres métadonnées.
  * -------------------------------------------------------------------------- */
 export const metadata: Metadata = {
   title: {
@@ -58,8 +45,10 @@ export const metadata: Metadata = {
     "France",
     "politiciens",
     "recherche sémantique",
+    "Dixipolis",
   ],
   authors: [{ name: "Dixipolis" }],
+  creator: "Dixipolis",
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -91,13 +80,24 @@ export default function RootLayout({
   return (
     <html lang="fr" className={inter.variable}>
       <body className="antialiased min-h-screen flex flex-col">
-        {/* ----- Header fixe en haut de toutes les pages ----- */}
+        {/* ----- Skip to content (accessibilité WCAG) ----- */}
+        <a href="#main-content" className="skip-to-content">
+          Aller au contenu principal
+        </a>
+
+        {/* ----- Header fixe ----- */}
         <Header />
 
-        {/* ----- Contenu principal de la page ----- */}
-        <main className="flex-1">{children}</main>
+        {/* ----- Contenu principal avec padding-top pour le header fixe ----- */}
+        <main
+          id="main-content"
+          className="flex-1"
+          style={{ paddingTop: "var(--header-height)" }}
+        >
+          {children}
+        </main>
 
-        {/* ----- Footer en bas de toutes les pages ----- */}
+        {/* ----- Footer ----- */}
         <Footer />
       </body>
     </html>

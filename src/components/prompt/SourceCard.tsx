@@ -1,18 +1,23 @@
 /* =============================================================================
  * components/prompt/SourceCard.tsx
  *
- * Composant de carte source pour un extrait de discours politique.
+ * Composant de carte source premium pour un extrait de discours politique.
  *
- * Affiche les informations clefs d'un verbatim cit comme source dans une
+ * Affiche les informations clefs d'un verbatim cite comme source dans une
  * reponse du chatbot :
- *   - Nom du politicien et badge de parti
+ *   - Icone play a gauche pour signaler le contenu video
+ *   - Nom du politicien et badge de parti colore
  *   - Titre de la video source
- *   - Date du discours
- *   - Timecode clickable menant a la video YouTube horodatee
- *   - Icone de lien externe pour signaler la redirection
+ *   - Date du discours et timecode de debut
+ *   - Icone de lien externe pour signaler la redirection YouTube
  *
- * Le composant est concu pour etre utilise a l'interieur de MessageBubble,
- * sous le texte de la reponse de l'assistant.
+ * Le composant est compact, dense mais lisible, avec un design horizontal
+ * et un effet de survol subtil (elevation + mise en couleur de la bordure).
+ *
+ * Regles de style :
+ *   - Toutes les couleurs utilisent des variables CSS via style={{ }}
+ *   - Les couleurs de parti utilisent des variables CSS custom en inline
+ *   - Effet de survol gere par style pour respecter le design system
  *
  * Utilisation :
  *   <SourceCard excerpt={speechExcerpt} />
@@ -21,7 +26,7 @@
 import { cn } from "@/lib/utils";
 import { formatDate, formatTimecode } from "@/lib/utils";
 import type { SpeechExcerpt } from "@/types";
-import { ExternalLink, Clock } from "lucide-react";
+import { Play, ExternalLink, Clock } from "lucide-react";
 
 /* --------------------------------------------------------------------------
  * Props du composant
@@ -29,37 +34,43 @@ import { ExternalLink, Clock } from "lucide-react";
 interface SourceCardProps {
   /** L'extrait de discours a afficher comme source */
   excerpt: SpeechExcerpt;
-
   /** Classes CSS supplementaires pour personnaliser l'apparence */
   className?: string;
 }
 
 /* --------------------------------------------------------------------------
  * Mapping des couleurs par parti politique
- * Permet d'afficher un badge colore en fonction du parti de l'orateur.
- * Les couleurs correspondent a la charte graphique officielle de chaque parti.
+ *
+ * Chaque parti est associe a une paire de couleurs CSS (fond + texte)
+ * pour le badge. Les couleurs utilisent des variables CSS ou des valeurs
+ * inline pour rester coherent avec le design system.
  * -------------------------------------------------------------------------- */
 const PARTY_COLORS: Record<string, { bg: string; text: string }> = {
-  RE:    { bg: "bg-amber-100",   text: "text-amber-800" },
-  RN:    { bg: "bg-blue-900/10", text: "text-blue-900" },
-  LFI:   { bg: "bg-red-100",     text: "text-red-800" },
-  LR:    { bg: "bg-blue-100",    text: "text-blue-800" },
-  PS:    { bg: "bg-pink-100",    text: "text-pink-800" },
-  EELV:  { bg: "bg-green-100",   text: "text-green-800" },
-  PCF:   { bg: "bg-red-200",     text: "text-red-900" },
-  MoDem: { bg: "bg-orange-100",  text: "text-orange-800" },
-  PD:    { bg: "bg-teal-100",    text: "text-teal-800" },
+  RE:    { bg: "rgb(255 215 0 / 0.15)", text: "rgb(161 98 7)" },
+  RN:    { bg: "rgb(13 43 85 / 0.1)",   text: "rgb(13 43 85)" },
+  LFI:   { bg: "rgb(204 0 0 / 0.1)",    text: "rgb(153 27 27)" },
+  LR:    { bg: "rgb(0 102 204 / 0.1)",   text: "rgb(30 64 175)" },
+  PS:    { bg: "rgb(255 105 180 / 0.1)", text: "rgb(157 23 77)" },
+  EELV:  { bg: "rgb(0 168 107 / 0.1)",  text: "rgb(22 101 52)" },
+  PCF:   { bg: "rgb(221 0 0 / 0.12)",   text: "rgb(127 29 29)" },
+  MoDem: { bg: "rgb(255 140 0 / 0.1)",  text: "rgb(146 64 14)" },
+  PD:    { bg: "rgb(20 184 166 / 0.1)", text: "rgb(17 94 89)" },
+};
+
+/* --------------------------------------------------------------------------
+ * Couleurs par defaut pour les partis non mappes
+ * -------------------------------------------------------------------------- */
+const DEFAULT_PARTY_COLOR = {
+  bg: "var(--color-bg-section)",
+  text: "var(--color-text-secondary)",
 };
 
 /* --------------------------------------------------------------------------
  * Composant SourceCard
  * -------------------------------------------------------------------------- */
 export default function SourceCard({ excerpt, className }: SourceCardProps) {
-  /* Recuperation des couleurs du badge de parti, avec un fallback gris */
-  const partyColor = PARTY_COLORS[excerpt.party] ?? {
-    bg: "bg-gray-100",
-    text: "text-gray-700",
-  };
+  /* Recuperation des couleurs du badge de parti */
+  const partyColor = PARTY_COLORS[excerpt.party] ?? DEFAULT_PARTY_COLOR;
 
   return (
     <a
@@ -67,66 +78,95 @@ export default function SourceCard({ excerpt, className }: SourceCardProps) {
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        /* Structure de base : carte avec bordure et fond blanc */
-        "group block rounded-[var(--radius-md)] border border-[var(--color-border)]",
-        "bg-[var(--color-bg-card)] p-3",
-
-        /* Transition fluide au survol */
+        "group block rounded-[var(--radius-md)]",
         "transition-all duration-[var(--transition-normal)]",
-        "hover:border-[var(--color-primary)]/30 hover:shadow-[var(--shadow-md)]",
-
-        /* Classes supplementaires eventuelles */
         className
       )}
-      aria-label={`Source : ${excerpt.politicianName} — ${excerpt.videoTitle}`}
+      style={{
+        backgroundColor: "var(--color-bg-card)",
+        border: "1px solid var(--color-border)",
+        padding: "10px 12px",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget;
+        el.style.borderColor = "var(--color-primary-200)";
+        el.style.boxShadow = "var(--shadow-md)";
+        el.style.transform = "translateY(-1px)";
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget;
+        el.style.borderColor = "var(--color-border)";
+        el.style.boxShadow = "none";
+        el.style.transform = "translateY(0)";
+      }}
+      aria-label={`Source : ${excerpt.politicianName} \u2014 ${excerpt.videoTitle}`}
     >
-      {/* ---- En-tete : nom du politicien + badge parti ---- */}
-      <div className="flex items-center justify-between gap-2 mb-1.5">
-        <div className="flex items-center gap-2 min-w-0">
-          {/* Nom du politicien */}
-          <span className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
-            {excerpt.politicianName}
-          </span>
+      {/* ---- Layout horizontal : icone play + contenu + lien externe ---- */}
+      <div className="flex items-start gap-2.5">
 
-          {/* Badge du parti politique */}
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center px-1.5 py-0.5 rounded-full",
-              "text-[10px] font-semibold leading-none",
-              partyColor.bg,
-              partyColor.text
-            )}
+        {/* Icone play dans un cercle subtil */}
+        <div
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full mt-0.5"
+          style={{
+            backgroundColor: "var(--color-primary-50)",
+          }}
+        >
+          <Play
+            className="h-3.5 w-3.5 ml-0.5"
+            style={{ color: "var(--color-primary)" }}
+            aria-hidden="true"
+          />
+        </div>
+
+        {/* Contenu principal : nom, titre, date, timecode */}
+        <div className="flex-1 min-w-0">
+
+          {/* En-tete : nom du politicien + badge parti */}
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className="text-sm font-semibold truncate"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              {excerpt.politicianName}
+            </span>
+            <span
+              className="inline-flex shrink-0 items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none"
+              style={{
+                backgroundColor: partyColor.bg,
+                color: partyColor.text,
+              }}
+            >
+              {excerpt.party}
+            </span>
+          </div>
+
+          {/* Titre de la video source */}
+          <p
+            className="text-xs line-clamp-1 mb-1"
+            style={{ color: "var(--color-text-secondary)" }}
           >
-            {excerpt.party}
-          </span>
+            {excerpt.videoTitle}
+          </p>
+
+          {/* Pied de carte : date + timecode */}
+          <div
+            className="flex items-center gap-3 text-[11px]"
+            style={{ color: "var(--color-text-muted)" }}
+          >
+            <span>{formatDate(excerpt.date)}</span>
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3 w-3" aria-hidden="true" />
+              {formatTimecode(excerpt.startTime)}
+            </span>
+          </div>
         </div>
 
         {/* Icone de lien externe — visible au survol */}
         <ExternalLink
-          className={cn(
-            "h-3.5 w-3.5 shrink-0 text-[var(--color-text-muted)]",
-            "transition-colors duration-[var(--transition-fast)]",
-            "group-hover:text-[var(--color-primary)]"
-          )}
+          className="h-3.5 w-3.5 shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ color: "var(--color-text-muted)" }}
           aria-hidden="true"
         />
-      </div>
-
-      {/* ---- Titre de la video source ---- */}
-      <p className="text-xs text-[var(--color-text-secondary)] line-clamp-2 mb-1.5">
-        {excerpt.videoTitle}
-      </p>
-
-      {/* ---- Pied de carte : date + timecode ---- */}
-      <div className="flex items-center gap-3 text-[11px] text-[var(--color-text-muted)]">
-        {/* Date du discours formatee en francais */}
-        <span>{formatDate(excerpt.date)}</span>
-
-        {/* Timecode de debut avec icone horloge */}
-        <span className="inline-flex items-center gap-1">
-          <Clock className="h-3 w-3" aria-hidden="true" />
-          {formatTimecode(excerpt.startTime)}
-        </span>
       </div>
     </a>
   );
