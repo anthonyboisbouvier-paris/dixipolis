@@ -1,138 +1,115 @@
 /* =============================================================================
  * components/home/HeroSection.tsx
  *
- * Section hero de la page d'accueil Dixipolis.
- * Affiche le titre principal, le sous-titre explicatif et un bouton CTA
- * qui dirige l'utilisateur vers l'interface de prompt IA.
+ * Hero section modernisee avec branding fort et design ludique.
+ * Gradient colore en arriere-plan, titre avec accent gradient,
+ * sous-titre percutant, CTA barre de recherche, indicateurs.
  *
  * Composant serveur (Server Component) — pas de "use client".
- * Utilise la classe utilitaire hero-gradient definie dans globals.css
- * pour un arriere-plan en degradé bleu clair/blanc.
  * ============================================================================= */
 
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, Search, CheckCircle, Video, Zap } from "lucide-react";
 
-/* --------------------------------------------------------------------------
- * HeroSection — Composant principal de la section hero
- *
- * Structure :
- *   - Conteneur plein ecran avec gradient de fond (hero-gradient)
- *   - Titre h1 percutant decrivant la valeur de la plateforme
- *   - Sous-titre contextuel expliquant le fonctionnement
- *   - Bouton CTA central imitant une barre de recherche
- *
- * Accessibilite :
- *   - Hierarchie de titres respectee (h1 unique par page)
- *   - Contraste de couleur conforme WCAG AA
- *   - Navigation clavier via Link natif
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export default function HeroSection() {
   return (
     <section
-      className="hero-gradient relative overflow-hidden"
-      aria-label="Presentation de la plateforme Dixipolis"
+      className="relative overflow-hidden"
+      aria-label="Pr\u00e9sentation de la plateforme Dixipolis"
     >
-      {/* Conteneur avec espacement genereux pour un rendu aere */}
-      <div className="page-container py-20 sm:py-28 lg:py-36">
-        {/* Bloc de contenu centre */}
+      {/* Background gradient colore */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(37,99,235,0.12), transparent)," +
+            "radial-gradient(ellipse 50% 40% at 80% 60%, rgba(99,102,241,0.08), transparent)," +
+            "radial-gradient(ellipse 40% 30% at 20% 80%, rgba(236,72,153,0.05), transparent)," +
+            "linear-gradient(180deg, #ffffff 0%, var(--color-bg-page) 100%)",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Cercles decoratifs flous */}
+      <div
+        className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full opacity-20 blur-3xl"
+        style={{ background: "var(--color-primary)" }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -bottom-16 left-10 h-56 w-56 rounded-full opacity-10 blur-3xl"
+        style={{ background: "var(--color-accent)" }}
+        aria-hidden="true"
+      />
+
+      <div className="page-container relative py-20 sm:py-28 lg:py-36">
         <div className="mx-auto max-w-4xl text-center">
-          {/* ----------------------------------------------------------------
-           * Badge de lancement / contexte
-           * Petit indicateur au-dessus du titre pour capter l'attention
-           * ---------------------------------------------------------------- */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] backdrop-blur-sm">
+          {/* Badge */}
+          <div className="animate-fade-in-up mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/80 px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] shadow-[var(--shadow-xs)] backdrop-blur-sm">
             <span
-              className="inline-block h-2 w-2 rounded-full bg-[var(--color-success)]"
+              className="inline-block h-2 w-2 animate-pulse rounded-full bg-[var(--color-success)]"
               aria-hidden="true"
             />
-            Plateforme IA pour le discours politique
+            IA &bull; Fact-checking &bull; Open Data
           </div>
 
-          {/* ----------------------------------------------------------------
-           * Titre principal (h1)
-           * Phrase d'accroche qui communique la proposition de valeur.
-           * Le mot "IA" est mis en couleur primaire pour attirer le regard.
-           * ---------------------------------------------------------------- */}
-          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
-            La plateforme{" "}
-            <span className="text-[var(--color-primary)]">d&apos;IA puissante</span>{" "}
-            pour analyser le discours politique
+          {/* Titre h1 avec gradient */}
+          <h1 className="animate-fade-in-up mb-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-6xl">
+            D&eacute;cryptez le discours{" "}
+            <span
+              style={{
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              politique fran&ccedil;ais
+            </span>
+            {" "}avec l&apos;IA
           </h1>
 
-          {/* ----------------------------------------------------------------
-           * Sous-titre explicatif
-           * Contexte supplementaire sur le fonctionnement de la plateforme.
-           * Texte secondaire pour ne pas concurrencer visuellement le titre.
-           * ---------------------------------------------------------------- */}
-          <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-[var(--color-text-secondary)] sm:text-xl">
-            Retrouvez ce que les politiques ont vraiment dit. Notre intelligence
-            artificielle analyse des milliers d&apos;heures de d&eacute;bats, interviews
-            et discours pour vous fournir des r&eacute;ponses sourc&eacute;es et v&eacute;rifiables.
+          {/* Sous-titre */}
+          <p className="animate-fade-in-up mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-[var(--color-text-secondary)] sm:text-xl" style={{ animationDelay: "100ms" }}>
+            Fact-checking automatis&eacute;, d&eacute;tection de propagande, analyse &eacute;motionnelle.
+            Chaque r&eacute;ponse est sourc&eacute;e avec un extrait vid&eacute;o horodat&eacute;.
           </p>
 
-          {/* ----------------------------------------------------------------
-           * Bouton CTA — Style barre de recherche
-           * Lien vers /prompt qui imite visuellement un champ de recherche
-           * pour encourager l'interaction. Au survol, l'ombre s'accentue
-           * et le bouton se deplace legerement vers le haut.
-           * ---------------------------------------------------------------- */}
-          <Link
-            href="/prompt"
-            className="group mx-auto inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-white px-6 py-4 text-base font-medium text-[var(--color-text-secondary)] transition-all duration-[var(--transition-normal)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-lg sm:px-8 sm:text-lg"
-          >
-            {/* Icone de recherche a gauche */}
-            <Search
-              className="h-5 w-5 text-[var(--color-text-muted)] transition-colors group-hover:text-[var(--color-primary)]"
-              aria-hidden="true"
-            />
-            <span>Posez votre question sur le discours politique...</span>
-            {/* Fleche directionnelle qui se deplace au survol */}
-            <ArrowRight
-              className="h-5 w-5 text-[var(--color-primary)] transition-transform group-hover:translate-x-1"
-              aria-hidden="true"
-            />
-          </Link>
+          {/* CTA barre de recherche */}
+          <div className="animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+            <Link
+              href="/prompt"
+              className="group mx-auto inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-white px-6 py-4 text-base font-medium text-[var(--color-text-secondary)] shadow-[var(--shadow-md)] transition-all duration-300 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow)] sm:px-8 sm:text-lg"
+            >
+              <Search
+                className="h-5 w-5 text-[var(--color-text-muted)] transition-colors group-hover:text-[var(--color-primary)]"
+                aria-hidden="true"
+              />
+              <span>Posez votre question sur le discours politique...</span>
+              <ArrowRight
+                className="h-5 w-5 text-[var(--color-primary)] transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              />
+            </Link>
+          </div>
 
-          {/* ----------------------------------------------------------------
-           * Indicateurs de credibilite sous le CTA
-           * Petites mentions rassurantes sur les capacites de la plateforme.
-           * ---------------------------------------------------------------- */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[var(--color-text-muted)]">
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
-                aria-hidden="true"
-              />
-              Sources v&eacute;rifi&eacute;es
+          {/* Indicateurs de credibilite */}
+          <div className="animate-fade-in-up mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-[var(--color-text-muted)]" style={{ animationDelay: "300ms" }}>
+            <span className="flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-[var(--color-success)]" aria-hidden="true" />
+              Fact-checks automatis&eacute;s
             </span>
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
-                aria-hidden="true"
-              />
+            <span className="flex items-center gap-2">
+              <Video className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
               Extraits vid&eacute;o horodat&eacute;s
             </span>
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
-                aria-hidden="true"
-              />
+            <span className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-[var(--color-warning)]" aria-hidden="true" />
               Mise &agrave; jour quotidienne
             </span>
           </div>
         </div>
       </div>
-
-      {/* ----------------------------------------------------------------
-       * Element decoratif de fond
-       * Cercle flou en arriere-plan pour renforcer l'effet de profondeur
-       * du degradé hero-gradient. Position absolue, pas d'impact layout.
-       * ---------------------------------------------------------------- */}
-      <div
-        className="pointer-events-none absolute -bottom-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-[var(--color-primary)] opacity-[0.04] blur-3xl"
-        aria-hidden="true"
-      />
     </section>
   );
 }

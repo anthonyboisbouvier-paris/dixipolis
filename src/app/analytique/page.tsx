@@ -1,112 +1,82 @@
 /* =============================================================================
  * app/analytique/page.tsx
  *
- * Page Analytique — Tableau de bord principal de Dixipolis.
+ * Page Analytique — Dashboard complet Dixipolis.
+ * Mise a jour avec les vraies metriques des tickets Linear :
+ *   - 6 KPI (discours, politiciens, heures, fact-checks, propagande, toxicite)
+ *   - Themes les plus abordes (barres visuelles)
+ *   - Top politiciens par activite
+ *   - Matrice de distance ideologique entre partis (DIX-31)
+ *   - Mots sur-representes par politicien / word cloud (DIX-15)
+ *   - Timeline d'activite
  *
- * Cette page presente une vue d'ensemble des donnees de la plateforme
- * sous forme de tableau de bord (dashboard) avec plusieurs sections :
- *
- *   1. En-tete de page : titre "Analytique" et sous-titre descriptif
- *   2. FilterBar : barre de filtres interactifs (periode, parti, theme)
- *   3. StatsOverview : 4 cartes statistiques en ligne (pleine largeur)
- *   4. ThemeBarChart + TopPoliticians : deux panneaux cote a cote
- *   5. ActivityTimeline : chronologie des activites recentes (pleine largeur)
- *
- * Metadata Next.js :
- *   - Titre et description optimises pour le SEO
- *   - Exportes en tant que constantes statiques (pas de generateMetadata)
- *
- * Architecture :
- *   - La page est un Server Component par defaut
- *   - Les composants interactifs (FilterBar, ThemeBarChart) sont marques "use client"
- *   - Les composants de donnees pures (StatsOverview, TopPoliticians, ActivityTimeline)
- *     sont des Server Components
- *   - PageWrapper fournit le conteneur centre avec padding pour le header fixe
+ * Composant serveur (Server Component) — pas de "use client".
  * ============================================================================= */
 
 import type { Metadata } from "next";
+import { BarChart3 } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import FilterBar from "@/components/analytique/FilterBar";
 import StatsOverview from "@/components/analytique/StatsOverview";
 import ThemeBarChart from "@/components/analytique/ThemeBarChart";
 import TopPoliticians from "@/components/analytique/TopPoliticians";
+import IdeologicalMatrix from "@/components/analytique/IdeologicalMatrix";
+import WordCloudPreview from "@/components/analytique/WordCloudPreview";
 import ActivityTimeline from "@/components/analytique/ActivityTimeline";
 
-/* --------------------------------------------------------------------------
- * Metadata SEO pour la page Analytique
- * Utilisee par Next.js pour generer les balises <title> et <meta description>.
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export const metadata: Metadata = {
   title: "Analytique | Dixipolis",
   description:
-    "Tableau de bord analytique Dixipolis : statistiques, th&egrave;mes politiques, classement des politiciens et chronologie des activit&eacute;s.",
+    "Dashboard analytique Dixipolis : KPI discursifs, fact-checking, propagande, distance id\u00e9ologique et mots sur-repr\u00e9sent\u00e9s par politicien.",
 };
 
-/* --------------------------------------------------------------------------
- * AnalytiquePage — Page principale du tableau de bord
- *
- * Disposition (layout) :
- *   - Pleine largeur : en-tete, filtres, statistiques, timeline
- *   - Grille 2 colonnes (lg) : graphique des themes + classement politiciens
- *   - Responsive : tout passe en colonne unique sur mobile
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export default function AnalytiquePage() {
   return (
     <PageWrapper className="py-8">
-      {/* ================================================================
-       * SECTION 1 : En-tete de la page
-       * Titre principal et sous-titre descriptif.
-       * ================================================================ */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+      {/* En-tete */}
+      <section className="mb-8">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]">
+          <BarChart3 className="h-3.5 w-3.5 text-[var(--color-primary)]" aria-hidden="true" />
+          Dashboard
+        </div>
+        <h1 className="mb-2 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
           Analytique
         </h1>
-        <p className="mt-2 text-lg text-gray-500">
-          Vue d&apos;ensemble des donn&eacute;es politiques analys&eacute;es par Dixipolis.
-          Explorez les tendances, les th&egrave;mes dominants et l&apos;activit&eacute;
-          des personnalit&eacute;s politiques.
+        <p className="max-w-2xl text-base leading-relaxed text-[var(--color-text-secondary)] sm:text-lg">
+          Vue d&apos;ensemble des m&eacute;triques discursives, fact-checking,
+          propagande et distance id&eacute;ologique du corpus Dixipolis.
         </p>
-      </div>
+      </section>
 
-      {/* ================================================================
-       * SECTION 2 : Barre de filtres
-       * Composant client interactif avec selection de periode, parti et theme.
-       * ================================================================ */}
+      {/* Filtres */}
       <div className="mb-6">
         <FilterBar />
       </div>
 
-      {/* ================================================================
-       * SECTION 3 : Cartes statistiques (pleine largeur)
-       * 4 cartes affichant les metriques cles de la plateforme.
-       * ================================================================ */}
+      {/* 6 KPI */}
       <div className="mb-6">
         <StatsOverview />
       </div>
 
-      {/* ================================================================
-       * SECTION 4 : Graphique des themes + Classement des politiciens
-       * Disposition en grille : 2 colonnes sur grands ecrans,
-       * 1 colonne sur mobile et tablette.
-       * Le graphique des themes prend legerement plus de place (7/12)
-       * que le classement des politiciens (5/12) pour equilibrer visuellement.
-       * ================================================================ */}
+      {/* Themes + Top Politiciens */}
       <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* -- Graphique a barres des themes (7 colonnes sur lg) -- */}
         <div className="lg:col-span-7">
           <ThemeBarChart />
         </div>
-
-        {/* -- Classement des politiciens (5 colonnes sur lg) -- */}
         <div className="lg:col-span-5">
           <TopPoliticians />
         </div>
       </div>
 
-      {/* ================================================================
-       * SECTION 5 : Chronologie des activites recentes (pleine largeur)
-       * Timeline verticale des derniers evenements politiques indexes.
-       * ================================================================ */}
+      {/* Matrice ideologique + Word Cloud */}
+      <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <IdeologicalMatrix />
+        <WordCloudPreview />
+      </div>
+
+      {/* Timeline */}
       <div>
         <ActivityTimeline />
       </div>

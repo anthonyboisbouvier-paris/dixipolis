@@ -34,6 +34,7 @@ export const SECONDARY_NAV_ITEMS: NavItem[] = [
   { label: "À Propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
   { label: "Compte", href: "/compte" },
+  { label: "Guide Technique", href: "/guide-technique.html" },
 ];
 
 /* --------------------------------------------------------------------------
@@ -50,7 +51,7 @@ export const FOOTER_NAV = {
   company: [
     { label: "À Propos", href: "/a-propos" },
     { label: "Contact", href: "/contact" },
-    { label: "Équipe", href: "/a-propos#equipe" },
+    { label: "Guide Technique", href: "/guide-technique.html" },
   ],
   legal: [
     { label: "Mentions Légales", href: "/mentions-legales" },
