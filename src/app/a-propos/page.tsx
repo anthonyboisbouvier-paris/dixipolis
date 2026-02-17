@@ -45,7 +45,6 @@ import {
   Linkedin,
   CheckCircle2,
   Clock,
-  Rocket,
   Sparkles,
 } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
@@ -55,9 +54,9 @@ import PageWrapper from "@/components/layout/PageWrapper";
  * Surcharge le template defini dans le layout racine.
  * -------------------------------------------------------------------------- */
 export const metadata: Metadata = {
-  title: "A Propos",
+  title: "\u00c0 Propos",
   description:
-    "Decouvrez la mission, l'equipe et les valeurs de Dixipolis, la plateforme d'IA pour l'analyse du discours politique francais.",
+    "D\u00e9couvrez la mission, l'\u00e9quipe et les valeurs de Dixipolis, la plateforme d'IA pour l'analyse du discours politique fran\u00e7ais.",
 };
 
 /* --------------------------------------------------------------------------
@@ -75,15 +74,15 @@ const TEAM_MEMBERS = [
     name: "Anthony Boisbouvier",
     role: "Co-fondateur & Chef de projet",
     description:
-      "Ingenieur en biotechnologies chez Servier, Anthony a concu et developpe le prototype initial de Dixipolis. Passionne par l'intersection entre la technologie et la democratie, il pilote la strategie produit et la vision globale de la plateforme.",
+      "Ing\u00e9nieur en biotechnologies chez Servier, Anthony a con\u00e7u et d\u00e9velopp\u00e9 le prototype initial de Dixipolis. Passionn\u00e9 par l'intersection entre la technologie et la d\u00e9mocratie, il pilote la strat\u00e9gie produit et la vision globale de la plateforme.",
     initials: "AB",
     linkedIn: "https://linkedin.com/in/anthonyboisbouvier",
   },
   {
-    name: "Loic Ginoux",
+    name: "Lo\u00efc Ginoux",
     role: "Co-fondateur & Responsable technique",
     description:
-      "Ingenieur logiciel chez Cocolis, Loic apporte son expertise en architecture logicielle et en developpement full-stack. Il supervise les choix techniques, l'infrastructure cloud et les pipelines de traitement des donnees.",
+      "Ing\u00e9nieur logiciel chez Cocolis, Lo\u00efc apporte son expertise en architecture logicielle et en d\u00e9veloppement full-stack. Il supervise les choix techniques, l'infrastructure cloud et les pipelines de traitement des donn\u00e9es.",
     initials: "LG",
     linkedIn: "https://linkedin.com/in/loicginoux",
   },
@@ -91,7 +90,7 @@ const TEAM_MEMBERS = [
     name: "Thierry Boisbouvier",
     role: "Sponsor & Mentor",
     description:
-      "Entrepreneur du numerique avec plus de 25 ans d'experience, Thierry accompagne Dixipolis en tant que sponsor et conseiller strategique. Son expertise en creation d'entreprise et en transformation digitale est un atout precieux pour le projet.",
+      "Entrepreneur du num\u00e9rique avec plus de 25 ans d'exp\u00e9rience, Thierry accompagne Dixipolis en tant que sponsor et conseiller strat\u00e9gique. Son expertise en cr\u00e9ation d'entreprise et en transformation digitale est un atout pr\u00e9cieux pour le projet.",
     initials: "TB",
     linkedIn: "https://linkedin.com/in/thierryboisbouvier",
   },
@@ -110,25 +109,25 @@ const VALUES = [
     icon: Eye,
     title: "Transparence",
     description:
-      "Rendre le discours politique accessible a tous. Chaque information est sourcee, horodatee et verifiable. Nous croyons que la transparence est le socle d'une democratie saine.",
+      "Rendre le discours politique accessible \u00e0 tous. Chaque information est sourc\u00e9e, horodat\u00e9e et v\u00e9rifiable. Nous croyons que la transparence est le socle d'une d\u00e9mocratie saine.",
   },
   {
     icon: Scale,
-    title: "Neutralite",
+    title: "Neutralit\u00e9",
     description:
-      "Aucun biais partisan. Notre IA analyse les discours de maniere factuelle, sans jugement ni orientation politique. Les faits parlent d'eux-memes.",
+      "Aucun biais partisan. Notre IA analyse les discours de mani\u00e8re factuelle, sans jugement ni orientation politique. Les faits parlent d'eux-m\u00eames.",
   },
   {
     icon: Lightbulb,
     title: "Innovation",
     description:
-      "Exploiter les dernieres avancees en intelligence artificielle et en traitement du langage naturel pour offrir des outils d'analyse inedits au service de l'interet general.",
+      "Exploiter les derni\u00e8res avanc\u00e9es en intelligence artificielle et en traitement du langage naturel pour offrir des outils d'analyse in\u00e9dits au service de l'int\u00e9r\u00eat g\u00e9n\u00e9ral.",
   },
   {
     icon: Heart,
-    title: "Accessibilite",
+    title: "Accessibilit\u00e9",
     description:
-      "Democratiser l'acces a l'information politique. Notre plateforme est concue pour etre utilisable par tous : citoyens, journalistes, chercheurs et associations.",
+      "D\u00e9mocratiser l'acc\u00e8s \u00e0 l'information politique. Notre plateforme est con\u00e7ue pour \u00eatre utilisable par tous : citoyens, journalistes, chercheurs et associations.",
   },
 ] as const;
 
@@ -144,10 +143,10 @@ const VALUES = [
  * -------------------------------------------------------------------------- */
 const MILESTONES = [
   {
-    date: "Ete 2024",
+    date: "\u00c9t\u00e9 2024",
     title: "Prototype initial",
     description:
-      "Conception et developpement du prototype fonctionnel. Validation du concept de recherche semantique sur les discours politiques francais.",
+      "Conception et d\u00e9veloppement du prototype fonctionnel. Validation du concept de recherche s\u00e9mantique sur les discours politiques fran\u00e7ais.",
     status: "completed" as const,
     icon: CheckCircle2,
   },
@@ -155,15 +154,15 @@ const MILESTONES = [
     date: "Debut 2025",
     title: "MVP — Phase 1",
     description:
-      "Lancement de la version beta avec recherche par prompt, base de donnees de discours et interface web. Integration de Supabase et deploiement sur Vercel.",
-    status: "in-progress" as const,
-    icon: Rocket,
+      "Lancement de la version b\u00eata avec recherche par prompt, base de donn\u00e9es de discours et interface web. Int\u00e9gration de Supabase et d\u00e9ploiement sur Vercel.",
+    status: "completed" as const,
+    icon: CheckCircle2,
   },
   {
     date: "2025 - 2026",
     title: "Phase 2 — Expansion",
     description:
-      "Ajout des tableaux de bord analytiques, de l'API Pro, des newsletters automatisees et de la couverture elargie des sources mediatiques.",
+      "Ajout des tableaux de bord analytiques, de l'API Pro, des newsletters automatis\u00e9es et de la couverture \u00e9largie des sources m\u00e9diatiques.",
     status: "planned" as const,
     icon: Sparkles,
   },
@@ -171,11 +170,17 @@ const MILESTONES = [
     date: "2026+",
     title: "Phase 3 — Consolidation",
     description:
-      "Ouverture a l'ensemble du paysage politique europeen. Partenariats institutionnels et mediatiques. Modele economique consolide.",
+      "Ouverture \u00e0 l'ensemble du paysage politique europ\u00e9en. Partenariats institutionnels et m\u00e9diatiques. Mod\u00e8le \u00e9conomique consolid\u00e9.",
     status: "planned" as const,
     icon: Clock,
   },
-] as const;
+] as Array<{
+  date: string;
+  title: string;
+  description: string;
+  status: "completed" | "in-progress" | "planned";
+  icon: typeof CheckCircle2;
+}>;
 
 /* --------------------------------------------------------------------------
  * AboutPage — Composant principal de la page "A Propos"
@@ -212,7 +217,7 @@ export default function AboutPage() {
         {/* Titre principal de la page (h1 unique) */}
         <h1 className="mb-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
           <span style={{ color: "var(--color-text-primary)" }}>
-            A Propos de{" "}
+            &Agrave; Propos de{" "}
           </span>
           <span style={{ color: "var(--color-primary)" }}>Dixipolis</span>
         </h1>
@@ -222,11 +227,11 @@ export default function AboutPage() {
           className="mx-auto max-w-3xl text-lg leading-relaxed sm:text-xl"
           style={{ color: "var(--color-text-secondary)" }}
         >
-          Dixipolis est ne d&apos;une conviction simple : chaque citoyen devrait
-          pouvoir acceder facilement et de maniere factuelle a ce que disent
-          reellement les responsables politiques. Notre plateforme d&apos;intelligence
-          artificielle analyse le discours politique francais pour vous offrir
-          une information transparente, sourcee et verifiable.
+          Dixipolis est n&eacute; d&apos;une conviction simple : chaque citoyen devrait
+          pouvoir acc&eacute;der facilement et de mani&egrave;re factuelle &agrave; ce que disent
+          r&eacute;ellement les responsables politiques. Notre plateforme d&apos;intelligence
+          artificielle analyse le discours politique fran&ccedil;ais pour vous offrir
+          une information transparente, sourc&eacute;e et v&eacute;rifiable.
         </p>
       </section>
 
@@ -253,26 +258,26 @@ export default function AboutPage() {
                 className="leading-relaxed mb-4"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                Dans un paysage mediatique ou l&apos;information politique est souvent
-                fragmentee, orientee ou difficile a verifier, Dixipolis se
-                positionne comme un outil de reference pour un acces transparent
+                Dans un paysage m&eacute;diatique o&ugrave; l&apos;information politique est souvent
+                fragment&eacute;e, orient&eacute;e ou difficile &agrave; v&eacute;rifier, Dixipolis se
+                positionne comme un outil de r&eacute;f&eacute;rence pour un acc&egrave;s transparent
                 et factuel au discours politique.
               </p>
               <p
                 className="leading-relaxed mb-4"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                Grace a l&apos;intelligence artificielle et au traitement automatique
+                Gr&acirc;ce &agrave; l&apos;intelligence artificielle et au traitement automatique
                 du langage naturel, nous analysons des milliers d&apos;heures de
-                debats parlementaires, d&apos;interviews televisees, de conferences
+                d&eacute;bats parlementaires, d&apos;interviews t&eacute;l&eacute;vis&eacute;es, de conf&eacute;rences
                 de presse et de discours officiels.
               </p>
               <p
                 className="leading-relaxed"
                 style={{ color: "var(--color-text-secondary)" }}
               >
-                Notre objectif : permettre a chaque citoyen, journaliste ou
-                chercheur de retrouver exactement ce qui a ete dit, par qui,
+                Notre objectif : permettre &agrave; chaque citoyen, journaliste ou
+                chercheur de retrouver exactement ce qui a &eacute;t&eacute; dit, par qui,
                 quand et dans quel contexte — en quelques secondes.
               </p>
             </div>
@@ -283,25 +288,25 @@ export default function AboutPage() {
                 className="text-lg font-semibold"
                 style={{ color: "var(--color-text-primary)" }}
               >
-                Notre vision de la transparence democratique
+                Notre vision de la transparence d&eacute;mocratique
               </h3>
 
               {/* Liste des engagements */}
               {[
                 {
                   icon: Target,
-                  title: "Acces universel",
-                  text: "Toute parole publique d'un responsable politique doit etre retrouvable et verifiable par n'importe quel citoyen.",
+                  title: "Acc\u00e8s universel",
+                  text: "Toute parole publique d'un responsable politique doit \u00eatre retrouvable et v\u00e9rifiable par n'importe quel citoyen.",
                 },
                 {
                   icon: Shield,
-                  title: "Integrite des donnees",
-                  text: "Chaque citation est accompagnee de sa source originale, de son contexte et d'un lien vers l'enregistrement video horodate.",
+                  title: "Int\u00e9grit\u00e9 des donn\u00e9es",
+                  text: "Chaque citation est accompagn\u00e9e de sa source originale, de son contexte et d'un lien vers l'enregistrement vid\u00e9o horodat\u00e9.",
                 },
                 {
                   icon: Award,
-                  title: "Independance editoriale",
-                  text: "Dixipolis n'est affilie a aucun parti politique, media ou groupe de pression. Notre financement est independant.",
+                  title: "Ind\u00e9pendance \u00e9ditoriale",
+                  text: "Dixipolis n'est affili\u00e9 \u00e0 aucun parti politique, m\u00e9dia ou groupe de pression. Notre financement est ind\u00e9pendant.",
                 },
               ].map((item) => (
                 <div key={item.title} className="flex gap-4">
@@ -355,14 +360,14 @@ export default function AboutPage() {
             className="text-2xl font-bold mb-3 sm:text-3xl"
             style={{ color: "var(--color-text-primary)" }}
           >
-            L&apos;equipe fondatrice
+            L&apos;&eacute;quipe fondatrice
           </h2>
           <p
             className="mx-auto max-w-2xl"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Dixipolis est porte par une equipe complementaire unissant expertise
-            technologique, vision produit et experience entrepreneuriale.
+            Dixipolis est port&eacute; par une &eacute;quipe compl&eacute;mentaire unissant expertise
+            technologique, vision produit et exp&eacute;rience entrepreneuriale.
           </p>
         </div>
 
@@ -447,8 +452,8 @@ export default function AboutPage() {
             className="mx-auto max-w-2xl"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Quatre principes fondamentaux guident chaque decision technique,
-            editoriale et strategique de Dixipolis.
+            Quatre principes fondamentaux guident chaque d&eacute;cision technique,
+            &eacute;ditoriale et strat&eacute;gique de Dixipolis.
           </p>
         </div>
 
@@ -513,8 +518,8 @@ export default function AboutPage() {
             className="mx-auto max-w-2xl"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            De l&apos;idee initiale au lancement de la plateforme : les etapes
-            cles du developpement de Dixipolis.
+            De l&apos;id&eacute;e initiale au lancement de la plateforme : les &eacute;tapes
+            cl&eacute;s du d&eacute;veloppement de Dixipolis.
           </p>
         </div>
 

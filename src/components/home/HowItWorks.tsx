@@ -42,7 +42,7 @@ const steps: StepData[] = [
     stepNumber: 1,
     title: "Posez votre question",
     description:
-      "Ecrivez votre question en francais, comme vous la poseriez a un expert. Par exemple : \"Que pense Macron de la reforme des retraites ?\"",
+      "\u00c9crivez votre question en fran\u00e7ais, comme vous la poseriez \u00e0 un expert. Par exemple : \"Que pense Macron de la r\u00e9forme des retraites ?\"",
     icon: Search,
   },
   {
@@ -54,9 +54,9 @@ const steps: StepData[] = [
   },
   {
     stepNumber: 3,
-    title: "Consultez les resultats",
+    title: "Consultez les r\u00e9sultats",
     description:
-      "Recevez des reponses structurees avec les extraits exacts, les sources video horodatees et le contexte complet de chaque declaration.",
+      "Recevez des r\u00e9ponses structur\u00e9es avec les extraits exacts, les sources vid\u00e9o horodat\u00e9es et le contexte complet de chaque d\u00e9claration.",
     icon: FileText,
   },
 ];
@@ -89,11 +89,11 @@ export default function HowItWorks() {
          * ---------------------------------------------------------------- */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Comment ca marche ?
+            Comment &ccedil;a marche ?
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)]">
-            Trois etapes simples pour acceder a l&apos;integralite du discours
-            politique francais, analyse par l&apos;intelligence artificielle.
+            Trois &eacute;tapes simples pour acc&eacute;der &agrave; l&apos;int&eacute;gralit&eacute; du discours
+            politique fran&ccedil;ais, analys&eacute; par l&apos;intelligence artificielle.
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export default function HowItWorks() {
                   {/* Badge numerote — petit cercle en haut a droite */}
                   <span
                     className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white"
-                    aria-label={`Etape ${step.stepNumber}`}
+                    aria-label={`\u00c9tape ${step.stepNumber}`}
                   >
                     {step.stepNumber}
                   </span>

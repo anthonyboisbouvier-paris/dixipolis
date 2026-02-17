@@ -79,39 +79,39 @@ const MOCK_RESPONSES: MockResponse[] = [
   {
     keywords: ["macron", "inflation", "prix", "pouvoir d'achat"],
     response:
-      "D'apres les discours indexes, Emmanuel Macron a aborde la question de l'inflation a plusieurs reprises en 2024. Il a notamment souligne la necessite de proteger le pouvoir d'achat des Francais tout en maintenant une politique de maitrise des depenses publiques.\n\nLors de son allocution du 14 juillet, il a evoque des mesures de soutien ciblees pour les menages les plus modestes. Voici les extraits les plus pertinents :",
+      "D'apr\u00e8s les discours index\u00e9s, Emmanuel Macron a abord\u00e9 la question de l'inflation \u00e0 plusieurs reprises en 2024. Il a notamment soulign\u00e9 la n\u00e9cessit\u00e9 de prot\u00e9ger le pouvoir d'achat des Fran\u00e7ais tout en maintenant une politique de ma\u00eetrise des d\u00e9penses publiques.\n\nLors de son allocution du 14 juillet, il a \u00e9voqu\u00e9 des mesures de soutien cibl\u00e9es pour les m\u00e9nages les plus modestes. Voici les extraits les plus pertinents :",
     sources: [
       {
         id: "src-1", politicianId: "1", politicianName: "Emmanuel Macron", party: "RE",
-        text: "Nous devons proteger nos concitoyens face a la hausse des prix tout en gardant le cap de la responsabilite budgetaire.",
+        text: "Nous devons prot\u00e9ger nos concitoyens face \u00e0 la hausse des prix tout en gardant le cap de la responsabilit\u00e9 budg\u00e9taire.",
         date: "2024-07-14T20:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example1&t=342",
-        videoTitle: "Allocution du 14 juillet 2024 \u2014 Interview televisee",
-        channelName: "France 2", startTime: 342, endTime: 398, theme: "Economie", relevanceScore: 0.95,
+        videoTitle: "Allocution du 14 juillet 2024 \u2014 Interview t\u00e9l\u00e9vis\u00e9e",
+        channelName: "France 2", startTime: 342, endTime: 398, theme: "\u00c9conomie", relevanceScore: 0.95,
       },
       {
         id: "src-2", politicianId: "1", politicianName: "Emmanuel Macron", party: "RE",
-        text: "Le cheque energie sera renforce pour les 5 millions de foyers les plus fragiles.",
+        text: "Le ch\u00e8que \u00e9nergie sera renforc\u00e9 pour les 5 millions de foyers les plus fragiles.",
         date: "2024-09-20T10:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example2&t=128",
-        videoTitle: "Conference de presse a l'Elysee \u2014 Rentree 2024",
-        channelName: "BFMTV", startTime: 128, endTime: 185, theme: "Economie", relevanceScore: 0.91,
+        videoTitle: "Conf\u00e9rence de presse \u00e0 l'\u00c9lys\u00e9e \u2014 Rentr\u00e9e 2024",
+        channelName: "BFMTV", startTime: 128, endTime: 185, theme: "\u00c9conomie", relevanceScore: 0.91,
       },
     ],
   },
   {
     keywords: ["le pen", "immigration", "rn"],
     response:
-      "Marine Le Pen a fait de l'immigration l'un de ses themes centraux lors de la session parlementaire 2024. Elle a defendu un durcissement significatif de la politique migratoire, en plaidant pour une reforme constitutionnelle et la mise en place de quotas stricts.\n\nVoici les extraits les plus significatifs de ses prises de parole :",
+      "Marine Le Pen a fait de l'immigration l'un de ses th\u00e8mes centraux lors de la session parlementaire 2024. Elle a d\u00e9fendu un durcissement significatif de la politique migratoire, en plaidant pour une r\u00e9forme constitutionnelle et la mise en place de quotas stricts.\n\nVoici les extraits les plus significatifs de ses prises de parole :",
     sources: [
       {
         id: "src-3", politicianId: "2", politicianName: "Marine Le Pen", party: "RN",
-        text: "La France doit reprendre le controle de sa politique migratoire. C'est une question de souverainete nationale.",
+        text: "La France doit reprendre le contr\u00f4le de sa politique migratoire. C'est une question de souverainet\u00e9 nationale.",
         date: "2024-11-15T15:30:00Z", videoUrl: "https://www.youtube.com/watch?v=example3&t=256",
-        videoTitle: "Debat a l'Assemblee nationale \u2014 Projet de loi immigration",
+        videoTitle: "D\u00e9bat \u00e0 l'Assembl\u00e9e nationale \u2014 Projet de loi immigration",
         channelName: "LCP", startTime: 256, endTime: 312, theme: "Immigration", relevanceScore: 0.97,
       },
       {
         id: "src-4", politicianId: "2", politicianName: "Marine Le Pen", party: "RN",
-        text: "Nous proposons l'instauration de quotas migratoires votes chaque annee par le Parlement.",
+        text: "Nous proposons l'instauration de quotas migratoires vot\u00e9s chaque ann\u00e9e par le Parlement.",
         date: "2024-10-03T09:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example4&t=87",
         videoTitle: "Interview matinale \u2014 RTL Matin",
         channelName: "RTL", startTime: 87, endTime: 142, theme: "Immigration", relevanceScore: 0.93,
@@ -121,34 +121,34 @@ const MOCK_RESPONSES: MockResponse[] = [
   {
     keywords: ["melenchon", "ecologie", "climat", "environnement"],
     response:
-      "Jean-Luc Melenchon a regulierement pris position sur les enjeux ecologiques, liant systematiquement la question climatique a la justice sociale. Il defend une planification ecologique fondee sur la bifurcation du modele productif et la sortie des energies fossiles.\n\nVoici les passages les plus marquants :",
+      "Jean-Luc M\u00e9lenchon a r\u00e9guli\u00e8rement pris position sur les enjeux \u00e9cologiques, liant syst\u00e9matiquement la question climatique \u00e0 la justice sociale. Il d\u00e9fend une planification \u00e9cologique fond\u00e9e sur la bifurcation du mod\u00e8le productif et la sortie des \u00e9nergies fossiles.\n\nVoici les passages les plus marquants :",
     sources: [
       {
-        id: "src-5", politicianId: "3", politicianName: "Jean-Luc Melenchon", party: "LFI",
-        text: "L'ecologie populaire, c'est l'idee que la transition ne doit pas se faire sur le dos des classes populaires.",
+        id: "src-5", politicianId: "3", politicianName: "Jean-Luc M\u00e9lenchon", party: "LFI",
+        text: "L'\u00e9cologie populaire, c'est l'id\u00e9e que la transition ne doit pas se faire sur le dos des classes populaires.",
         date: "2024-06-05T14:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example5&t=415",
-        videoTitle: "Meeting pour la planification ecologique \u2014 Marseille",
-        channelName: "La France Insoumise", startTime: 415, endTime: 470, theme: "Ecologie", relevanceScore: 0.94,
+        videoTitle: "Meeting pour la planification \u00e9cologique \u2014 Marseille",
+        channelName: "La France Insoumise", startTime: 415, endTime: 470, theme: "\u00c9cologie", relevanceScore: 0.94,
       },
       {
-        id: "src-6", politicianId: "3", politicianName: "Jean-Luc Melenchon", party: "LFI",
-        text: "Il faut sortir des energies fossiles d'ici 2045 et investir massivement dans les renouvelables.",
+        id: "src-6", politicianId: "3", politicianName: "Jean-Luc M\u00e9lenchon", party: "LFI",
+        text: "Il faut sortir des \u00e9nergies fossiles d'ici 2045 et investir massivement dans les renouvelables.",
         date: "2024-09-12T16:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example6&t=203",
-        videoTitle: "Question au gouvernement \u2014 Transition energetique",
-        channelName: "LCP", startTime: 203, endTime: 258, theme: "Ecologie", relevanceScore: 0.89,
+        videoTitle: "Question au gouvernement \u2014 Transition \u00e9nerg\u00e9tique",
+        channelName: "LCP", startTime: 203, endTime: 258, theme: "\u00c9cologie", relevanceScore: 0.89,
       },
     ],
   },
   {
     keywords: ["bardella", "europe", "ue"],
     response:
-      "Jordan Bardella a porte une vision critique de l'Union europeenne, plaidant pour une Europe des nations ou chaque pays conserve sa souverainete. Au Parlement europeen, il a conteste plusieurs directives qu'il juge contraires aux interets francais.\n\nVoici ses declarations les plus notables :",
+      "Jordan Bardella a port\u00e9 une vision critique de l'Union europ\u00e9enne, plaidant pour une Europe des nations o\u00f9 chaque pays conserve sa souverainet\u00e9. Au Parlement europ\u00e9en, il a contest\u00e9 plusieurs directives qu'il juge contraires aux int\u00e9r\u00eats fran\u00e7ais.\n\nVoici ses d\u00e9clarations les plus notables :",
     sources: [
       {
         id: "src-7", politicianId: "4", politicianName: "Jordan Bardella", party: "RN",
-        text: "Nous voulons une Europe des nations libres, pas un super-Etat qui decide a la place des peuples.",
+        text: "Nous voulons une Europe des nations libres, pas un super-\u00c9tat qui d\u00e9cide \u00e0 la place des peuples.",
         date: "2024-05-28T10:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example7&t=178",
-        videoTitle: "Grand meeting europeennes 2024 \u2014 Paris",
+        videoTitle: "Grand meeting europ\u00e9ennes 2024 \u2014 Paris",
         channelName: "RN Officiel", startTime: 178, endTime: 235, theme: "Europe", relevanceScore: 0.92,
       },
     ],
@@ -156,21 +156,21 @@ const MOCK_RESPONSES: MockResponse[] = [
   {
     keywords: ["attal", "education", "ecole"],
     response:
-      "Gabriel Attal a place l'education au coeur de son action en tant que Premier ministre. Il a notamment annonce le retour des groupes de niveau au college et le renforcement de l'autorite des enseignants.\n\nSon passage au ministere de l'Education avait deja ete marque par des reformes structurantes. Voici les extraits pertinents :",
+      "Gabriel Attal a plac\u00e9 l'\u00e9ducation au c\u0153ur de son action en tant que Premier ministre. Il a notamment annonc\u00e9 le retour des groupes de niveau au coll\u00e8ge et le renforcement de l'autorit\u00e9 des enseignants.\n\nSon passage au minist\u00e8re de l'\u00c9ducation avait d\u00e9j\u00e0 \u00e9t\u00e9 marqu\u00e9 par des r\u00e9formes structurantes. Voici les extraits pertinents :",
     sources: [
       {
         id: "src-8", politicianId: "5", politicianName: "Gabriel Attal", party: "RE",
-        text: "Le niveau scolaire de nos eleves doit redevenir une priorite absolue. C'est l'avenir de la Nation qui est en jeu.",
+        text: "Le niveau scolaire de nos \u00e9l\u00e8ves doit redevenir une priorit\u00e9 absolue. C'est l'avenir de la Nation qui est en jeu.",
         date: "2024-01-30T11:00:00Z", videoUrl: "https://www.youtube.com/watch?v=example8&t=95",
-        videoTitle: "Discours de politique generale \u2014 Assemblee nationale",
-        channelName: "LCP", startTime: 95, endTime: 152, theme: "Education", relevanceScore: 0.96,
+        videoTitle: "Discours de politique g\u00e9n\u00e9rale \u2014 Assembl\u00e9e nationale",
+        channelName: "LCP", startTime: 95, endTime: 152, theme: "\u00c9ducation", relevanceScore: 0.96,
       },
       {
         id: "src-9", politicianId: "5", politicianName: "Gabriel Attal", party: "RE",
-        text: "Les groupes de niveau permettront de mieux accompagner chaque eleve selon ses besoins.",
+        text: "Les groupes de niveau permettront de mieux accompagner chaque \u00e9l\u00e8ve selon ses besoins.",
         date: "2024-03-18T09:30:00Z", videoUrl: "https://www.youtube.com/watch?v=example9&t=312",
-        videoTitle: "Conference de presse \u2014 Reforme du college",
-        channelName: "France Info", startTime: 312, endTime: 365, theme: "Education", relevanceScore: 0.88,
+        videoTitle: "Conf\u00e9rence de presse \u2014 R\u00e9forme du coll\u00e8ge",
+        channelName: "France Info", startTime: 312, endTime: 365, theme: "\u00c9ducation", relevanceScore: 0.88,
       },
     ],
   },
@@ -182,21 +182,21 @@ const MOCK_RESPONSES: MockResponse[] = [
 const DEFAULT_MOCK_RESPONSE: MockResponse = {
   keywords: [],
   response:
-    "Voici ce que j'ai trouve dans la base de donnees Dixipolis. Plusieurs politiciens se sont exprimes sur ce sujet au cours des derniers mois. L'analyse croisee de leurs declarations revele des positions contrastees selon les familles politiques.\n\nVoici les extraits les plus pertinents :",
+    "Voici ce que j'ai trouv\u00e9 dans la base de donn\u00e9es Dixipolis. Plusieurs politiciens se sont exprim\u00e9s sur ce sujet au cours des derniers mois. L'analyse crois\u00e9e de leurs d\u00e9clarations r\u00e9v\u00e8le des positions contrast\u00e9es selon les familles politiques.\n\nVoici les extraits les plus pertinents :",
   sources: [
     {
       id: "src-default-1", politicianId: "1", politicianName: "Emmanuel Macron", party: "RE",
-      text: "La France doit continuer a se reformer pour rester competitive dans un monde en mutation.",
+      text: "La France doit continuer \u00e0 se r\u00e9former pour rester comp\u00e9titive dans un monde en mutation.",
       date: "2024-12-10T20:00:00Z", videoUrl: "https://www.youtube.com/watch?v=default1&t=450",
-      videoTitle: "Voeux aux Francais \u2014 Decembre 2024",
-      channelName: "France 2", startTime: 450, endTime: 510, theme: "Reformes", relevanceScore: 0.82,
+      videoTitle: "V\u0153ux aux Fran\u00e7ais \u2014 D\u00e9cembre 2024",
+      channelName: "France 2", startTime: 450, endTime: 510, theme: "R\u00e9formes", relevanceScore: 0.82,
     },
     {
-      id: "src-default-2", politicianId: "3", politicianName: "Jean-Luc Melenchon", party: "LFI",
-      text: "Il est temps de rompre avec les politiques d'austerite qui appauvrissent les Francais.",
+      id: "src-default-2", politicianId: "3", politicianName: "Jean-Luc M\u00e9lenchon", party: "LFI",
+      text: "Il est temps de rompre avec les politiques d'aust\u00e9rit\u00e9 qui appauvrissent les Fran\u00e7ais.",
       date: "2024-11-22T14:00:00Z", videoUrl: "https://www.youtube.com/watch?v=default2&t=267",
-      videoTitle: "Questions d'actualite au gouvernement",
-      channelName: "LCP", startTime: 267, endTime: 320, theme: "Economie", relevanceScore: 0.78,
+      videoTitle: "Questions d'actualit\u00e9 au gouvernement",
+      channelName: "LCP", startTime: 267, endTime: 320, theme: "\u00c9conomie", relevanceScore: 0.78,
     },
   ],
 };
@@ -418,8 +418,8 @@ export default function ChatInterface() {
                 style={{ color: "var(--color-text-secondary)" }}
               >
                 Posez une question sur les discours et prises de position
-                des politiciens francais. Dixipolis retrouve les verbatims
-                exacts avec sources video horodatees.
+                des politiciens fran&ccedil;ais. Dixipolis retrouve les verbatims
+                exacts avec sources vid&eacute;o horodat&eacute;es.
               </p>
 
               {/* ---- Grille de suggestions (2 colonnes, 3 lignes) ---- */}
@@ -603,8 +603,8 @@ export default function ChatInterface() {
               className="text-center mt-2.5 text-[11px] leading-relaxed"
               style={{ color: "var(--color-text-muted)" }}
             >
-              Dixipolis analyse les discours publics. Les reponses sont generees
-              par IA et doivent etre verifiees. Sources video horodatees fournies.
+              Dixipolis analyse les discours publics. Les r&eacute;ponses sont g&eacute;n&eacute;r&eacute;es
+              par IA et doivent &ecirc;tre v&eacute;rifi&eacute;es. Sources vid&eacute;o horodat&eacute;es fournies.
             </p>
           </div>
         </div>

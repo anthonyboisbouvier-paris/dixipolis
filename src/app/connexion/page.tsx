@@ -86,7 +86,7 @@ export default function ConnexionPage() {
             className="mt-2 text-sm"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Connectez-vous pour acceder a votre espace
+            Connectez-vous pour acc&eacute;der &agrave; votre espace
           </p>
         </div>
 
@@ -203,15 +203,16 @@ export default function ConnexionPage() {
             </div>
           </div>
 
-          {/* ---- Lien mot de passe oublie ---- */}
+          {/* ---- Bouton mot de passe oublie (fonctionnalite a venir) ---- */}
           <div className="text-right">
-            <Link
-              href="/mot-de-passe-oublie"
-              className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline"
+            <button
+              type="button"
+              onClick={() => alert("Cette fonctionnalit\u00e9 sera bient\u00f4t disponible")}
+              className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline cursor-pointer bg-transparent border-none p-0"
               style={{ color: "var(--color-primary)" }}
             >
-              Mot de passe oublie ?
-            </Link>
+              Mot de passe oubli&eacute; ?
+            </button>
           </div>
 
           {/* ---- Bouton de soumission ---- */}
@@ -272,7 +273,7 @@ export default function ConnexionPage() {
               className="font-semibold transition-opacity hover:opacity-80 hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
-              Creer un compte
+              Cr&eacute;er un compte
             </Link>
           </p>
         </div>

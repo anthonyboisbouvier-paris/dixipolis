@@ -71,7 +71,7 @@ const TYPE_CONFIG: Record<
     classes: "bg-purple-50 text-purple-700",
   },
   synthesis: {
-    label: "Synthese",
+    label: "Synth\u00e8se",
     icon: BookOpen,
     classes: "bg-green-50 text-green-700",
   },

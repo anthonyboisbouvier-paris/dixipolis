@@ -39,7 +39,7 @@ import ActivityTimeline from "@/components/analytique/ActivityTimeline";
 export const metadata: Metadata = {
   title: "Analytique | Dixipolis",
   description:
-    "Tableau de bord analytique Dixipolis : statistiques, themes politiques, classement des politiciens et chronologie des activites.",
+    "Tableau de bord analytique Dixipolis : statistiques, th&egrave;mes politiques, classement des politiciens et chronologie des activit&eacute;s.",
 };
 
 /* --------------------------------------------------------------------------
@@ -62,9 +62,9 @@ export default function AnalytiquePage() {
           Analytique
         </h1>
         <p className="mt-2 text-lg text-gray-500">
-          Vue d&apos;ensemble des donnees politiques analysees par Dixipolis.
-          Explorez les tendances, les themes dominants et l&apos;activite
-          des personnalites politiques.
+          Vue d&apos;ensemble des donn&eacute;es politiques analys&eacute;es par Dixipolis.
+          Explorez les tendances, les th&egrave;mes dominants et l&apos;activit&eacute;
+          des personnalit&eacute;s politiques.
         </p>
       </div>
 

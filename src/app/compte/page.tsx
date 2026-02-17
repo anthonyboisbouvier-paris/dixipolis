@@ -56,24 +56,24 @@ const MOCK_USER = {
   firstName: "Marie",
   lastName: "Laurent",
   email: "marie.laurent@exemple.fr",
-  plan: "Acces Pro",
+  plan: "Acc\u00e8s Pro",
 } as const;
 
 /** Recherches sauvegardees par l'utilisateur */
 const MOCK_SAVED_SEARCHES = [
   {
     id: "s1",
-    label: "Reforme des retraites 2025",
+    label: "R\u00e9forme des retraites 2025",
     date: "12 fev. 2026",
   },
   {
     id: "s2",
-    label: "Discours presidentiel — environnement",
+    label: "Discours pr\u00e9sidentiel — environnement",
     date: "8 fev. 2026",
   },
   {
     id: "s3",
-    label: "Debat Assemblee nationale — budget 2026",
+    label: "D\u00e9bat Assembl\u00e9e nationale — budget 2026",
     date: "3 fev. 2026",
   },
 ] as const;
@@ -88,7 +88,7 @@ const MOCK_FOLLOWED_POLITICIANS = [
   },
   {
     id: "p2",
-    name: "Jean-Luc Melenchon",
+    name: "Jean-Luc M\u00e9lenchon",
     party: "La France Insoumise",
     slug: "jean-luc-melenchon",
   },
@@ -155,7 +155,7 @@ export default function ComptePage() {
               className="mt-1 text-sm"
               style={{ color: "var(--color-text-secondary)" }}
             >
-              Gerez votre profil et vos preferences
+              G&eacute;rez votre profil et vos pr&eacute;f&eacute;rences
             </p>
           </div>
           {/* Lien de retour a l'accueil */}
@@ -164,7 +164,7 @@ export default function ComptePage() {
             className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline"
             style={{ color: "var(--color-primary)" }}
           >
-            Retour a l&apos;accueil
+            Retour &agrave; l&apos;accueil
           </Link>
         </div>
 
@@ -290,7 +290,7 @@ export default function ComptePage() {
                     className="mb-1.5 block text-sm font-medium"
                     style={{ color: "var(--color-text-primary)" }}
                   >
-                    Prenom
+                    Pr&eacute;nom
                   </label>
                   <div className="relative">
                     <User
@@ -378,7 +378,7 @@ export default function ComptePage() {
                     className="mt-1 text-xs"
                     style={{ color: "var(--color-text-muted)" }}
                   >
-                    L&apos;email ne peut pas etre modifie directement.
+                    L&apos;email ne peut pas &ecirc;tre modifi&eacute; directement.
                     Contactez le support.
                   </p>
                 </div>
@@ -437,8 +437,8 @@ export default function ComptePage() {
                       className="mt-1 text-sm"
                       style={{ color: "var(--color-text-secondary)" }}
                     >
-                      Acces illimite a toutes les analyses et fonctionnalites
-                      avancees.
+                      Acc&egrave;s illimit&eacute; &agrave; toutes les analyses et fonctionnalit&eacute;s
+                      avanc&eacute;es.
                     </p>
                   </div>
                   <Shield
@@ -453,9 +453,9 @@ export default function ComptePage() {
                   className="mt-4 space-y-1 text-sm"
                   style={{ color: "var(--color-text-secondary)" }}
                 >
-                  <li>Analyses illimitees</li>
-                  <li>Alertes en temps reel</li>
-                  <li>Export des donnees</li>
+                  <li>Analyses illimit&eacute;es</li>
+                  <li>Alertes en temps r&eacute;el</li>
+                  <li>Export des donn&eacute;es</li>
                   <li>Support prioritaire</li>
                 </ul>
               </div>
@@ -528,7 +528,7 @@ export default function ComptePage() {
                             className="text-xs"
                             style={{ color: "var(--color-text-muted)" }}
                           >
-                            Sauvegardee le {search.date}
+                            Sauvegard&eacute;e le {search.date}
                           </p>
                         </div>
                       </div>
@@ -639,7 +639,7 @@ export default function ComptePage() {
                   style={{ color: "var(--color-primary)" }}
                   aria-hidden="true"
                 />
-                Preferences d&apos;alertes
+                Pr&eacute;f&eacute;rences d&apos;alertes
               </h2>
 
               <p
@@ -673,8 +673,8 @@ export default function ComptePage() {
                 {/* Toggle : Resume hebdomadaire */}
                 <AlertToggle
                   id="alert-weekly-digest"
-                  label="Resume hebdomadaire"
-                  description="Recevoir chaque lundi un resume des faits marquants de la semaine politique."
+                  label="R\u00e9sum\u00e9 hebdomadaire"
+                  description="Recevoir chaque lundi un r\u00e9sum\u00e9 des faits marquants de la semaine politique."
                   checked={alertWeeklyDigest}
                   onChange={setAlertWeeklyDigest}
                 />
@@ -703,7 +703,7 @@ export default function ComptePage() {
             }}
           >
             <LogOut size={18} aria-hidden="true" />
-            Se deconnecter
+            Se d&eacute;connecter
           </button>
         </div>
       </div>

@@ -68,7 +68,7 @@ const features: FeatureCardData[] = [
     id: "prompt",
     title: "Prompt",
     description:
-      "Posez vos questions en langage naturel. Notre IA analyse des milliers d'heures de discours et vous repond avec des extraits sources.",
+      "Posez vos questions en langage naturel. Notre IA analyse des milliers d'heures de discours et vous r\u00e9pond avec des extraits sourc\u00e9s.",
     href: "/prompt",
     icon: MessageSquare,
     illustrationIcon: Brain,
@@ -81,7 +81,7 @@ const features: FeatureCardData[] = [
     id: "analytique",
     title: "Analytique",
     description:
-      "Explorez les tendances du discours politique avec des tableaux de bord interactifs, graphiques temporels et comparaisons thematiques.",
+      "Explorez les tendances du discours politique avec des tableaux de bord interactifs, graphiques temporels et comparaisons th\u00e9matiques.",
     href: "/analytique",
     icon: BarChart3,
     illustrationIcon: Search,
@@ -94,7 +94,7 @@ const features: FeatureCardData[] = [
     id: "contenu",
     title: "Contenu",
     description:
-      "Consultez des articles, syntheses et newsletters generes automatiquement a partir des declarations politiques les plus recentes.",
+      "Consultez des articles, synth\u00e8ses et newsletters g\u00e9n\u00e9r\u00e9s automatiquement \u00e0 partir des d\u00e9clarations politiques les plus r\u00e9centes.",
     href: "/contenu",
     icon: Play,
     illustrationIcon: FileText,
@@ -107,7 +107,7 @@ const features: FeatureCardData[] = [
     id: "api-pro",
     title: "API Pro",
     description:
-      "Integrez les donnees Dixipolis dans vos applications grace a notre API RESTful. Documentation complete, SDK et support dedie.",
+      "Int\u00e9grez les donn\u00e9es Dixipolis dans vos applications gr\u00e2ce \u00e0 notre API RESTful. Documentation compl\u00e8te, SDK et support d\u00e9di\u00e9.",
     href: "/api-pro",
     icon: Code,
     illustrationIcon: Database,
@@ -141,11 +141,11 @@ export default function FeatureCards() {
          * ---------------------------------------------------------------- */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Quatre outils pour decrypter le politique
+            Quatre outils pour d&eacute;crypter le politique
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)]">
             Chaque module exploite l&apos;intelligence artificielle pour vous donner
-            un acces clair, rapide et source au discours politique francais.
+            un acc&egrave;s clair, rapide et sourc&eacute; au discours politique fran&ccedil;ais.
           </p>
         </div>
 
@@ -194,7 +194,7 @@ function FeatureCard({ feature }: { feature: FeatureCardData }) {
     <Link
       href={href}
       className="card card-interactive group flex flex-col p-6"
-      aria-label={`Decouvrir la fonctionnalite ${title}`}
+      aria-label={`D\u00e9couvrir la fonctionnalit\u00e9 ${title}`}
     >
       {/* ----------------------------------------------------------------
        * Badge d'icone — Petit carre arrondi avec icone coloree
@@ -254,7 +254,7 @@ function FeatureCard({ feature }: { feature: FeatureCardData }) {
        * Au survol de la carte, la fleche se deplace a droite.
        * ---------------------------------------------------------------- */}
       <div className="flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-[var(--transition-fast)] group-hover:bg-[var(--color-primary-hover)]">
-        <span>Decouvrir</span>
+        <span>D&eacute;couvrir</span>
         <ArrowRight
           className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
           aria-hidden="true"

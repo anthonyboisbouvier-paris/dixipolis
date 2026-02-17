@@ -80,7 +80,8 @@ export default function Footer() {
 
   return (
     <footer
-      className="bg-[#0f172a] text-white"
+      className="text-white"
+      style={{ backgroundColor: "var(--color-bg-dark)" }}
       role="contentinfo"
       aria-label="Pied de page Dixipolis"
     >
@@ -109,7 +110,7 @@ export default function Footer() {
             </Link>
 
             {/* Description courte du site */}
-            <p className="text-sm text-slate-400 leading-relaxed mb-6 max-w-xs">
+            <p className="text-sm leading-relaxed mb-6 max-w-xs" style={{ color: "var(--color-text-muted)" }}>
               La plateforme d&apos;IA pour analyser le discours politique
               fran&ccedil;ais. D&eacute;cryptez, comparez et comprenez ce que
               disent vraiment les politiques.
@@ -123,7 +124,8 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center h-9 w-9 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-colors duration-200"
+                  className="flex items-center justify-center h-9 w-9 rounded-lg hover:bg-slate-700 hover:text-white transition-colors duration-200"
+                  style={{ backgroundColor: "rgba(255,255,255,0.08)", color: "var(--color-text-muted)" }}
                   aria-label={`Suivre ${SITE_NAME} sur ${label}`}
                 >
                   <Icon className="h-4 w-4" />
@@ -143,7 +145,7 @@ export default function Footer() {
               aria-label={`Navigation ${title}`}
             >
               {/* Titre de la colonne */}
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-300 mb-4">
+              <h3 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--color-text-on-dark)" }}>
                 {title}
               </h3>
 
@@ -153,7 +155,8 @@ export default function Footer() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-sm text-slate-400 hover:text-white transition-colors duration-200"
+                      className="text-sm hover:text-white transition-colors duration-200"
+                      style={{ color: "var(--color-text-muted)" }}
                     >
                       {item.label}
                     </Link>
@@ -170,10 +173,10 @@ export default function Footer() {
        * Separee visuellement par une bordure superieure fine.
        * Affiche le nom du site et l'annee courante.
        * ================================================================ */}
-      <div className="border-t border-slate-800">
+      <div className="border-t" style={{ borderColor: "rgba(255,255,255,0.1)" }}>
         <div className="page-container py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Copyright */}
-          <p className="text-sm text-slate-500">
+          <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
             &copy; {currentYear} {SITE_NAME}. Tous droits r&eacute;serv&eacute;s.
           </p>
 
@@ -181,21 +184,24 @@ export default function Footer() {
           <div className="flex items-center gap-4">
             <Link
               href="/mentions-legales"
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-200"
+              className="text-xs hover:text-white transition-colors duration-200"
+              style={{ color: "var(--color-text-muted)" }}
             >
               Mentions l&eacute;gales
             </Link>
-            <span className="text-slate-700" aria-hidden="true">|</span>
+            <span style={{ opacity: 0.2 }} aria-hidden="true">|</span>
             <Link
               href="/politique-confidentialite"
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-200"
+              className="text-xs hover:text-white transition-colors duration-200"
+              style={{ color: "var(--color-text-muted)" }}
             >
               Confidentialit&eacute;
             </Link>
-            <span className="text-slate-700" aria-hidden="true">|</span>
+            <span style={{ opacity: 0.2 }} aria-hidden="true">|</span>
             <Link
               href="/cgu"
-              className="text-xs text-slate-500 hover:text-slate-300 transition-colors duration-200"
+              className="text-xs hover:text-white transition-colors duration-200"
+              style={{ color: "var(--color-text-muted)" }}
             >
               CGU
             </Link>

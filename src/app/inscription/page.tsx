@@ -139,7 +139,7 @@ export default function InscriptionPage() {
             className="mt-2 text-sm"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Creez votre compte pour commencer
+            Cr&eacute;ez votre compte pour commencer
           </p>
         </div>
 
@@ -156,7 +156,7 @@ export default function InscriptionPage() {
                 className="mb-1.5 block text-sm font-medium"
                 style={{ color: "var(--color-text-primary)" }}
               >
-                Prenom
+                Pr&eacute;nom
               </label>
               <div className="relative">
                 <User
@@ -477,7 +477,7 @@ export default function InscriptionPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                conditions generales d&apos;utilisation
+                conditions g&eacute;n&eacute;rales d&apos;utilisation
               </Link>
             </label>
           </div>
@@ -500,7 +500,7 @@ export default function InscriptionPage() {
             aria-disabled={!isFormValid}
           >
             <UserPlus size={18} aria-hidden="true" />
-            Creer mon compte
+            Cr&eacute;er mon compte
           </button>
         </form>
 
@@ -512,7 +512,7 @@ export default function InscriptionPage() {
             className="text-sm"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Deja un compte ?{" "}
+            D&eacute;j&agrave; un compte ?{" "}
             <Link
               href="/connexion"
               className="font-semibold transition-opacity hover:opacity-80 hover:underline"

@@ -67,7 +67,7 @@ export default function CTASection() {
            * ---------------------------------------------------------------- */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur-sm">
             <Zap className="h-4 w-4" aria-hidden="true" />
-            Acces gratuit disponible
+            Acc&egrave;s gratuit disponible
           </div>
 
           {/* ----------------------------------------------------------------
@@ -75,7 +75,7 @@ export default function CTASection() {
            * Message percutant et orienté action pour encourager l'inscription.
            * ---------------------------------------------------------------- */}
           <h2 className="mb-5 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Pret a decrypter le discours politique ?
+            Pr&ecirc;t &agrave; d&eacute;crypter le discours politique ?
           </h2>
 
           {/* ----------------------------------------------------------------
@@ -84,8 +84,8 @@ export default function CTASection() {
            * pour creer une hierarchie visuelle avec le titre.
            * ---------------------------------------------------------------- */}
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-white/80">
-            Commencez gratuitement et decouvrez ce que les politiques ont
-            vraiment dit. Pas de carte bancaire requise, acces immediat a la
+            Commencez gratuitement et d&eacute;couvrez ce que les politiques ont
+            vraiment dit. Pas de carte bancaire requise, acc&egrave;s imm&eacute;diat &agrave; la
             plateforme.
           </p>
 
@@ -113,7 +113,7 @@ export default function CTASection() {
               href="/api-pro"
               className="inline-flex items-center gap-2 rounded-[var(--radius-lg)] border-2 border-white/30 px-8 py-3.5 text-base font-semibold text-white transition-all duration-[var(--transition-normal)] hover:border-white/60 hover:bg-white/10"
             >
-              Decouvrir l&apos;API
+              D&eacute;couvrir l&apos;API
             </Link>
           </div>
 
@@ -134,14 +134,14 @@ export default function CTASection() {
                 className="inline-block h-1.5 w-1.5 rounded-full bg-white/60"
                 aria-hidden="true"
               />
-              Donnees securisees
+              Donn&eacute;es s&eacute;curis&eacute;es
             </span>
             <span className="flex items-center gap-1.5">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full bg-white/60"
                 aria-hidden="true"
               />
-              Support reactif
+              Support r&eacute;actif
             </span>
           </div>
         </div>

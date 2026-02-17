@@ -67,8 +67,8 @@ export default function HeroSection() {
            * ---------------------------------------------------------------- */}
           <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-[var(--color-text-secondary)] sm:text-xl">
             Retrouvez ce que les politiques ont vraiment dit. Notre intelligence
-            artificielle analyse des milliers d&apos;heures de debats, interviews
-            et discours pour vous fournir des reponses sourcees et verifiables.
+            artificielle analyse des milliers d&apos;heures de d&eacute;bats, interviews
+            et discours pour vous fournir des r&eacute;ponses sourc&eacute;es et v&eacute;rifiables.
           </p>
 
           {/* ----------------------------------------------------------------
@@ -104,21 +104,21 @@ export default function HeroSection() {
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              Sources verifiees
+              Sources v&eacute;rifi&eacute;es
             </span>
             <span className="flex items-center gap-1.5">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              Extraits video horodates
+              Extraits vid&eacute;o horodat&eacute;s
             </span>
             <span className="flex items-center gap-1.5">
               <span
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              Mise a jour quotidienne
+              Mise &agrave; jour quotidienne
             </span>
           </div>
         </div>

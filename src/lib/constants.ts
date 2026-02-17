@@ -13,7 +13,7 @@ import type { NavItem, PricingPlan, Politician, GeneratedContent, ThemeData } fr
 export const SITE_NAME = "Dixipolis";
 export const SITE_DESCRIPTION =
   "La plateforme d'IA puissante pour analyser le discours politique. Retrouvez facilement tout ce qui a été dit par les politiciens et partis grâce à l'intelligence artificielle.";
-export const SITE_URL = "https://dixipolis.fr";
+export const SITE_URL = "https://dixipolis.vercel.app";
 
 /* --------------------------------------------------------------------------
  * NAVIGATION PRINCIPALE
@@ -24,6 +24,7 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
   { label: "Analytique", href: "/analytique" },
   { label: "Contenu", href: "/contenu" },
   { label: "API Pro", href: "/api-pro" },
+  { label: "Tarifs", href: "/tarifs" },
 ];
 
 /* --------------------------------------------------------------------------
@@ -32,8 +33,6 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
 export const SECONDARY_NAV_ITEMS: NavItem[] = [
   { label: "À Propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
-  { label: "Tarifs", href: "/tarifs" },
-  { label: "Se Connecter", href: "/connexion" },
   { label: "Compte", href: "/compte" },
 ];
 

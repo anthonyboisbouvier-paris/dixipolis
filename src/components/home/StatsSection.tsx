@@ -49,7 +49,7 @@ const stats: StatItem[] = [
     id: "hours",
     value: 10000,
     suffix: "+",
-    label: "Heures indexees",
+    label: "Heures index\u00e9es",
     icon: Clock,
   },
   {
@@ -63,14 +63,14 @@ const stats: StatItem[] = [
     id: "excerpts",
     value: 500000,
     suffix: "+",
-    label: "Extraits analyses",
+    label: "Extraits analys\u00e9s",
     icon: Database,
   },
   {
     id: "updates",
     value: 150,
     suffix: "+",
-    label: "Mises a jour / jour",
+    label: "Mises \u00e0 jour / jour",
     icon: Zap,
   },
 ];
@@ -101,11 +101,11 @@ export default function StatsSection() {
          * ---------------------------------------------------------------- */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <h2 className="mb-3 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Des donnees a grande echelle
+            Des donn&eacute;es &agrave; grande &eacute;chelle
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)]">
-            Notre plateforme indexe en continu le discours politique francais
-            pour vous offrir la base de donnees la plus exhaustive.
+            Notre plateforme indexe en continu le discours politique fran&ccedil;ais
+            pour vous offrir la base de donn&eacute;es la plus exhaustive.
           </p>
         </div>
 

@@ -37,7 +37,7 @@ import ContentGrid from "@/components/contenu/ContentGrid";
 export const metadata: Metadata = {
   title: "Contenu | Dixipolis",
   description:
-    "Consultez les articles, newsletters, syntheses et alertes generes par l'IA de Dixipolis sur l'actualite politique francaise.",
+    "Consultez les articles, newsletters, synth&egrave;ses et alertes g&eacute;n&eacute;r&eacute;s par l'IA de Dixipolis sur l'actualit&eacute; politique fran&ccedil;aise.",
 };
 
 /* --------------------------------------------------------------------------
@@ -75,7 +75,7 @@ export default function ContenuPage() {
 
         {/* Sous-titre descriptif expliquant la finalite de la page */}
         <p className="max-w-2xl text-base leading-relaxed text-[var(--color-text-secondary)] sm:text-lg">
-          Consultez le contenu genere par l&apos;IA sur l&apos;actualite politique
+          Consultez le contenu g&eacute;n&eacute;r&eacute; par l&apos;IA sur l&apos;actualit&eacute; politique
           depuis la base de Dixipolis.
         </p>
       </section>

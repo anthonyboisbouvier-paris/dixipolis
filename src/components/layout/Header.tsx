@@ -10,11 +10,12 @@
  *
  * Structure du header :
  *   - Logo "Dixipolis" avec icone plume (PenTool) a gauche, lien vers "/"
- *   - Navigation principale horizontale (desktop uniquement)
+ *   - Navigation principale horizontale (desktop uniquement), incluant Tarifs
+ *   - Bouton "Se Connecter" (desktop) : CTA primaire avec icone LogIn
  *   - Bouton hamburger a droite :
- *       > Desktop : ouvre un dropdown avec les liens secondaires uniquement
- *       > Mobile  : ouvre un menu plein ecran avec TOUS les liens (principaux + secondaires)
- *   - Fond blanc, position fixe, hauteur 64px, ombre au scroll
+ *       > Desktop : ouvre un dropdown avec les liens secondaires (A Propos, Contact, Compte)
+ *       > Mobile  : ouvre un menu plein ecran avec TOUS les liens + bouton Se Connecter
+ *   - Fond blanc, position fixe, hauteur 72px, ombre au scroll
  *
  * Couleurs et styles :
  *   - Lien actif : texte bleu primaire (var(--color-primary)) avec bordure inferieure
@@ -33,7 +34,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, PenTool, ChevronDown } from "lucide-react";
+import { Menu, X, PenTool, ChevronDown, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAIN_NAV_ITEMS, SECONDARY_NAV_ITEMS, SITE_NAME } from "@/lib/constants";
 
@@ -235,6 +236,20 @@ export default function Header() {
            * - Mobile  : ouvre le menu plein ecran avec tous les liens
            * ================================================================ */}
           <div className="flex items-center gap-2">
+            {/* -- Bouton "Se Connecter" (desktop uniquement) -- */}
+            <Link
+              href="/connexion"
+              className={cn(
+                "hidden md:inline-flex items-center gap-1.5",
+                "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
+                "text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]",
+                "shadow-sm hover:shadow-md"
+              )}
+            >
+              <LogIn className="h-4 w-4" />
+              Se Connecter
+            </Link>
+
             {/* -- Bouton hamburger desktop (liens secondaires) -- */}
             {/* Visible uniquement sur desktop (hidden md:flex) */}
             <div className="hidden md:block relative">
@@ -404,6 +419,22 @@ export default function Header() {
                 ))}
               </div>
             </div>
+
+            {/* -- Separateur visuel -- */}
+            <hr className="border-[var(--color-border)] my-6" />
+
+            {/* -- Bouton "Se Connecter" (mobile) -- */}
+            <Link
+              href="/connexion"
+              className={cn(
+                "flex items-center justify-center gap-2",
+                "w-full px-4 py-3 text-base font-semibold rounded-lg transition-all duration-200",
+                "text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]"
+              )}
+            >
+              <LogIn className="h-5 w-5" />
+              Se Connecter
+            </Link>
           </nav>
         </div>
       )}

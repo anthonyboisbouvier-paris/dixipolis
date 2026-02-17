@@ -19,7 +19,6 @@
  *   <FeaturedContent />
  * ============================================================================= */
 
-import Link from "next/link";
 import {
   FileText,
   Mail,
@@ -28,7 +27,6 @@ import {
   Clock,
   Tag,
   Users,
-  ArrowRight,
 } from "lucide-react";
 import { cn, formatDate, getReadTimeLabel } from "@/lib/utils";
 import { MOCK_CONTENT } from "@/lib/constants";
@@ -55,7 +53,7 @@ const TYPE_CONFIG: Record<
     classes: "bg-purple-50 text-purple-700",
   },
   synthesis: {
-    label: "Synthese",
+    label: "Synth\u00e8se",
     icon: BookOpen,
     classes: "bg-green-50 text-green-700",
   },
@@ -99,7 +97,7 @@ export default function FeaturedContent() {
   return (
     <section
       className="mb-8"
-      aria-label="Contenu a la une"
+      aria-label="Contenu &agrave; la une"
     >
       {/* ================================================================
        * CARTE VEDETTE
@@ -108,11 +106,10 @@ export default function FeaturedContent() {
        * de la bordure degrade en pseudo-element a gauche.
        * overflow: hidden empeche le degrade de depasser les coins arrondis.
        * ================================================================ */}
-      <Link
-        href="#"
+      <article
         className={cn(
           /* Base de la carte : fond blanc, bordure, coins arrondis */
-          "card card-interactive",
+          "card",
 
           /* Position relative pour la bordure degrade */
           "relative overflow-hidden",
@@ -120,16 +117,10 @@ export default function FeaturedContent() {
           /* Disposition horizontale sur desktop */
           "flex flex-col",
 
-          /* Suppression de la couleur de lien par defaut */
-          "text-[var(--color-text-primary)] no-underline",
-
-          /* Curseur pointeur pour indiquer l'interactivite */
-          "cursor-pointer",
-
-          /* Transition pour l'effet de survol */
-          "transition-all duration-[var(--transition-normal)]"
+          /* Couleur du texte */
+          "text-[var(--color-text-primary)]"
         )}
-        aria-label={`A la une : ${featured.title}`}
+        aria-label={`\u00c0 la une : ${featured.title}`}
       >
         {/* ================================================================
          * BORDURE GAUCHE DECORATIVE — Degrade bleu
@@ -176,7 +167,7 @@ export default function FeaturedContent() {
                 "px-2.5 py-1 text-xs font-semibold"
               )}
             >
-              A la une
+              &Agrave; la une
             </span>
           </div>
 
@@ -267,25 +258,20 @@ export default function FeaturedContent() {
             </div>
           )}
 
-          {/* ---- Bouton CTA "Lire l'article" ---- */}
-          {/* Simule un bouton mais est en fait un span dans le <Link> */}
+          {/* ---- Badge "Bientot disponible" ---- */}
           <span
             className={cn(
               "inline-flex items-center gap-2",
-              "text-sm font-semibold",
-              "text-[var(--color-primary)]",
-              "transition-all duration-[var(--transition-fast)]",
-              "group-hover:gap-3"
+              "rounded-[var(--radius-full)]",
+              "bg-[var(--color-bg-section)] text-[var(--color-text-muted)]",
+              "px-3 py-1 text-xs font-medium",
+              "border border-[var(--color-border-light)]"
             )}
           >
-            Lire l&apos;article
-            <ArrowRight
-              className="h-4 w-4 transition-transform duration-[var(--transition-fast)]"
-              aria-hidden="true"
-            />
+            Bient&ocirc;t disponible
           </span>
         </div>
-      </Link>
+      </article>
     </section>
   );
 }

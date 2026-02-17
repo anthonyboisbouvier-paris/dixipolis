@@ -75,11 +75,11 @@ interface FormErrors {
  * CONSTANTES LOCALES — Sujets disponibles dans le select
  * -------------------------------------------------------------------------- */
 const SUBJECT_OPTIONS = [
-  { value: "", label: "Selectionnez un sujet" },
-  { value: "question", label: "Question generale" },
+  { value: "", label: "S\u00e9lectionnez un sujet" },
+  { value: "question", label: "Question g\u00e9n\u00e9rale" },
   { value: "partenariat", label: "Partenariat" },
   { value: "support", label: "Support technique" },
-  { value: "presse", label: "Presse & medias" },
+  { value: "presse", label: "Presse & m\u00e9dias" },
   { value: "autre", label: "Autre" },
 ] as const;
 
@@ -169,14 +169,14 @@ export default function ContactPage() {
 
     /* Validation du sujet */
     if (!formData.subject) {
-      newErrors.subject = "Veuillez selectionner un sujet.";
+      newErrors.subject = "Veuillez s\u00e9lectionner un sujet.";
     }
 
     /* Validation du message */
     if (!formData.message.trim()) {
       newErrors.message = "Le message est requis.";
     } else if (formData.message.trim().length < 10) {
-      newErrors.message = "Le message doit contenir au moins 10 caracteres.";
+      newErrors.message = "Le message doit contenir au moins 10 caract\u00e8res.";
     }
 
     setErrors(newErrors);
@@ -283,8 +283,8 @@ export default function ContactPage() {
           style={{ color: "var(--color-text-secondary)" }}
         >
           Une question, une proposition de partenariat ou un besoin
-          d&apos;assistance ? N&apos;hesitez pas a nous ecrire. Nous vous
-          repondrons dans les meilleurs delais.
+          d&apos;assistance ? N&apos;h&eacute;sitez pas &agrave; nous &eacute;crire. Nous vous
+          r&eacute;pondrons dans les meilleurs d&eacute;lais.
         </p>
       </section>
 
@@ -310,8 +310,8 @@ export default function ContactPage() {
               >
                 <CheckCircle2 className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
                 <p>
-                  Votre message a bien ete envoye. Nous vous repondrons dans les
-                  plus brefs delais.
+                  Votre message a bien &eacute;t&eacute; envoy&eacute;. Nous vous r&eacute;pondrons dans les
+                  plus brefs d&eacute;lais.
                 </p>
               </div>
             )}
@@ -337,7 +337,7 @@ export default function ContactPage() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Votre nom et prenom"
+                    placeholder="Votre nom et pr&eacute;nom"
                     className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 focus:outline-none focus:ring-2"
                     style={{
                       ...(errors.name ? inputErrorStyle : inputBaseStyle),
@@ -456,7 +456,7 @@ export default function ContactPage() {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Decrivez votre demande en detail..."
+                    placeholder="D&eacute;crivez votre demande en d&eacute;tail..."
                     rows={6}
                     className="w-full rounded-lg border px-4 py-3 text-sm transition-colors duration-200 resize-y focus:outline-none focus:ring-2"
                     style={{
@@ -522,7 +522,7 @@ export default function ContactPage() {
               className="text-lg font-bold mb-5"
               style={{ color: "var(--color-text-primary)" }}
             >
-              Nos coordonnees
+              Nos coordonn&eacute;es
             </h2>
 
             <div className="space-y-5">
@@ -621,16 +621,16 @@ export default function ContactPage() {
                 className="text-sm font-bold"
                 style={{ color: "var(--color-primary)" }}
               >
-                Delai de reponse
+                D&eacute;lai de r&eacute;ponse
               </h3>
             </div>
             <p
               className="text-sm leading-relaxed"
               style={{ color: "var(--color-text-secondary)" }}
             >
-              Nous nous engageons a repondre a toutes les demandes dans un
-              delai de 48 heures ouvrees. Pour les demandes urgentes de
-              support technique, veuillez le preciser dans votre message.
+              Nous nous engageons &agrave; r&eacute;pondre &agrave; toutes les demandes dans un
+              d&eacute;lai de 48 heures ouvr&eacute;es. Pour les demandes urgentes de
+              support technique, veuillez le pr&eacute;ciser dans votre message.
             </p>
           </div>
         </div>

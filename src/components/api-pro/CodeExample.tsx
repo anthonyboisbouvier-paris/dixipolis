@@ -309,7 +309,6 @@ export default function CodeExample() {
 
   return (
     <section
-      id="documentation"
       className="bg-[var(--color-bg-page)] py-16 sm:py-20 lg:py-24"
       aria-label="Exemple de code API Dixipolis"
     >
@@ -348,7 +347,7 @@ export default function CodeExample() {
             {/* ---- Barre d'onglets ---- */}
             <div className="flex items-center justify-between border-b border-slate-700 bg-[#0f172a] px-4">
               {/* Onglets de langage */}
-              <div className="flex">
+              <div className="flex" role="tablist">
                 {(Object.keys(codeExamples) as CodeTab[]).map((tab) => (
                   <button
                     key={tab}
@@ -391,7 +390,7 @@ export default function CodeExample() {
             </div>
 
             {/* ---- Bloc de code avec coloration syntaxique ---- */}
-            <div className="overflow-x-auto bg-[#1e293b] p-5">
+            <div className="overflow-x-auto bg-[#1e293b] p-5" role="tabpanel">
               <pre className="font-mono text-sm leading-relaxed text-[#e2e8f0]">
                 <code>{codeExamples[activeTab].jsx}</code>
               </pre>

@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
-  <rect width="200" height="200" rx="100" fill="#e8f0fe"/>
-  <circle cx="100" cy="80" r="35" fill="#94a3b8"/>
-  <ellipse cx="100" cy="160" rx="55" ry="40" fill="#94a3b8"/>
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="100" fill="#dbeafe"/>
+  <!-- Head -->
+  <circle cx="100" cy="78" r="32" fill="#2563eb"/>
+  <!-- Body / shoulders -->
+  <path d="M100 118c-32 0-56 16-56 36v10h112v-10c0-20-24-36-56-36z" fill="#2563eb"/>
 </svg>

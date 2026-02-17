@@ -118,6 +118,7 @@ const methodStyles: Record<"GET" | "POST", string> = {
 export default function EndpointList() {
   return (
     <section
+      id="documentation"
       className="bg-white py-16 sm:py-20 lg:py-24"
       aria-label="Liste des endpoints de l'API Dixipolis"
     >

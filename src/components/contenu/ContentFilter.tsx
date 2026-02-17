@@ -77,7 +77,7 @@ const FILTER_TABS: Array<{
   { key: "all", label: "Tout", icon: Filter },
   { key: "article", label: "Articles", icon: FileText },
   { key: "newsletter", label: "Newsletters", icon: Mail },
-  { key: "synthesis", label: "Syntheses", icon: BookOpen },
+  { key: "synthesis", label: "Synth\u00e8ses", icon: BookOpen },
   { key: "alert", label: "Alertes", icon: Bell },
 ];
 

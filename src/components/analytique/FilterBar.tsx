@@ -128,7 +128,7 @@ export default function FilterBar() {
 
   /* Options pour le select des themes */
   const themeOptions: { value: string; label: string }[] = [
-    { value: "", label: "Tous les themes" },
+    { value: "", label: "Tous les th\u00e8mes" },
     ...MOCK_THEMES.map((t) => ({
       value: t.theme,
       label: t.theme,
@@ -153,7 +153,7 @@ export default function FilterBar() {
 
       {/* Select : Periode */}
       <FilterSelect
-        label="Periode"
+        label="P\u00e9riode"
         value={filters.period}
         onChange={(v) => setFilters((prev) => ({ ...prev, period: v }))}
         options={PERIOD_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
@@ -170,7 +170,7 @@ export default function FilterBar() {
 
       {/* Select : Theme */}
       <FilterSelect
-        label="Theme"
+        label="Th\u00e8me"
         value={filters.theme}
         onChange={(v) => setFilters((prev) => ({ ...prev, theme: v }))}
         options={themeOptions}
@@ -194,7 +194,7 @@ export default function FilterBar() {
           }}
         >
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-          Reinitialiser
+          R&eacute;initialiser
           <span
             className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white"
             style={{ backgroundColor: "var(--color-primary)" }}
