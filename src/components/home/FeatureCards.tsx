@@ -24,7 +24,6 @@ import {
   Brain,
   FileText,
   Database,
-  Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

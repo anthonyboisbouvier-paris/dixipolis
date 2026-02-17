@@ -172,7 +172,7 @@ console.log(data);`,
       <>
         {/* Commentaire descriptif */}
         <span style={{ color: "#86efac" }}>
-          // Recherche semantique avec fetch (ES2022+)
+          {"// Recherche semantique avec fetch (ES2022+)"}
         </span>
         {"\n"}
         {/* Declaration */}

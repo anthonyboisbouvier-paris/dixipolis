@@ -73,7 +73,9 @@ export default function Header() {
   /* ---- Fermeture au changement de route ---- */
   // Quand l'utilisateur navigue vers une nouvelle page, on ferme tous les menus
   // pour eviter qu'ils restent ouverts apres la navigation.
+  // C'est un pattern legitime : on remet l'UI dans un etat coherent apres navigation.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobileMenuOpen(false);
     setIsDropdownOpen(false);
   }, [pathname]);

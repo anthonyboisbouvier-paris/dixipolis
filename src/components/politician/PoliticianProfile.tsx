@@ -38,9 +38,8 @@ import {
   Building,
   Clock,
   MapPin,
-  ExternalLink,
 } from "lucide-react";
-import { cn, formatDate, formatNumber } from "@/lib/utils";
+import { formatDate, formatNumber } from "@/lib/utils";
 import type { Politician } from "@/types";
 
 /* --------------------------------------------------------------------------

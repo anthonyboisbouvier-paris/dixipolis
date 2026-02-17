@@ -11,7 +11,7 @@
  * ============================================================================= */
 
 import Link from "next/link";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 
 /* --------------------------------------------------------------------------
  * HeroSection — Composant principal de la section hero

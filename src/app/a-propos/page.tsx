@@ -33,7 +33,6 @@
  * ============================================================================= */
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   Users,
   Target,
@@ -50,7 +49,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
-import { cn } from "@/lib/utils";
 
 /* --------------------------------------------------------------------------
  * METADONNEES SEO — Titre et description de la page

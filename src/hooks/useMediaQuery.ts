@@ -7,27 +7,36 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore, useCallback } from "react";
 
 /**
  * useMediaQuery — Retourne true si la media query correspond.
+ *
+ * Utilise useSyncExternalStore (React 18+) pour souscrire aux changements
+ * de media query sans appeler setState dans un useEffect, ce qui est
+ * conforme aux règles react-hooks/set-state-in-effect.
+ *
  * @param query - Media query CSS (ex: "(min-width: 768px)")
  * @returns boolean
  */
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  // Souscription aux changements de la media query
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const mediaQuery = window.matchMedia(query);
+      mediaQuery.addEventListener("change", callback);
+      return () => mediaQuery.removeEventListener("change", callback);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    setMatches(mediaQuery.matches);
-
-    const handler = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+  // Snapshot côté client : valeur actuelle de la media query
+  const getSnapshot = useCallback(() => {
+    return window.matchMedia(query).matches;
   }, [query]);
 
-  return matches;
+  // Snapshot côté serveur (SSR) : toujours false
+  const getServerSnapshot = useCallback(() => false, []);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

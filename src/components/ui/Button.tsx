@@ -214,7 +214,8 @@ export const Button = forwardRef<
 
   /* Si "href" est fourni, on rend un <a> */
   if ("href" in props && props.href !== undefined) {
-    const { href, variant: _v, size: _s, loading: _l, iconLeft: _il, iconRight: _ir, ...linkProps } = props as ButtonAsLink;
+    const { href, variant: _variant, size: _size, loading: _loading, iconLeft: _il, iconRight: _ir, ...linkProps } = props as ButtonAsLink;
+    void _variant; void _size; void _loading; void _il; void _ir;
     return (
       <a
         ref={ref as React.Ref<HTMLAnchorElement>}
@@ -230,7 +231,8 @@ export const Button = forwardRef<
   }
 
   /* Sinon, on rend un <button> classique */
-  const { variant: _v, size: _s, loading: _l, iconLeft: _il, iconRight: _ir, ...buttonProps } = restProps as Omit<ButtonAsButton, "children" | "className">;
+  const { variant: _variant2, size: _size2, loading: _loading2, iconLeft: _il2, iconRight: _ir2, ...buttonProps } = restProps as Omit<ButtonAsButton, "children" | "className">;
+  void _variant2; void _size2; void _loading2; void _il2; void _ir2;
   return (
     <button
       ref={ref as React.Ref<HTMLButtonElement>}
