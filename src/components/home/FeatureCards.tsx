@@ -1,14 +1,11 @@
 /* =============================================================================
  * components/home/FeatureCards.tsx
  *
- * Section de presentation des 4 fonctionnalites principales de Dixipolis.
- * Mise a jour pour refleter les vraies capacites du produit :
- *   1. Agent IA — Recherche semantique + textuelle via agent LLM
- *   2. Analytique — Metriques discursives, distance ideologique, word clouds
- *   3. Contenu — Fact-checking, detection propagande, alertes
- *   4. API Pro — 5 endpoints pour developpeurs (search, text, videos, context, entities)
+ * 4 modules Dixipolis — approche UX "ce que l'utilisateur peut FAIRE".
+ * Design audacieux : icônes larges, couleurs fortes, texte orienté action.
+ * Chaque carte répond à la question "Qu'est-ce que je peux faire avec ça ?"
  *
- * Composant serveur (Server Component) — pas de "use client".
+ * Composant serveur (Server Component).
  * ============================================================================= */
 
 import Link from "next/link";
@@ -18,10 +15,6 @@ import {
   Shield,
   Code,
   ArrowRight,
-  Brain,
-  Target,
-  Scale,
-  Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -29,92 +22,95 @@ import { cn } from "@/lib/utils";
 interface FeatureCardData {
   id: string;
   title: string;
+  tagline: string;
   description: string;
+  userActions: string[];
   href: string;
+  ctaLabel: string;
   icon: React.ComponentType<{ className?: string }>;
-  illustrationIcon: React.ComponentType<{ className?: string }>;
-  highlights: string[];
-  iconBgClass: string;
-  iconTextClass: string;
-  illustrationBgClass: string;
-  illustrationIconClass: string;
+  accentColor: string;
+  accentBg: string;
+  accentBorder: string;
+  gradient: string;
 }
 
-/* --------------------------------------------------------------------------
- * Les 4 fonctionnalites principales, alignees avec les tickets Linear.
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 const features: FeatureCardData[] = [
   {
     id: "prompt",
-    title: "Agent IA",
+    title: "Interroger la base",
+    tagline: "Posez une question, obtenez des preuves",
     description:
-      "Un agent intelligent qui combine recherche s\u00e9mantique et textuelle pour retrouver ce que les politiques ont vraiment dit, avec sources vid\u00e9o horodat\u00e9es.",
-    highlights: [
-      "Recherche par le sens (embeddings)",
-      "Citations mot-pour-mot",
-      "Contexte complet du discours",
+      "Un agent IA qui fouille 45 000+ discours pour retrouver exactement ce qu\u2019un politique a dit \u2014 avec l\u2019extrait vid\u00e9o horodat\u00e9.",
+    userActions: [
+      "Rechercher par le sens ou par citation exacte",
+      "Obtenir l\u2019extrait vid\u00e9o avec timecode",
+      "Croiser les d\u00e9clarations de plusieurs politiciens",
     ],
     href: "/prompt",
+    ctaLabel: "Poser une question",
     icon: MessageSquare,
-    illustrationIcon: Brain,
-    iconBgClass: "bg-[#dbeafe]",
-    iconTextClass: "text-[#2563eb]",
-    illustrationBgClass: "bg-gradient-to-br from-[#eff6ff] to-[#dbeafe]",
-    illustrationIconClass: "text-[#2563eb]",
+    accentColor: "#2563eb",
+    accentBg: "rgba(37,99,235,0.08)",
+    accentBorder: "rgba(37,99,235,0.2)",
+    gradient: "linear-gradient(135deg, #2563eb 0%, #6366f1 100%)",
   },
   {
     id: "analytique",
-    title: "Analytique",
+    title: "Explorer les donn\u00e9es",
+    tagline: "Tableaux de bord du discours politique",
     description:
-      "Tableaux de bord avec m\u00e9triques discursives : temps de parole, d\u00e9bit, diversit\u00e9 du vocabulaire, distance id\u00e9ologique entre politiciens.",
-    highlights: [
-      "M\u00e9triques mensuelles par politicien",
-      "Matrice de distance id\u00e9ologique",
-      "Mots sur-repr\u00e9sent\u00e9s (word cloud)",
+      "Visualisez qui parle de quoi, la distance id\u00e9ologique entre partis, les mots sur-repr\u00e9sent\u00e9s et l\u2019\u00e9volution dans le temps.",
+    userActions: [
+      "Comparer les th\u00e8mes par politicien et par parti",
+      "Voir la matrice de proximit\u00e9 id\u00e9ologique",
+      "Suivre l\u2019\u00e9volution des sujets dans le temps",
     ],
     href: "/analytique",
+    ctaLabel: "Voir le dashboard",
     icon: BarChart3,
-    illustrationIcon: Target,
-    iconBgClass: "bg-[#dcfce7]",
-    iconTextClass: "text-[#16a34a]",
-    illustrationBgClass: "bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7]",
-    illustrationIconClass: "text-[#16a34a]",
+    accentColor: "#16a34a",
+    accentBg: "rgba(22,163,74,0.08)",
+    accentBorder: "rgba(22,163,74,0.2)",
+    gradient: "linear-gradient(135deg, #16a34a 0%, #10b981 100%)",
   },
   {
     id: "contenu",
-    title: "V\u00e9rification",
+    title: "V\u00e9rifier les faits",
+    tagline: "Fact-checking et d\u00e9tection de propagande",
     description:
-      "Fact-checking automatis\u00e9 des assertions politiques, d\u00e9tection de propagande et analyse du ton \u00e9motionnel de chaque discours.",
-    highlights: [
-      "Fact-checking via Factiverse",
-      "D\u00e9tection de propagande",
-      "Analyse \u00e9motionnelle et toxicit\u00e9",
+      "Chaque assertion politique est v\u00e9rifi\u00e9e automatiquement. L\u2019IA d\u00e9tecte les techniques de manipulation et le ton \u00e9motionnel.",
+    userActions: [
+      "Lire les fact-checks automatis\u00e9s avec verdict",
+      "D\u00e9tecter les techniques de propagande",
+      "Mesurer la toxicit\u00e9 et le ton \u00e9motionnel",
     ],
     href: "/contenu",
+    ctaLabel: "Voir les v\u00e9rifications",
     icon: Shield,
-    illustrationIcon: Scale,
-    iconBgClass: "bg-[#fef3c7]",
-    iconTextClass: "text-[#d97706]",
-    illustrationBgClass: "bg-gradient-to-br from-[#fffbeb] to-[#fef3c7]",
-    illustrationIconClass: "text-[#d97706]",
+    accentColor: "#d97706",
+    accentBg: "rgba(217,119,6,0.08)",
+    accentBorder: "rgba(217,119,6,0.2)",
+    gradient: "linear-gradient(135deg, #d97706 0%, #f59e0b 100%)",
   },
   {
     id: "api-pro",
-    title: "API Pro",
+    title: "Int\u00e9grer via API",
+    tagline: "5 endpoints pour vos applications",
     description:
-      "5 endpoints pour int\u00e9grer Dixipolis dans vos apps : recherche s\u00e9mantique, textuelle, inventaire vid\u00e9o, contexte et r\u00e9solution d\u2019entit\u00e9s.",
-    highlights: [
-      "Recherche s\u00e9mantique + textuelle",
-      "Liste vid\u00e9os par politicien/th\u00e8me",
-      "R\u00e9solution d\u2019entit\u00e9s (personne/parti/th\u00e8me)",
+      "Int\u00e9grez la puissance de Dixipolis dans vos propres outils : recherche s\u00e9mantique, inventaire vid\u00e9o, r\u00e9solution d\u2019entit\u00e9s.",
+    userActions: [
+      "Recherche s\u00e9mantique + textuelle en une requ\u00eate",
+      "Lister les vid\u00e9os par politicien ou th\u00e8me",
+      "R\u00e9soudre automatiquement personnes et partis",
     ],
     href: "/api-pro",
+    ctaLabel: "Voir la doc API",
     icon: Code,
-    illustrationIcon: Database,
-    iconBgClass: "bg-[#e0e7ff]",
-    iconTextClass: "text-[#4f46e5]",
-    illustrationBgClass: "bg-gradient-to-br from-[#eef2ff] to-[#e0e7ff]",
-    illustrationIconClass: "text-[#4f46e5]",
+    accentColor: "#7c3aed",
+    accentBg: "rgba(124,58,237,0.08)",
+    accentBorder: "rgba(124,58,237,0.2)",
+    gradient: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
   },
 ];
 
@@ -122,24 +118,27 @@ const features: FeatureCardData[] = [
 export default function FeatureCards() {
   return (
     <section
-      className="bg-[var(--color-bg-page)] py-16 sm:py-20 lg:py-24"
-      aria-label="Fonctionnalit\u00e9s principales de Dixipolis"
+      className="py-16 sm:py-20 lg:py-24"
+      style={{ backgroundColor: "var(--color-bg-page)" }}
+      aria-label="Ce que vous pouvez faire avec Dixipolis"
     >
       <div className="page-container">
-        {/* En-tete de section */}
+        {/* En-tête */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Quatre outils pour d&eacute;crypter le politique
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "var(--color-border)", color: "var(--color-primary)", backgroundColor: "var(--color-primary-light)" }}>
+            4 modules
+          </div>
+          <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl" style={{ color: "var(--color-text-primary)" }}>
+            Qu&apos;est-ce que vous pouvez faire ?
           </h2>
-          <p className="text-lg text-[var(--color-text-secondary)]">
-            De l&apos;ing&eacute;stion vid&eacute;o au fact-checking, chaque module
-            exploite l&apos;IA pour vous donner un acc&egrave;s clair et sourc&eacute;
-            au discours politique fran&ccedil;ais.
+          <p className="text-lg" style={{ color: "var(--color-text-secondary)" }}>
+            Quatre fa&ccedil;ons d&apos;exploiter la plus grande base de donn&eacute;es
+            du discours politique fran&ccedil;ais.
           </p>
         </div>
 
-        {/* Grille responsive */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        {/* Grille 2×2 */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
           {features.map((feature) => (
             <FeatureCard key={feature.id} feature={feature} />
           ))}
@@ -153,83 +152,103 @@ export default function FeatureCards() {
 function FeatureCard({ feature }: { feature: FeatureCardData }) {
   const {
     title,
+    tagline,
     description,
+    userActions,
     href,
-    highlights,
+    ctaLabel,
     icon: Icon,
-    illustrationIcon: IllustrationIcon,
-    iconBgClass,
-    iconTextClass,
-    illustrationBgClass,
-    illustrationIconClass,
+    accentColor,
+    accentBg,
+    accentBorder,
+    gradient,
   } = feature;
 
   return (
     <Link
       href={href}
-      className="card card-interactive group flex flex-col p-6"
-      aria-label={`D\u00e9couvrir ${title}`}
+      className="card card-interactive group flex flex-col overflow-hidden"
+      aria-label={ctaLabel}
     >
-      {/* Badge icone */}
-      <div
-        className={cn(
-          "mb-4 flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)]",
-          iconBgClass
-        )}
-        aria-hidden="true"
-      >
-        <Icon className={cn("h-5 w-5", iconTextClass)} />
-      </div>
+      {/* Bande de couleur en haut */}
+      <div className="h-1.5" style={{ background: gradient }} />
 
-      {/* Titre */}
-      <h3 className="mb-2 text-lg font-bold text-[var(--color-text-primary)]">
-        {title}
-      </h3>
-
-      {/* Description */}
-      <p className="mb-4 flex-1 text-sm leading-relaxed text-[var(--color-text-secondary)]">
-        {description}
-      </p>
-
-      {/* Points cles */}
-      <ul className="mb-5 space-y-1.5">
-        {highlights.map((item) => (
-          <li
-            key={item}
-            className="flex items-start gap-2 text-xs text-[var(--color-text-secondary)]"
+      <div className="flex flex-1 flex-col p-6 sm:p-8">
+        {/* Icône + tagline */}
+        <div className="mb-4 flex items-center gap-3">
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-xl"
+            style={{ background: gradient, color: "#fff" }}
+            aria-hidden="true"
           >
-            <span
-              className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-[var(--color-primary)]"
-              aria-hidden="true"
-            />
-            {item}
-          </li>
-        ))}
-      </ul>
+            <Icon className="h-6 w-6" />
+          </div>
+          <div>
+            <h3
+              className="text-lg font-bold"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              {title}
+            </h3>
+            <p className="text-xs font-medium" style={{ color: accentColor }}>
+              {tagline}
+            </p>
+          </div>
+        </div>
 
-      {/* Zone illustration */}
-      <div
-        className={cn(
-          "mb-5 flex h-28 items-center justify-center rounded-[var(--radius-lg)]",
-          illustrationBgClass
-        )}
-        aria-hidden="true"
-      >
-        <IllustrationIcon
-          className={cn(
-            "h-10 w-10 opacity-40 transition-transform duration-300 group-hover:scale-110",
-            illustrationIconClass
-          )}
-        />
-      </div>
+        {/* Description */}
+        <p
+          className="mb-5 text-sm leading-relaxed"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
+          {description}
+        </p>
 
-      {/* Bouton CTA */}
-      <div className="flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-[var(--transition-fast)] group-hover:bg-[var(--color-primary-hover)]">
-        <span>D&eacute;couvrir</span>
-        <ArrowRight
-          className="ml-2 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"
-          aria-hidden="true"
-        />
+        {/* Actions utilisateur */}
+        <div
+          className="mb-6 flex-1 rounded-xl border p-4"
+          style={{
+            backgroundColor: accentBg,
+            borderColor: accentBorder,
+          }}
+        >
+          <p
+            className="mb-2.5 text-[11px] font-bold uppercase tracking-wider"
+            style={{ color: accentColor }}
+          >
+            Ce que vous pouvez faire
+          </p>
+          <ul className="space-y-2">
+            {userActions.map((action) => (
+              <li
+                key={action}
+                className="flex items-start gap-2 text-sm"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                <span
+                  className={cn(
+                    "mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+                  )}
+                  style={{ backgroundColor: accentColor }}
+                  aria-hidden="true"
+                />
+                {action}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* CTA */}
+        <div
+          className="flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white transition-all duration-200 group-hover:shadow-lg"
+          style={{ background: gradient }}
+        >
+          {ctaLabel}
+          <ArrowRight
+            className="h-4 w-4 transition-transform group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </div>
       </div>
     </Link>
   );

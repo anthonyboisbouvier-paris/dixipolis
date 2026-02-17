@@ -1,20 +1,10 @@
 /* =============================================================================
  * app/page.tsx
  *
- * Page d'accueil de l'application Dixipolis.
- * Composant serveur (Server Component) qui importe et assemble toutes les
- * sections de la page d'accueil dans l'ordre de defilement.
+ * Page d'accueil Dixipolis.
+ * Parcours : accroche data-first > features > chiffres > cas d'usage > CTA.
  *
- * Structure de la page :
- *   1. HeroSection    — Titre, sous-titre et CTA principal
- *   2. FeatureCards   — Grille des 4 fonctionnalites (Prompt, Analytique, Contenu, API)
- *   3. StatsSection   — Chiffres cles de la plateforme
- *   4. HowItWorks     — 3 etapes du processus utilisateur
- *   5. CTASection     — Appel a l'action final
- *
- * Chaque section est un composant autonome avec son propre style et contenu.
- * L'ordre est choisi pour guider le visiteur dans un parcours de decouverte :
- * accroche > fonctionnalites > credibilite > comprehension > conversion.
+ * Composant serveur (Server Component).
  * ============================================================================= */
 
 import HeroSection from "@/components/home/HeroSection";
@@ -23,33 +13,23 @@ import StatsSection from "@/components/home/StatsSection";
 import HowItWorks from "@/components/home/HowItWorks";
 import CTASection from "@/components/home/CTASection";
 
-/* --------------------------------------------------------------------------
- * Home — Composant de page principal
- *
- * Ce composant est le point d'entree de la route "/" (racine).
- * Il n'a pas de logique propre : il se contente d'orchestrer l'affichage
- * des sections dans l'ordre de defilement.
- *
- * Note : le <main> semantique est deja fourni par le layout racine
- * (app/layout.tsx). On utilise donc un Fragment React (<>) ici
- * pour eviter un <main> imbrique invalide en HTML.
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export default function Home() {
   return (
     <>
-      {/* Section 1 — Hero : accroche visuelle et proposition de valeur */}
+      {/* 1 — Hero : "Chaque mot prononcé, transcrit et cherchable" + pipeline */}
       <HeroSection />
 
-      {/* Section 2 — Fonctionnalites : les 4 outils de la plateforme */}
-      <FeatureCards />
-
-      {/* Section 3 — Statistiques : chiffres cles pour la credibilite */}
+      {/* 2 — Stats : fond sombre, chiffres lumineux (la base en chiffres) */}
       <StatsSection />
 
-      {/* Section 4 — Comment ca marche : processus en 3 etapes */}
+      {/* 3 — Features : 4 modules UX-oriented (interroger, explorer, vérifier, API) */}
+      <FeatureCards />
+
+      {/* 4 — Cas d'usage : 3 scénarios concrets avec exemples */}
       <HowItWorks />
 
-      {/* Section 5 — CTA final : conversion du visiteur */}
+      {/* 5 — CTA final : "45 000 discours vous attendent" */}
       <CTASection />
     </>
   );

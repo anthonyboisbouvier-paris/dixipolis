@@ -1,49 +1,53 @@
 /* =============================================================================
  * components/home/HowItWorks.tsx
  *
- * Section "Comment ca marche" — 3 etapes du pipeline Dixipolis.
- * Mise a jour pour refleter le vrai pipeline des tickets Linear :
- *   1. Ingestion — Decouverte et transcription video quotidienne
- *   2. Analyse IA — Classification thematique, emotions, fact-checking
- *   3. Requete — Agent IA qui repond avec preuves sourcees
+ * Section "Cas d'usage" — Montre 3 scénarios concrets.
+ * Pas un pipeline technique, mais ce que l'UTILISATEUR fait.
+ * Design : cartes avec numéros, emojis, exemples concrets.
  *
- * Composant serveur (Server Component) — pas de "use client".
+ * Composant serveur (Server Component).
  * ============================================================================= */
 
-import { Video, Brain, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
-interface StepData {
-  stepNumber: number;
+interface UseCaseData {
+  number: string;
+  emoji: string;
   title: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
+  scenario: string;
+  example: string;
+  href: string;
 }
 
-/* --------------------------------------------------------------------------
- * Les 3 etapes du pipeline, alignees avec les tickets Linear.
- * -------------------------------------------------------------------------- */
-const steps: StepData[] = [
+const useCases: UseCaseData[] = [
   {
-    stepNumber: 1,
-    title: "Ingestion quotidienne",
-    description:
-      "Chaque jour, notre syst\u00e8me d\u00e9couvre automatiquement les nouvelles vid\u00e9os politiques, les transcrit mot \u00e0 mot avec horodatage pr\u00e9cis, et identifie chaque orateur.",
-    icon: Video,
+    number: "01",
+    emoji: "\ud83d\udd0d",
+    title: "Retrouver une d\u00e9claration pr\u00e9cise",
+    scenario:
+      "Vous avez entendu un politique dire quelque chose en interview mais vous ne retrouvez plus la source. Posez votre question \u00e0 l\u2019agent IA, il retrouve l\u2019extrait exact avec la vid\u00e9o.",
+    example: "\u00ab Qu\u2019a dit Darmanin sur les violences polici\u00e8res en mars 2024 ? \u00bb",
+    href: "/prompt",
   },
   {
-    stepNumber: 2,
-    title: "Analyse multi-couches",
-    description:
-      "L\u2019IA classifie chaque tour de parole par th\u00e9matique, d\u00e9tecte les \u00e9motions, la toxicit\u00e9, les techniques de propagande, et identifie les assertions fact-checkables.",
-    icon: Brain,
+    number: "02",
+    emoji: "\ud83d\udcca",
+    title: "Comparer les positions des partis",
+    scenario:
+      "Vous voulez comprendre les diff\u00e9rences r\u00e9elles entre les discours de gauche et de droite sur un sujet. Le dashboard analytique compare les th\u00e8mes, mots-cl\u00e9s et distance id\u00e9ologique.",
+    example: "Matrice id\u00e9ologique RE vs RN vs LFI sur l\u2019\u00e9conomie",
+    href: "/analytique",
   },
   {
-    stepNumber: 3,
-    title: "R\u00e9ponses sourc\u00e9es",
-    description:
-      "Posez votre question en langage naturel. L\u2019agent combine recherche s\u00e9mantique et textuelle pour vous fournir des extraits exacts avec lien vid\u00e9o horodat\u00e9.",
-    icon: MessageSquare,
+    number: "03",
+    emoji: "\ud83d\udee1\ufe0f",
+    title: "V\u00e9rifier si c\u2019est vrai",
+    scenario:
+      "Un politique affirme un chiffre ou un fait. Le module de v\u00e9rification croise automatiquement les sources et affiche le verdict : confirm\u00e9, exag\u00e9r\u00e9, faux ou manipulatoire.",
+    example: "Fact-check : \u00ab Le ch\u00f4mage n\u2019a jamais \u00e9t\u00e9 aussi bas \u00bb",
+    href: "/contenu",
   },
 ];
 
@@ -51,63 +55,88 @@ const steps: StepData[] = [
 export default function HowItWorks() {
   return (
     <section
-      className="bg-[var(--color-bg-page)] py-16 sm:py-20 lg:py-24"
-      aria-label="Comment fonctionne Dixipolis"
+      className="py-16 sm:py-20 lg:py-24"
+      style={{ backgroundColor: "var(--color-bg-page)" }}
+      aria-label="Cas d'usage Dixipolis"
     >
       <div className="page-container">
-        {/* En-tete */}
+        {/* En-tête */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Comment &ccedil;a marche ?
+          <h2
+            className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            Concr&egrave;tement, &agrave; quoi &ccedil;a sert ?
           </h2>
-          <p className="text-lg text-[var(--color-text-secondary)]">
-            De la vid&eacute;o brute &agrave; la r&eacute;ponse sourc&eacute;e, tout est automatis&eacute;.
-            Aucune intervention humaine dans le pipeline d&apos;analyse.
+          <p className="text-lg" style={{ color: "var(--color-text-secondary)" }}>
+            Trois sc&eacute;narios r&eacute;els que nos utilisateurs vivent au quotidien.
           </p>
         </div>
 
-        {/* Grille des 3 etapes */}
-        <ol className="relative grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8 lg:gap-12">
-          {steps.map((step, index) => {
-            const Icon = step.icon;
-            const isLast = index === steps.length - 1;
+        {/* Cas d'usage */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
+          {useCases.map((uc) => (
+            <Link
+              key={uc.number}
+              href={uc.href}
+              className="card card-interactive group flex flex-col overflow-hidden p-6 sm:p-8"
+            >
+              {/* Numéro + Emoji */}
+              <div className="mb-5 flex items-center gap-3">
+                <span
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-black"
+                  style={{
+                    background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+                    color: "#fff",
+                  }}
+                >
+                  {uc.number}
+                </span>
+                <span className="text-2xl" role="img" aria-hidden="true">
+                  {uc.emoji}
+                </span>
+              </div>
 
-            return (
-              <li key={step.stepNumber} className="relative flex flex-col items-center text-center">
-                {/* Connecteur horizontal (desktop) */}
-                {!isLast && (
-                  <div
-                    className="pointer-events-none absolute left-1/2 top-8 hidden h-0.5 w-full border-t-2 border-dashed border-[var(--color-border)] md:block"
-                    aria-hidden="true"
-                  />
-                )}
+              {/* Titre */}
+              <h3
+                className="mb-3 text-lg font-bold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                {uc.title}
+              </h3>
 
-                {/* Cercle icone */}
-                <div className="relative z-10 mb-5">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary-light)] ring-4 ring-white">
-                    <Icon className="h-7 w-7 text-[var(--color-primary)]" aria-hidden="true" />
-                  </div>
-                  <span
-                    className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs font-bold text-white"
-                    aria-label={`\u00c9tape ${step.stepNumber}`}
-                  >
-                    {step.stepNumber}
-                  </span>
-                </div>
+              {/* Scénario */}
+              <p
+                className="mb-5 flex-1 text-sm leading-relaxed"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                {uc.scenario}
+              </p>
 
-                {/* Titre */}
-                <h3 className="mb-3 text-lg font-bold text-[var(--color-text-primary)]">
-                  {step.title}
-                </h3>
-
-                {/* Description */}
-                <p className="max-w-xs text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                  {step.description}
+              {/* Exemple concret */}
+              <div
+                className="mb-5 rounded-lg border border-dashed p-3"
+                style={{
+                  borderColor: "var(--color-primary-200)",
+                  backgroundColor: "var(--color-primary-light)",
+                }}
+              >
+                <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "var(--color-primary)" }}>
+                  Exemple
                 </p>
-              </li>
-            );
-          })}
-        </ol>
+                <p className="mt-1 text-sm font-medium italic" style={{ color: "var(--color-text-primary)" }}>
+                  {uc.example}
+                </p>
+              </div>
+
+              {/* CTA */}
+              <div className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
+                Essayer
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

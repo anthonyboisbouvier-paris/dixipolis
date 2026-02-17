@@ -1,48 +1,27 @@
 /* =============================================================================
  * components/home/CTASection.tsx
  *
- * Section d'appel a l'action (Call to Action) de la page d'accueil Dixipolis.
- * Derniere section de la page, elle invite le visiteur a essayer la plateforme
- * avec un message percutant sur fond bleu degrade.
+ * CTA final — personnalité forte, branding Dixipolis.
+ * Gradient audacieux, texte percutant, lien vers la recherche.
  *
- * Composant serveur (Server Component) — pas de "use client".
- *
- * Design :
- *   - Fond en degrade bleu (primaire vers primaire fonce)
- *   - Texte blanc pour un contraste maximal
- *   - Bouton blanc qui ressort sur le fond colore
- *   - Elements decoratifs subtils (cercles flous)
+ * Composant serveur (Server Component).
  * ============================================================================= */
 
 import Link from "next/link";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 
-/* --------------------------------------------------------------------------
- * CTASection — Composant principal de la section appel a l'action
- *
- * Structure :
- *   - Conteneur pleine largeur avec fond degrade bleu
- *   - Titre accrocheur en blanc
- *   - Description encourageante
- *   - Deux boutons : primaire (blanc sur bleu) et secondaire (transparent)
- *   - Elements decoratifs en arriere-plan (cercles flous)
- *
- * Accessibilite :
- *   - Contraste texte blanc sur fond bleu > 4.5:1 (WCAG AA)
- *   - Liens semantiques avec texte descriptif
- *   - Section labelisee pour les technologies d'assistance
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export default function CTASection() {
   return (
     <section
-      className="relative overflow-hidden bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary-700)] to-[var(--color-primary-900)] py-16 sm:py-20 lg:py-24"
-      aria-label="Essayer la plateforme Dixipolis"
+      className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
+      style={{
+        background:
+          "linear-gradient(135deg, #2563eb 0%, #4f46e5 40%, #7c3aed 100%)",
+      }}
+      aria-label="Essayer Dixipolis gratuitement"
     >
-      {/* ----------------------------------------------------------------
-       * Elements decoratifs de fond
-       * Cercles flous semi-transparents pour creer de la profondeur
-       * et du mouvement visuel dans le fond degrade.
-       * ---------------------------------------------------------------- */}
+      {/* Éléments décoratifs */}
       <div
         className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white opacity-[0.06] blur-3xl"
         aria-hidden="true"
@@ -52,96 +31,66 @@ export default function CTASection() {
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute right-1/4 top-1/3 h-32 w-32 rounded-full bg-white opacity-[0.08] blur-2xl"
+        className="pointer-events-none absolute left-1/3 top-1/4 h-48 w-48 rounded-full bg-white opacity-[0.05] blur-2xl"
         aria-hidden="true"
       />
 
-      {/* ----------------------------------------------------------------
-       * Contenu principal centre
-       * ---------------------------------------------------------------- */}
       <div className="page-container relative z-10">
         <div className="mx-auto max-w-3xl text-center">
-          {/* ----------------------------------------------------------------
-           * Badge decoratif au-dessus du titre
-           * Petite pastille avec icone pour capter l'attention.
-           * ---------------------------------------------------------------- */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur-sm">
-            <Zap className="h-4 w-4" aria-hidden="true" />
-            Acc&egrave;s gratuit disponible
+          {/* Badge */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur-sm">
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            Acc&egrave;s gratuit &mdash; sans carte bancaire
           </div>
 
-          {/* ----------------------------------------------------------------
-           * Titre de la section CTA
-           * Message percutant et orienté action pour encourager l'inscription.
-           * ---------------------------------------------------------------- */}
+          {/* Titre */}
           <h2 className="mb-5 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Pr&ecirc;t &agrave; d&eacute;crypter le discours politique ?
+            45&nbsp;000 discours vous attendent.
+            <br />
+            Qu&apos;allez-vous chercher ?
           </h2>
 
-          {/* ----------------------------------------------------------------
-           * Description sous le titre
-           * Message rassurant et incitatif, texte blanc legerement transparent
-           * pour creer une hierarchie visuelle avec le titre.
-           * ---------------------------------------------------------------- */}
-          <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-white/80">
-            Commencez gratuitement et d&eacute;couvrez ce que les politiques ont
-            vraiment dit. Pas de carte bancaire requise, acc&egrave;s imm&eacute;diat &agrave; la
-            plateforme.
+          {/* Description */}
+          <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-white/70">
+            Journalistes, chercheurs, citoyens engag&eacute;s &mdash; Dixipolis
+            donne &agrave; chacun le pouvoir de v&eacute;rifier ce que les
+            politiques ont vraiment dit.
           </p>
 
-          {/* ----------------------------------------------------------------
-           * Groupe de boutons CTA
-           * Deux boutons cote a cote :
-           *   - Bouton primaire : blanc, lien vers /prompt
-           *   - Bouton secondaire : transparent borde, lien vers /api-pro
-           * ---------------------------------------------------------------- */}
+          {/* Boutons */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            {/* Bouton primaire — Commencer gratuitement */}
             <Link
               href="/prompt"
-              className="group inline-flex items-center gap-2 rounded-[var(--radius-lg)] bg-white px-8 py-3.5 text-base font-semibold text-[var(--color-primary)] shadow-lg transition-all duration-[var(--transition-normal)] hover:bg-white/90 hover:shadow-xl"
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold shadow-lg transition-all duration-300 hover:bg-white/90 hover:shadow-xl"
+              style={{ color: "#4f46e5" }}
             >
-              Commencer gratuitement
+              Interroger la base
               <ArrowRight
                 className="h-5 w-5 transition-transform group-hover:translate-x-1"
                 aria-hidden="true"
               />
             </Link>
-
-            {/* Bouton secondaire — Decouvrir l'API */}
             <Link
               href="/api-pro"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-lg)] border-2 border-white/30 px-8 py-3.5 text-base font-semibold text-white transition-all duration-[var(--transition-normal)] hover:border-white/60 hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-8 py-4 text-base font-bold text-white transition-all duration-300 hover:border-white/60 hover:bg-white/10"
             >
               D&eacute;couvrir l&apos;API
             </Link>
           </div>
 
-          {/* ----------------------------------------------------------------
-           * Mention rassurante sous les boutons
-           * Petits textes de reassurance pour lever les freins a l'action.
-           * ---------------------------------------------------------------- */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/60">
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-white/60"
-                aria-hidden="true"
-              />
-              Sans engagement
+          {/* Reassurance */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-white/50">
+            <span className="flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/50" aria-hidden="true" />
+              Open data &amp; transparent
             </span>
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-white/60"
-                aria-hidden="true"
-              />
-              Donn&eacute;es s&eacute;curis&eacute;es
+            <span className="flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/50" aria-hidden="true" />
+              Sources v&eacute;rifiables
             </span>
-            <span className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full bg-white/60"
-                aria-hidden="true"
-              />
-              Support r&eacute;actif
+            <span className="flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/50" aria-hidden="true" />
+              Mis &agrave; jour quotidiennement
             </span>
           </div>
         </div>

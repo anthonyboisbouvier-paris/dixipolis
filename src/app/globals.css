@@ -396,6 +396,34 @@ a {
   50% { box-shadow: 0 0 0 8px rgb(37 99 235 / 0); }
 }
 
+/* Float doux — décoration */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Scale in depuis le centre */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Gradient text helper */
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* --------------------------------------------------------------------------
  * BOUTONS — utilitaires
  * -------------------------------------------------------------------------- */
