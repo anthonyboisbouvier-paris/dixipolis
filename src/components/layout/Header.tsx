@@ -162,11 +162,12 @@ export default function Header() {
     <>
       {/* -- Header fixe -- */}
       <header
+        style={{ height: "var(--header-height)" }}
         className={cn(
           // Position fixe en haut de la page, pleine largeur, z-index eleve
           "fixed top-0 left-0 right-0 z-50",
-          // Fond blanc, hauteur 64px (correspond a --header-height)
-          "bg-white h-16",
+          // Fond blanc
+          "bg-white",
           // Transition fluide pour l'ombre
           "transition-shadow duration-200",
           // Ombre visible uniquement apres le scroll
@@ -334,11 +335,12 @@ export default function Header() {
        * ================================================================== */}
       {isMobileMenuOpen && (
         <div
+          style={{ top: "var(--header-height)" }}
           className={cn(
             // Visible uniquement sur mobile
             "md:hidden",
             // Position fixe sous le header, couvre tout l'ecran
-            "fixed inset-0 top-16 z-40",
+            "fixed inset-x-0 bottom-0 z-40",
             // Fond blanc opaque avec defilement possible
             "bg-white overflow-y-auto"
           )}

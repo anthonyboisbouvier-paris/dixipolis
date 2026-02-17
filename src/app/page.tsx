@@ -28,14 +28,15 @@ import CTASection from "@/components/home/CTASection";
  *
  * Ce composant est le point d'entree de la route "/" (racine).
  * Il n'a pas de logique propre : il se contente d'orchestrer l'affichage
- * des sections dans un conteneur <main> semantique.
+ * des sections dans l'ordre de defilement.
  *
- * Le <main> permet aux technologies d'assistance de reperer rapidement
- * le contenu principal de la page (landmark role="main").
+ * Note : le <main> semantique est deja fourni par le layout racine
+ * (app/layout.tsx). On utilise donc un Fragment React (<>) ici
+ * pour eviter un <main> imbrique invalide en HTML.
  * -------------------------------------------------------------------------- */
 export default function Home() {
   return (
-    <main className="min-h-screen">
+    <>
       {/* Section 1 — Hero : accroche visuelle et proposition de valeur */}
       <HeroSection />
 
@@ -50,6 +51,6 @@ export default function Home() {
 
       {/* Section 5 — CTA final : conversion du visiteur */}
       <CTASection />
-    </main>
+    </>
   );
 }
