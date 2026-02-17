@@ -119,7 +119,7 @@ export interface GeneratedContent {
   title: string;
   summary: string;
   content: string;              // Contenu HTML complet
-  type: "article" | "newsletter" | "synthesis" | "alert";
+  type: "article" | "newsletter" | "synthesis" | "alert" | "fact-check" | "propaganda";
   theme: string;
   publishedAt: string;
   readTimeMinutes: number;

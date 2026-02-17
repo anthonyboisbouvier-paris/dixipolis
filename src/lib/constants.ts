@@ -282,34 +282,41 @@ export const MOCK_THEMES: ThemeData[] = [
 
 /* --------------------------------------------------------------------------
  * DONNÉES MOCK — CONTENU GÉNÉRÉ
+ * Reflète les vrais modules d'analyse des tickets Linear :
+ *   - fact-check  : verdicts Factiverse (DIX-12)
+ *   - propaganda  : détection de techniques de manipulation (DIX-11)
+ *   - alert       : pics de toxicité ou nouvelles prises de parole (DIX-10)
+ *   - synthesis   : comparaisons inter-partis (DIX-31/32)
+ *   - article     : analyses thématiques croisées (DIX-8)
+ *   - newsletter  : résumé hebdomadaire automatisé
  * -------------------------------------------------------------------------- */
 export const MOCK_CONTENT: GeneratedContent[] = [
   {
     id: "1",
-    title: "L'évolution du discours sur l'inflation en 2024",
-    summary: "Analyse croisée des positions des principaux partis sur la hausse des prix et le pouvoir d'achat au cours de l'année écoulée.",
+    title: "Fact-check : « Le chômage a baissé de 30 % depuis 2017 »",
+    summary: "Verdict automatique : TROMPEUR. Le taux de chômage est passé de 9,5 % à 7,1 %, soit −25 %, pas −30 %. Sources INSEE croisées avec score de confiance 0.87.",
     content: "",
-    type: "article",
+    type: "fact-check",
     theme: "Économie",
     publishedAt: "2025-01-15T08:00:00Z",
-    readTimeMinutes: 7,
-    relatedPoliticians: ["Emmanuel Macron", "Marine Le Pen", "Jean-Luc Mélenchon"],
+    readTimeMinutes: 4,
+    relatedPoliticians: ["Emmanuel Macron"],
   },
   {
     id: "2",
-    title: "Immigration : ce que disent vraiment les chiffres cités par les politiques",
-    summary: "Fact-checking automatisé des principales déclarations sur l'immigration au cours du dernier trimestre.",
+    title: "Propagande détectée : appel à la peur sur l'immigration",
+    summary: "Techniques identifiées : appel à la peur, simplification abusive. Score de confiance : 0.73. Analyse du tour de parole complet avec contexte.",
     content: "",
-    type: "article",
+    type: "propaganda",
     theme: "Immigration",
     publishedAt: "2025-01-14T10:30:00Z",
     readTimeMinutes: 5,
-    relatedPoliticians: ["Marine Le Pen", "Jordan Bardella", "Gabriel Attal"],
+    relatedPoliticians: ["Marine Le Pen", "Jordan Bardella"],
   },
   {
     id: "3",
     title: "Newsletter hebdomadaire — Semaine du 6 janvier 2025",
-    summary: "Les déclarations marquantes de la semaine, les tendances émergentes et les contradictions détectées.",
+    summary: "Claims fact-checkés de la semaine, techniques de propagande détectées, et évolution des émotions dominantes par parti.",
     content: "",
     type: "newsletter",
     theme: "Général",
@@ -319,8 +326,8 @@ export const MOCK_CONTENT: GeneratedContent[] = [
   },
   {
     id: "4",
-    title: "Éducation : les propositions des partis comparées",
-    summary: "Synthèse des positions de chaque parti sur la réforme éducative, basée sur les discours des 6 derniers mois.",
+    title: "Éducation : matrice de distance idéologique entre partis",
+    summary: "Synthèse des positions par parti sur l'éducation, basée sur la distance sémantique des embeddings des 6 derniers mois de discours.",
     content: "",
     type: "synthesis",
     theme: "Éducation",
@@ -330,8 +337,8 @@ export const MOCK_CONTENT: GeneratedContent[] = [
   },
   {
     id: "5",
-    title: "Alerte : nouveau discours sur la réforme des retraites",
-    summary: "Détection automatique d'une prise de parole majeure sur le sujet des retraites.",
+    title: "Alerte : pic de toxicité détecté sur les retraites",
+    summary: "Détection automatique d'un pic de toxicité (score 0.87) dans les tours de parole sur les retraites cette semaine.",
     content: "",
     type: "alert",
     theme: "Réformes",
@@ -341,8 +348,8 @@ export const MOCK_CONTENT: GeneratedContent[] = [
   },
   {
     id: "6",
-    title: "Écologie : quand les promesses divergent des actes",
-    summary: "Comparaison entre les engagements écologiques prononcés et les votes effectifs à l'Assemblée nationale.",
+    title: "Écologie : scoring des propositions par parti",
+    summary: "Clustering automatique des propositions écologiques. Score d'importance et répartition par acteur politique via analyse des embeddings.",
     content: "",
     type: "article",
     theme: "Écologie",

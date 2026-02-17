@@ -31,6 +31,8 @@ import {
   Bell,
   Search,
   Filter,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GeneratedContent } from "@/types";
@@ -75,10 +77,12 @@ const FILTER_TABS: Array<{
   icon: typeof FileText;
 }> = [
   { key: "all", label: "Tout", icon: Filter },
+  { key: "fact-check", label: "Fact-checks", icon: CheckCircle },
+  { key: "propaganda", label: "Propagande", icon: AlertTriangle },
   { key: "article", label: "Articles", icon: FileText },
-  { key: "newsletter", label: "Newsletters", icon: Mail },
   { key: "synthesis", label: "Synth\u00e8ses", icon: BookOpen },
   { key: "alert", label: "Alertes", icon: Bell },
+  { key: "newsletter", label: "Newsletters", icon: Mail },
 ];
 
 /* --------------------------------------------------------------------------

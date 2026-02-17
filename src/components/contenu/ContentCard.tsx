@@ -30,6 +30,8 @@ import {
   Clock,
   Tag,
   Users,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { cn, formatRelativeDate, getReadTimeLabel, truncateText } from "@/lib/utils";
 import type { GeneratedContent } from "@/types";
@@ -79,6 +81,16 @@ const TYPE_CONFIG: Record<
     label: "Alerte",
     icon: Bell,
     classes: "bg-orange-50 text-orange-700",
+  },
+  "fact-check": {
+    label: "Fact-check",
+    icon: CheckCircle,
+    classes: "bg-emerald-50 text-emerald-700",
+  },
+  propaganda: {
+    label: "Propagande",
+    icon: AlertTriangle,
+    classes: "bg-red-50 text-red-700",
   },
 };
 

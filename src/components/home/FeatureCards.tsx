@@ -2,73 +2,58 @@
  * components/home/FeatureCards.tsx
  *
  * Section de presentation des 4 fonctionnalites principales de Dixipolis.
- * Affiche une grille responsive de cartes interactives :
- *   1. Prompt — Interface conversationnelle IA
- *   2. Analytique — Tableaux de bord et statistiques
- *   3. Contenu — Articles et syntheses generes
- *   4. API Pro — Acces programmatique aux donnees
+ * Mise a jour pour refleter les vraies capacites du produit :
+ *   1. Agent IA — Recherche semantique + textuelle via agent LLM
+ *   2. Analytique — Metriques discursives, distance ideologique, word clouds
+ *   3. Contenu — Fact-checking, detection propagande, alertes
+ *   4. API Pro — 5 endpoints pour developpeurs (search, text, videos, context, entities)
  *
  * Composant serveur (Server Component) — pas de "use client".
- * Chaque carte contient un badge d'icone colore, un titre, une description,
- * une zone d'illustration et un bouton "Decouvrir".
  * ============================================================================= */
 
 import Link from "next/link";
 import {
   MessageSquare,
   BarChart3,
-  Play,
+  Shield,
   Code,
   ArrowRight,
-  Search,
   Brain,
-  FileText,
+  Target,
+  Scale,
   Database,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/* --------------------------------------------------------------------------
- * Interface locale pour definir la structure d'une carte fonctionnalite.
- * Chaque carte possede ses propres couleurs de teinte et son icone.
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 interface FeatureCardData {
-  /** Identifiant unique de la fonctionnalite */
   id: string;
-  /** Titre affiche en gras sur la carte */
   title: string;
-  /** Description courte de la fonctionnalite */
   description: string;
-  /** Route Next.js vers la page dediee */
   href: string;
-  /** Composant icone Lucide pour le badge principal */
   icon: React.ComponentType<{ className?: string }>;
-  /** Composant icone Lucide pour la zone d'illustration */
   illustrationIcon: React.ComponentType<{ className?: string }>;
-  /** Classe Tailwind pour la couleur de fond du badge d'icone */
+  highlights: string[];
   iconBgClass: string;
-  /** Classe Tailwind pour la couleur du texte de l'icone */
   iconTextClass: string;
-  /** Classe Tailwind pour le fond de la zone d'illustration */
   illustrationBgClass: string;
-  /** Classe Tailwind pour la couleur de l'icone d'illustration */
   illustrationIconClass: string;
 }
 
 /* --------------------------------------------------------------------------
- * Donnees statiques des 4 cartes fonctionnalites.
- *
- * Palette de teintes par fonctionnalite :
- *   - Prompt   : Bleu clair (#dbeafe / #2563eb) — confiance, IA
- *   - Analytique : Vert clair (#dcfce7 / #16a34a) — donnees, croissance
- *   - Contenu  : Rose/violet clair (#fce7f3 / #db2777) — creativite, contenu
- *   - API Pro  : Bleu indigo (#e0e7ff / #4f46e5) — technique, pro
+ * Les 4 fonctionnalites principales, alignees avec les tickets Linear.
  * -------------------------------------------------------------------------- */
 const features: FeatureCardData[] = [
   {
     id: "prompt",
-    title: "Prompt",
+    title: "Agent IA",
     description:
-      "Posez vos questions en langage naturel. Notre IA analyse des milliers d'heures de discours et vous r\u00e9pond avec des extraits sourc\u00e9s.",
+      "Un agent intelligent qui combine recherche s\u00e9mantique et textuelle pour retrouver ce que les politiques ont vraiment dit, avec sources vid\u00e9o horodat\u00e9es.",
+    highlights: [
+      "Recherche par le sens (embeddings)",
+      "Citations mot-pour-mot",
+      "Contexte complet du discours",
+    ],
     href: "/prompt",
     icon: MessageSquare,
     illustrationIcon: Brain,
@@ -81,10 +66,15 @@ const features: FeatureCardData[] = [
     id: "analytique",
     title: "Analytique",
     description:
-      "Explorez les tendances du discours politique avec des tableaux de bord interactifs, graphiques temporels et comparaisons th\u00e9matiques.",
+      "Tableaux de bord avec m\u00e9triques discursives : temps de parole, d\u00e9bit, diversit\u00e9 du vocabulaire, distance id\u00e9ologique entre politiciens.",
+    highlights: [
+      "M\u00e9triques mensuelles par politicien",
+      "Matrice de distance id\u00e9ologique",
+      "Mots sur-repr\u00e9sent\u00e9s (word cloud)",
+    ],
     href: "/analytique",
     icon: BarChart3,
-    illustrationIcon: Search,
+    illustrationIcon: Target,
     iconBgClass: "bg-[#dcfce7]",
     iconTextClass: "text-[#16a34a]",
     illustrationBgClass: "bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7]",
@@ -92,22 +82,32 @@ const features: FeatureCardData[] = [
   },
   {
     id: "contenu",
-    title: "Contenu",
+    title: "V\u00e9rification",
     description:
-      "Consultez des articles, synth\u00e8ses et newsletters g\u00e9n\u00e9r\u00e9s automatiquement \u00e0 partir des d\u00e9clarations politiques les plus r\u00e9centes.",
+      "Fact-checking automatis\u00e9 des assertions politiques, d\u00e9tection de propagande et analyse du ton \u00e9motionnel de chaque discours.",
+    highlights: [
+      "Fact-checking via Factiverse",
+      "D\u00e9tection de propagande",
+      "Analyse \u00e9motionnelle et toxicit\u00e9",
+    ],
     href: "/contenu",
-    icon: Play,
-    illustrationIcon: FileText,
-    iconBgClass: "bg-[#fce7f3]",
-    iconTextClass: "text-[#db2777]",
-    illustrationBgClass: "bg-gradient-to-br from-[#fdf2f8] to-[#fce7f3]",
-    illustrationIconClass: "text-[#db2777]",
+    icon: Shield,
+    illustrationIcon: Scale,
+    iconBgClass: "bg-[#fef3c7]",
+    iconTextClass: "text-[#d97706]",
+    illustrationBgClass: "bg-gradient-to-br from-[#fffbeb] to-[#fef3c7]",
+    illustrationIconClass: "text-[#d97706]",
   },
   {
     id: "api-pro",
     title: "API Pro",
     description:
-      "Int\u00e9grez les donn\u00e9es Dixipolis dans vos applications gr\u00e2ce \u00e0 notre API RESTful. Documentation compl\u00e8te, SDK et support d\u00e9di\u00e9.",
+      "5 endpoints pour int\u00e9grer Dixipolis dans vos apps : recherche s\u00e9mantique, textuelle, inventaire vid\u00e9o, contexte et r\u00e9solution d\u2019entit\u00e9s.",
+    highlights: [
+      "Recherche s\u00e9mantique + textuelle",
+      "Liste vid\u00e9os par politicien/th\u00e8me",
+      "R\u00e9solution d\u2019entit\u00e9s (personne/parti/th\u00e8me)",
+    ],
     href: "/api-pro",
     icon: Code,
     illustrationIcon: Database,
@@ -118,41 +118,27 @@ const features: FeatureCardData[] = [
   },
 ];
 
-/* --------------------------------------------------------------------------
- * FeatureCards — Composant principal de la grille de fonctionnalites
- *
- * Layout responsive :
- *   - Mobile  (< 640px)  : 1 colonne
- *   - Tablette (640-1023px) : 2 colonnes
- *   - Desktop (>= 1024px) : 4 colonnes
- *
- * Chaque carte est un lien cliquable avec effet de survol (card-interactive).
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 export default function FeatureCards() {
   return (
     <section
       className="bg-[var(--color-bg-page)] py-16 sm:py-20 lg:py-24"
-      aria-label="Fonctionnalites principales de Dixipolis"
+      aria-label="Fonctionnalit\u00e9s principales de Dixipolis"
     >
       <div className="page-container">
-        {/* ----------------------------------------------------------------
-         * En-tete de section avec titre et sous-titre
-         * Centre, avec espacement genereux avant la grille de cartes.
-         * ---------------------------------------------------------------- */}
+        {/* En-tete de section */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
             Quatre outils pour d&eacute;crypter le politique
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)]">
-            Chaque module exploite l&apos;intelligence artificielle pour vous donner
-            un acc&egrave;s clair, rapide et sourc&eacute; au discours politique fran&ccedil;ais.
+            De l&apos;ing&eacute;stion vid&eacute;o au fact-checking, chaque module
+            exploite l&apos;IA pour vous donner un acc&egrave;s clair et sourc&eacute;
+            au discours politique fran&ccedil;ais.
           </p>
         </div>
 
-        {/* ----------------------------------------------------------------
-         * Grille responsive de cartes
-         * Utilise CSS Grid avec gap uniforme pour un alignement parfait.
-         * ---------------------------------------------------------------- */}
+        {/* Grille responsive */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {features.map((feature) => (
             <FeatureCard key={feature.id} feature={feature} />
@@ -163,25 +149,13 @@ export default function FeatureCards() {
   );
 }
 
-/* --------------------------------------------------------------------------
- * FeatureCard — Carte individuelle d'une fonctionnalite
- *
- * Structure interne :
- *   1. Badge d'icone colore (coin superieur gauche)
- *   2. Titre en gras
- *   3. Description textuelle
- *   4. Zone d'illustration avec icone decorative
- *   5. Bouton "Decouvrir" avec fleche directionnelle
- *
- * La carte entiere est cliquable via le lien enveloppant.
- * L'effet card-interactive (defini dans globals.css) applique un
- * deplacement vertical et une ombre au survol.
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 function FeatureCard({ feature }: { feature: FeatureCardData }) {
   const {
     title,
     description,
     href,
+    highlights,
     icon: Icon,
     illustrationIcon: IllustrationIcon,
     iconBgClass,
@@ -194,12 +168,9 @@ function FeatureCard({ feature }: { feature: FeatureCardData }) {
     <Link
       href={href}
       className="card card-interactive group flex flex-col p-6"
-      aria-label={`D\u00e9couvrir la fonctionnalit\u00e9 ${title}`}
+      aria-label={`D\u00e9couvrir ${title}`}
     >
-      {/* ----------------------------------------------------------------
-       * Badge d'icone — Petit carre arrondi avec icone coloree
-       * Fond colore translucide, icone dans la teinte associee.
-       * ---------------------------------------------------------------- */}
+      {/* Badge icone */}
       <div
         className={cn(
           "mb-4 flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)]",
@@ -210,49 +181,49 @@ function FeatureCard({ feature }: { feature: FeatureCardData }) {
         <Icon className={cn("h-5 w-5", iconTextClass)} />
       </div>
 
-      {/* ----------------------------------------------------------------
-       * Titre de la fonctionnalite
-       * Texte principal en gras, taille moderee pour s'adapter a la carte.
-       * ---------------------------------------------------------------- */}
+      {/* Titre */}
       <h3 className="mb-2 text-lg font-bold text-[var(--color-text-primary)]">
         {title}
       </h3>
 
-      {/* ----------------------------------------------------------------
-       * Description courte
-       * Texte secondaire decrivant brievement la fonctionnalite.
-       * flex-1 permet de pousser l'illustration et le bouton vers le bas.
-       * ---------------------------------------------------------------- */}
-      <p className="mb-5 flex-1 text-sm leading-relaxed text-[var(--color-text-secondary)]">
+      {/* Description */}
+      <p className="mb-4 flex-1 text-sm leading-relaxed text-[var(--color-text-secondary)]">
         {description}
       </p>
 
-      {/* ----------------------------------------------------------------
-       * Zone d'illustration decorative
-       * Conteneur avec gradient de fond et icone centree de grande taille.
-       * Simule un espace pour une illustration ou capture d'ecran future.
-       * Au survol de la carte, l'icone se met a l'echelle legerement.
-       * ---------------------------------------------------------------- */}
+      {/* Points cles */}
+      <ul className="mb-5 space-y-1.5">
+        {highlights.map((item) => (
+          <li
+            key={item}
+            className="flex items-start gap-2 text-xs text-[var(--color-text-secondary)]"
+          >
+            <span
+              className="mt-1.5 inline-block h-1 w-1 shrink-0 rounded-full bg-[var(--color-primary)]"
+              aria-hidden="true"
+            />
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      {/* Zone illustration */}
       <div
         className={cn(
-          "mb-5 flex h-36 items-center justify-center rounded-[var(--radius-lg)]",
+          "mb-5 flex h-28 items-center justify-center rounded-[var(--radius-lg)]",
           illustrationBgClass
         )}
         aria-hidden="true"
       >
         <IllustrationIcon
           className={cn(
-            "h-12 w-12 opacity-40 transition-transform duration-300 group-hover:scale-110",
+            "h-10 w-10 opacity-40 transition-transform duration-300 group-hover:scale-110",
             illustrationIconClass
           )}
         />
       </div>
 
-      {/* ----------------------------------------------------------------
-       * Bouton "Decouvrir"
-       * Bouton plein en bleu primaire avec icone fleche.
-       * Au survol de la carte, la fleche se deplace a droite.
-       * ---------------------------------------------------------------- */}
+      {/* Bouton CTA */}
       <div className="flex items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-[var(--transition-fast)] group-hover:bg-[var(--color-primary-hover)]">
         <span>D&eacute;couvrir</span>
         <ArrowRight

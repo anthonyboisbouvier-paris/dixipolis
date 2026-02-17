@@ -23,7 +23,7 @@
  * ============================================================================= */
 
 import type { Metadata } from "next";
-import { Newspaper } from "lucide-react";
+import { Shield } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import FeaturedContent from "@/components/contenu/FeaturedContent";
 import ContentGrid from "@/components/contenu/ContentGrid";
@@ -35,9 +35,9 @@ import ContentGrid from "@/components/contenu/ContentGrid";
  * automatiquement dans le <head> de la page.
  * -------------------------------------------------------------------------- */
 export const metadata: Metadata = {
-  title: "Contenu | Dixipolis",
+  title: "V\u00e9rification & Contenu | Dixipolis",
   description:
-    "Consultez les articles, newsletters, synth&egrave;ses et alertes g&eacute;n&eacute;r&eacute;s par l'IA de Dixipolis sur l'actualit&eacute; politique fran&ccedil;aise.",
+    "Fact-checking automatis\u00e9, d\u00e9tection de propagande, analyse \u00e9motionnelle et alertes g\u00e9n\u00e9r\u00e9s par l'IA Dixipolis sur le discours politique fran\u00e7ais.",
 };
 
 /* --------------------------------------------------------------------------
@@ -61,22 +61,23 @@ export default function ContenuPage() {
        * L'icone "journal" (Newspaper) renforce visuellement la nature
        * editoriale de cette section de la plateforme.
        * ================================================================ */}
-      <section className="mb-8 sm:mb-10" aria-label="Presentation de la page Contenu">
-        {/* Badge contextuel au-dessus du titre (style similaire au hero) */}
+      <section className="mb-8 sm:mb-10" aria-label="Pr\u00e9sentation de la page V\u00e9rification">
+        {/* Badge contextuel */}
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]">
-          <Newspaper className="h-3.5 w-3.5 text-[var(--color-primary)]" aria-hidden="true" />
-          Contenu IA
+          <Shield className="h-3.5 w-3.5 text-[var(--color-primary)]" aria-hidden="true" />
+          V&eacute;rification IA
         </div>
 
-        {/* Titre principal de la page */}
+        {/* Titre */}
         <h1 className="mb-3 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-          Contenu
+          V&eacute;rification &amp; Contenu
         </h1>
 
-        {/* Sous-titre descriptif expliquant la finalite de la page */}
+        {/* Sous-titre */}
         <p className="max-w-2xl text-base leading-relaxed text-[var(--color-text-secondary)] sm:text-lg">
-          Consultez le contenu g&eacute;n&eacute;r&eacute; par l&apos;IA sur l&apos;actualit&eacute; politique
-          depuis la base de Dixipolis.
+          Fact-checking automatis&eacute;, d&eacute;tection de propagande, analyse
+          &eacute;motionnelle et alertes de toxicit&eacute; &mdash; tout g&eacute;n&eacute;r&eacute;
+          automatiquement par l&apos;IA Dixipolis.
         </p>
       </section>
 

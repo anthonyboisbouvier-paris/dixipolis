@@ -1,151 +1,113 @@
 /* =============================================================================
  * components/api-pro/EndpointList.tsx
  *
- * Section listant les endpoints disponibles de l'API Dixipolis.
- *
- * Affiche une liste structuree de 6 endpoints REST avec pour chacun :
- *   - Un badge de methode HTTP colore (GET = vert, POST = bleu)
- *   - Le chemin de l'endpoint (path) en police monospace
- *   - Une description courte en francais
- *
- * Endpoints presentes :
- *   1. GET  /api/v1/search          — Recherche semantique
- *   2. GET  /api/v1/politicians     — Liste des politiciens
- *   3. GET  /api/v1/politicians/:id — Details d'un politicien
- *   4. GET  /api/v1/excerpts        — Extraits de discours
- *   5. GET  /api/v1/themes          — Themes et statistiques
- *   6. POST /api/v1/analyze         — Analyse thematique
+ * Liste des endpoints de l'API Dixipolis.
+ * Mise a jour pour refleter les 5 vrais endpoints des tickets Linear :
+ *   1. POST /search/semantic   — Recherche semantique (DIX-17)
+ *   2. POST /search/text       — Recherche textuelle exacte (DIX-18)
+ *   3. POST /videos/list       — Inventaire des videos (DIX-19)
+ *   4. POST /context/expand    — Enrichissement contextuel (DIX-20)
+ *   5. POST /entities/match    — Resolution d'entites (DIX-21)
  *
  * Composant serveur (Server Component) — pas de "use client".
- *
- * Design :
- *   - Fond blanc pour la section
- *   - Chaque ligne est un element de liste avec separateurs
- *   - Badges de methode avec coins arrondis et couleurs distinctes
- *   - Police monospace pour les chemins d'endpoint
- *   - Responsive : sur mobile, le path passe sous le badge
  * ============================================================================= */
 
 import { Server } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/* --------------------------------------------------------------------------
- * Types — Structure d'un endpoint API
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 interface ApiEndpoint {
-  /** Identifiant unique pour la cle React */
   id: string;
-  /** Methode HTTP (GET ou POST) */
   method: "GET" | "POST";
-  /** Chemin de l'endpoint (ex: /api/v1/search) */
   path: string;
-  /** Description courte en francais */
   description: string;
+  tag: string;
 }
 
 /* --------------------------------------------------------------------------
- * Donnees statiques — Les 6 endpoints de l'API Dixipolis
- *
- * Ces donnees sont definies ici car elles sont specifiques a cette page
- * et ne sont pas reutilisees ailleurs dans l'application.
- * Lorsque la documentation OpenAPI sera generee, ces donnees pourront
- * etre remplacees par une source dynamique.
+ * Les 5 endpoints reels de l'API Dixipolis (issus des tickets Linear).
  * -------------------------------------------------------------------------- */
 const endpoints: ApiEndpoint[] = [
   {
-    id: "search",
-    method: "GET",
-    path: "/api/v1/search",
-    description:
-      "Recherche s\u00e9mantique dans l\u2019ensemble des discours index\u00e9s. Supporte les filtres par politicien, parti, date et th\u00e8me.",
-  },
-  {
-    id: "politicians-list",
-    method: "GET",
-    path: "/api/v1/politicians",
-    description:
-      "Liste pagin\u00e9e de tous les politiciens index\u00e9s avec leur parti, r\u00f4le et nombre de discours.",
-  },
-  {
-    id: "politician-detail",
-    method: "GET",
-    path: "/api/v1/politicians/:id",
-    description:
-      "D\u00e9tails complets d\u2019un politicien : biographie, th\u00e8mes principaux, statistiques et derniers discours.",
-  },
-  {
-    id: "excerpts",
-    method: "GET",
-    path: "/api/v1/excerpts",
-    description:
-      "Extraits de discours avec verbatim, lien vid\u00e9o horodat\u00e9, m\u00e9tadonn\u00e9es compl\u00e8tes et score de pertinence.",
-  },
-  {
-    id: "themes",
-    method: "GET",
-    path: "/api/v1/themes",
-    description:
-      "Th\u00e8mes d\u00e9tect\u00e9s avec statistiques agr\u00e9g\u00e9es : nombre de mentions, tendance et r\u00e9partition par parti.",
-  },
-  {
-    id: "analyze",
+    id: "semantic-search",
     method: "POST",
-    path: "/api/v1/analyze",
+    path: "/search/semantic",
     description:
-      "Analyse th\u00e9matique d\u2019un texte soumis. Retourne les th\u00e8mes d\u00e9tect\u00e9s, le sentiment et les politiciens associ\u00e9s.",
+      "Recherche par proximit\u00e9 s\u00e9mantique dans les discours. Retrouve des passages par le sens, m\u00eame sans correspondance de mots exacts. Filtres par politicien, parti, th\u00e8me et p\u00e9riode.",
+    tag: "Recherche",
+  },
+  {
+    id: "text-search",
+    method: "POST",
+    path: "/search/text",
+    description:
+      "Recherche lexicale stricte (full-text). Id\u00e9al pour retrouver des citations, chiffres ou expressions pr\u00e9cises. Chaque r\u00e9sultat inclut le verbatim exact et le lien vid\u00e9o horodat\u00e9.",
+    tag: "Recherche",
+  },
+  {
+    id: "videos-list",
+    method: "POST",
+    path: "/videos/list",
+    description:
+      "Liste les vid\u00e9os par politicien, parti ou th\u00e9matique sur une p\u00e9riode donn\u00e9e. Outil d\u2019inventaire pour construire des corpus cibl\u00e9s avant analyse.",
+    tag: "Inventaire",
+  },
+  {
+    id: "context-expand",
+    method: "POST",
+    path: "/context/expand",
+    description:
+      "R\u00e9cup\u00e8re le contexte autour d\u2019un segment : tour de parole seul, avec contexte (tours pr\u00e9c\u00e9dent/suivant), ou transcript complet de la vid\u00e9o.",
+    tag: "Contexte",
+  },
+  {
+    id: "entities-match",
+    method: "POST",
+    path: "/entities/match",
+    description:
+      "R\u00e9sout une entit\u00e9 politique (personne, parti ou th\u00e8me) vers un ID en base avec score de confiance. Un appel = un type d\u2019entit\u00e9.",
+    tag: "Entit\u00e9s",
   },
 ];
 
-/* --------------------------------------------------------------------------
- * Classes de style pour les badges de methode HTTP
- *
- * GET  : fond vert clair, texte vert fonce — lecture seule, safe
- * POST : fond bleu clair, texte bleu fonce — action, ecriture
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 const methodStyles: Record<"GET" | "POST", string> = {
   GET: "bg-green-50 text-green-700 border-green-200",
   POST: "bg-blue-50 text-blue-700 border-blue-200",
 };
 
-/* --------------------------------------------------------------------------
- * EndpointList — Composant principal de la section endpoints
- *
- * Structure :
- *   1. En-tete de section (titre + sous-titre)
- *   2. Conteneur de la liste avec bordure et coins arrondis
- *   3. Elements de liste separes par des bordures horizontales
- * -------------------------------------------------------------------------- */
+const tagStyles: Record<string, string> = {
+  Recherche: "bg-purple-50 text-purple-700",
+  Inventaire: "bg-orange-50 text-orange-700",
+  Contexte: "bg-teal-50 text-teal-700",
+  "Entit\u00e9s": "bg-pink-50 text-pink-700",
+};
+
+/* -------------------------------------------------------------------------- */
 export default function EndpointList() {
   return (
     <section
       id="documentation"
       className="bg-white py-16 sm:py-20 lg:py-24"
-      aria-label="Liste des endpoints de l'API Dixipolis"
+      aria-label="Endpoints de l'API Dixipolis"
     >
       <div className="page-container">
-        {/* ----------------------------------------------------------------
-         * En-tete de section
-         * Titre avec icone Server et description.
-         * ---------------------------------------------------------------- */}
+        {/* En-tete */}
         <div className="mx-auto mb-12 max-w-2xl text-center lg:mb-16">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-xs font-semibold text-[var(--color-primary)]">
             <Server className="h-3.5 w-3.5" aria-hidden="true" />
-            Endpoints
+            5 Endpoints
           </div>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-4xl">
-            Endpoints disponibles
+            Endpoints de l&apos;API
           </h2>
           <p className="text-lg text-[var(--color-text-secondary)]">
-            Tous les endpoints de l&apos;API Dixipolis en un coup d&apos;oeil.
-            Chaque endpoint retourne des donn&eacute;es JSON structur&eacute;es.
+            Cinq outils con&ccedil;us pour &ecirc;tre utilis&eacute;s par un agent IA.
+            Chaque endpoint est d&eacute;terministe, sourc&eacute; et compatible avec un usage interactif.
           </p>
         </div>
 
-        {/* ----------------------------------------------------------------
-         * Conteneur de la liste d'endpoints
-         * Carte blanche avec bordure, coins arrondis et ombre legere.
-         * Chaque endpoint est un element de liste avec separateur.
-         * ---------------------------------------------------------------- */}
+        {/* Liste */}
         <div className="mx-auto max-w-4xl overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)]">
           {/* En-tete du tableau */}
           <div className="hidden items-center gap-4 border-b border-[var(--color-border)] bg-[var(--color-bg-section)] px-6 py-3 sm:flex">
@@ -160,7 +122,6 @@ export default function EndpointList() {
             </span>
           </div>
 
-          {/* Liste des endpoints */}
           <ul role="list">
             {endpoints.map((endpoint, index) => (
               <EndpointRow
@@ -176,17 +137,7 @@ export default function EndpointList() {
   );
 }
 
-/* --------------------------------------------------------------------------
- * EndpointRow — Ligne individuelle d'un endpoint
- *
- * Props :
- *   - endpoint : objet ApiEndpoint contenant les informations de l'endpoint
- *   - isLast   : indique si c'est le dernier element (pas de bordure en bas)
- *
- * Layout responsive :
- *   - Mobile : badge methode + path empiles, description en dessous
- *   - Desktop : badge methode | path | description sur une seule ligne
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 function EndpointRow({
   endpoint,
   isLast,
@@ -194,35 +145,41 @@ function EndpointRow({
   endpoint: ApiEndpoint;
   isLast: boolean;
 }) {
-  const { method, path, description } = endpoint;
+  const { method, path, description, tag } = endpoint;
 
   return (
     <li
       className={cn(
-        /* Base : padding, flex, alignement */
         "flex flex-col gap-2 px-6 py-4 transition-colors duration-[var(--transition-fast)] hover:bg-[var(--color-bg-section)] sm:flex-row sm:items-center sm:gap-4",
-        /* Bordure en bas sauf pour le dernier element */
         !isLast && "border-b border-[var(--color-border)]"
       )}
     >
-      {/* Badge de methode HTTP */}
+      {/* Badge methode HTTP */}
       <span
         className={cn(
-          /* Base : inline-flex, centre, arrondi, police mono, bordure */
           "inline-flex w-fit shrink-0 items-center justify-center rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono text-xs font-bold sm:w-20",
-          /* Couleur conditionnelle selon la methode */
           methodStyles[method]
         )}
       >
         {method}
       </span>
 
-      {/* Chemin de l'endpoint en police monospace */}
-      <span className="min-w-0 flex-1 font-mono text-sm font-medium text-[var(--color-text-primary)]">
-        {path}
-      </span>
+      {/* Chemin + tag */}
+      <div className="min-w-0 flex-1">
+        <span className="font-mono text-sm font-medium text-[var(--color-text-primary)]">
+          {path}
+        </span>
+        <span
+          className={cn(
+            "ml-2 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
+            tagStyles[tag] ?? "bg-gray-50 text-gray-600"
+          )}
+        >
+          {tag}
+        </span>
+      </div>
 
-      {/* Description de l'endpoint */}
+      {/* Description */}
       <span className="text-sm leading-relaxed text-[var(--color-text-secondary)] lg:w-80 lg:shrink-0">
         {description}
       </span>
