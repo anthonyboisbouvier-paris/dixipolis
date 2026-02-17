@@ -1,0 +1,754 @@
+/* =============================================================================
+ * app/compte/page.tsx
+ *
+ * Tableau de bord du compte utilisateur (mock) de Dixipolis.
+ *
+ * Sections :
+ *   1. Profil       — Informations personnelles (nom, email) en lecture seule
+ *   2. Abonnement   — Plan actuel avec lien vers /tarifs
+ *   3. Recherches   — Liste de recherches sauvegardees (donnees fictives)
+ *   4. Alertes      — Toggles d'alertes email (donnees fictives)
+ *   5. Politiciens  — Liste de politiciens suivis avec liens vers leurs fiches
+ *
+ * Ce composant est entierement front-end avec des donnees fictives.
+ * Il sera connecte a Supabase une fois l'authentification en place.
+ *
+ * Design :
+ *   - Fond gris clair, cartes blanches avec ombre legere
+ *   - Navigation par onglets horizontaux
+ *   - Palette Dixipolis (bleu primaire, gris, blanc)
+ * ============================================================================= */
+
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import {
+  User,
+  Mail,
+  Settings,
+  Bell,
+  Bookmark,
+  Search,
+  LogOut,
+  Shield,
+  CreditCard,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+
+/* --------------------------------------------------------------------------
+ * DONNEES FICTIVES — Simulation de l'etat utilisateur
+ *
+ * Ces donnees seront remplacees par des appels API Supabase.
+ * -------------------------------------------------------------------------- */
+
+/** Informations du profil utilisateur */
+const MOCK_USER = {
+  firstName: "Marie",
+  lastName: "Laurent",
+  email: "marie.laurent@exemple.fr",
+  plan: "Acces Pro",
+} as const;
+
+/** Recherches sauvegardees par l'utilisateur */
+const MOCK_SAVED_SEARCHES = [
+  {
+    id: "s1",
+    label: "Reforme des retraites 2025",
+    date: "12 fev. 2026",
+  },
+  {
+    id: "s2",
+    label: "Discours presidentiel — environnement",
+    date: "8 fev. 2026",
+  },
+  {
+    id: "s3",
+    label: "Debat Assemblee nationale — budget 2026",
+    date: "3 fev. 2026",
+  },
+] as const;
+
+/** Politiciens suivis par l'utilisateur */
+const MOCK_FOLLOWED_POLITICIANS = [
+  {
+    id: "p1",
+    name: "Marine Le Pen",
+    party: "Rassemblement National",
+    slug: "marine-le-pen",
+  },
+  {
+    id: "p2",
+    name: "Jean-Luc Melenchon",
+    party: "La France Insoumise",
+    slug: "jean-luc-melenchon",
+  },
+  {
+    id: "p3",
+    name: "Gabriel Attal",
+    party: "Renaissance",
+    slug: "gabriel-attal",
+  },
+] as const;
+
+/* --------------------------------------------------------------------------
+ * ONGLETS — Definition des sections du tableau de bord
+ * -------------------------------------------------------------------------- */
+type TabId = "profil" | "abonnement" | "recherches" | "alertes" | "politiciens";
+
+interface TabDefinition {
+  id: TabId;
+  label: string;
+  icon: React.ElementType;
+}
+
+const TABS: TabDefinition[] = [
+  { id: "profil", label: "Profil", icon: User },
+  { id: "abonnement", label: "Abonnement", icon: CreditCard },
+  { id: "recherches", label: "Recherches sauvegardees", icon: Bookmark },
+  { id: "alertes", label: "Alertes", icon: Bell },
+  { id: "politiciens", label: "Politiciens suivis", icon: Shield },
+];
+
+/* --------------------------------------------------------------------------
+ * ComptePage — Composant principal du tableau de bord
+ * -------------------------------------------------------------------------- */
+export default function ComptePage() {
+  /* ---- Onglet actif ---- */
+  const [activeTab, setActiveTab] = useState<TabId>("profil");
+
+  /* ---- Etat des toggles d'alertes (mock) ---- */
+  const [alertNewAnalysis, setAlertNewAnalysis] = useState(true);
+  const [alertFollowedPolitician, setAlertFollowedPolitician] = useState(true);
+  const [alertWeeklyDigest, setAlertWeeklyDigest] = useState(false);
+
+  /* ---- Rendu ---- */
+  return (
+    <main
+      className="min-h-screen px-4 py-10 sm:py-14"
+      style={{ backgroundColor: "var(--color-bg-page)" }}
+    >
+      <div className="mx-auto max-w-3xl">
+        {/* ==============================================================
+         * En-tete de la page
+         * ============================================================== */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1
+              className="text-2xl font-bold tracking-tight sm:text-3xl"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Mon Compte
+            </h1>
+            <p
+              className="mt-1 text-sm"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Gerez votre profil et vos preferences
+            </p>
+          </div>
+          {/* Lien de retour a l'accueil */}
+          <Link
+            href="/"
+            className="text-sm font-medium transition-colors hover:underline"
+            style={{ color: "var(--color-primary)" }}
+          >
+            Retour a l&apos;accueil
+          </Link>
+        </div>
+
+        {/* ==============================================================
+         * Carte d'information utilisateur (resume)
+         * ============================================================== */}
+        <div className="card mb-8 flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center">
+          {/* Avatar placeholder */}
+          <div
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-bold"
+            style={{
+              backgroundColor: "var(--color-primary-light)",
+              color: "var(--color-primary)",
+            }}
+            aria-hidden="true"
+          >
+            {MOCK_USER.firstName[0]}
+            {MOCK_USER.lastName[0]}
+          </div>
+          {/* Informations */}
+          <div className="flex-1">
+            <p
+              className="text-lg font-semibold"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              {MOCK_USER.firstName} {MOCK_USER.lastName}
+            </p>
+            <p
+              className="text-sm"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              {MOCK_USER.email}
+            </p>
+          </div>
+          {/* Badge plan */}
+          <span className="theme-badge">{MOCK_USER.plan}</span>
+        </div>
+
+        {/* ==============================================================
+         * Navigation par onglets
+         * ============================================================== */}
+        <nav
+          className="mb-6 flex gap-1 overflow-x-auto rounded-lg p-1"
+          style={{ backgroundColor: "var(--color-bg-section)" }}
+          role="tablist"
+          aria-label="Sections du compte"
+        >
+          {TABS.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={isActive}
+                aria-controls={`panel-${tab.id}`}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-all",
+                  "focus:outline-none focus:ring-2",
+                  isActive ? "shadow-sm" : "hover:opacity-80"
+                )}
+                style={{
+                  backgroundColor: isActive
+                    ? "var(--color-bg-card)"
+                    : "transparent",
+                  color: isActive
+                    ? "var(--color-primary)"
+                    : "var(--color-text-secondary)",
+                }}
+              >
+                <Icon size={16} aria-hidden="true" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* ==============================================================
+         * Contenu de l'onglet actif
+         * ============================================================== */}
+        <div
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+        >
+          {/* --------------------------------------------------------
+           * ONGLET : Profil
+           * -------------------------------------------------------- */}
+          {activeTab === "profil" && (
+            <section className="card p-6 sm:p-8" aria-label="Profil">
+              <h2
+                className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                <Settings
+                  size={20}
+                  style={{ color: "var(--color-primary)" }}
+                  aria-hidden="true"
+                />
+                Informations personnelles
+              </h2>
+
+              <div className="space-y-5">
+                {/* Prenom */}
+                <div>
+                  <label
+                    htmlFor="profile-firstname"
+                    className="mb-1.5 block text-sm font-medium"
+                    style={{ color: "var(--color-text-primary)" }}
+                  >
+                    Prenom
+                  </label>
+                  <div className="relative">
+                    <User
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                      size={18}
+                      style={{ color: "var(--color-text-muted)" }}
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="profile-firstname"
+                      type="text"
+                      value={MOCK_USER.firstName}
+                      readOnly
+                      className="w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm"
+                      style={{
+                        borderColor: "var(--color-border)",
+                        backgroundColor: "var(--color-bg-section)",
+                        color: "var(--color-text-primary)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Nom */}
+                <div>
+                  <label
+                    htmlFor="profile-lastname"
+                    className="mb-1.5 block text-sm font-medium"
+                    style={{ color: "var(--color-text-primary)" }}
+                  >
+                    Nom
+                  </label>
+                  <div className="relative">
+                    <User
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                      size={18}
+                      style={{ color: "var(--color-text-muted)" }}
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="profile-lastname"
+                      type="text"
+                      value={MOCK_USER.lastName}
+                      readOnly
+                      className="w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm"
+                      style={{
+                        borderColor: "var(--color-border)",
+                        backgroundColor: "var(--color-bg-section)",
+                        color: "var(--color-text-primary)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Email (desactive) */}
+                <div>
+                  <label
+                    htmlFor="profile-email"
+                    className="mb-1.5 block text-sm font-medium"
+                    style={{ color: "var(--color-text-primary)" }}
+                  >
+                    Adresse email
+                  </label>
+                  <div className="relative">
+                    <Mail
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                      size={18}
+                      style={{ color: "var(--color-text-muted)" }}
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="profile-email"
+                      type="email"
+                      value={MOCK_USER.email}
+                      disabled
+                      className="w-full cursor-not-allowed rounded-lg border py-2.5 pl-10 pr-4 text-sm opacity-60"
+                      style={{
+                        borderColor: "var(--color-border)",
+                        backgroundColor: "var(--color-bg-section)",
+                        color: "var(--color-text-secondary)",
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="mt-1 text-xs"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    L&apos;email ne peut pas etre modifie directement.
+                    Contactez le support.
+                  </p>
+                </div>
+              </div>
+
+              {/* Bouton sauvegarder (desactive dans le mock) */}
+              <button
+                type="button"
+                disabled
+                className="mt-6 cursor-not-allowed rounded-lg px-5 py-2.5 text-sm font-semibold opacity-50"
+                style={{
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--color-text-on-primary)",
+                }}
+              >
+                Sauvegarder les modifications
+              </button>
+            </section>
+          )}
+
+          {/* --------------------------------------------------------
+           * ONGLET : Abonnement
+           * -------------------------------------------------------- */}
+          {activeTab === "abonnement" && (
+            <section className="card p-6 sm:p-8" aria-label="Abonnement">
+              <h2
+                className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                <CreditCard
+                  size={20}
+                  style={{ color: "var(--color-primary)" }}
+                  aria-hidden="true"
+                />
+                Mon abonnement
+              </h2>
+
+              {/* Carte du plan actuel */}
+              <div
+                className="rounded-lg border p-5"
+                style={{
+                  borderColor: "var(--color-primary)",
+                  backgroundColor: "var(--color-primary-50)",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p
+                      className="text-lg font-bold"
+                      style={{ color: "var(--color-primary)" }}
+                    >
+                      {MOCK_USER.plan}
+                    </p>
+                    <p
+                      className="mt-1 text-sm"
+                      style={{ color: "var(--color-text-secondary)" }}
+                    >
+                      Acces illimite a toutes les analyses et fonctionnalites
+                      avancees.
+                    </p>
+                  </div>
+                  <Shield
+                    size={32}
+                    style={{ color: "var(--color-primary)" }}
+                    aria-hidden="true"
+                  />
+                </div>
+
+                {/* Details du plan */}
+                <ul
+                  className="mt-4 space-y-1 text-sm"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  <li>Analyses illimitees</li>
+                  <li>Alertes en temps reel</li>
+                  <li>Export des donnees</li>
+                  <li>Support prioritaire</li>
+                </ul>
+              </div>
+
+              {/* Lien pour changer d'abonnement */}
+              <div className="mt-6">
+                <Link
+                  href="/tarifs"
+                  className="inline-flex items-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-semibold transition-colors hover:opacity-80"
+                  style={{
+                    borderColor: "var(--color-primary)",
+                    color: "var(--color-primary)",
+                  }}
+                >
+                  Changer d&apos;abonnement
+                </Link>
+              </div>
+            </section>
+          )}
+
+          {/* --------------------------------------------------------
+           * ONGLET : Recherches sauvegardees
+           * -------------------------------------------------------- */}
+          {activeTab === "recherches" && (
+            <section
+              className="card p-6 sm:p-8"
+              aria-label="Recherches sauvegardees"
+            >
+              <h2
+                className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                <Bookmark
+                  size={20}
+                  style={{ color: "var(--color-primary)" }}
+                  aria-hidden="true"
+                />
+                Recherches sauvegardees
+              </h2>
+
+              {/* Liste des recherches */}
+              <ul className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+                {MOCK_SAVED_SEARCHES.map((search) => (
+                  <li
+                    key={search.id}
+                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Search
+                        size={16}
+                        style={{ color: "var(--color-text-muted)" }}
+                        aria-hidden="true"
+                      />
+                      <div>
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: "var(--color-text-primary)" }}
+                        >
+                          {search.label}
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--color-text-muted)" }}
+                        >
+                          Sauvegardee le {search.date}
+                        </p>
+                      </div>
+                    </div>
+                    {/* Bouton relancer la recherche (mock) */}
+                    <button
+                      type="button"
+                      className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        backgroundColor: "var(--color-primary-light)",
+                        color: "var(--color-primary)",
+                      }}
+                    >
+                      Relancer
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* --------------------------------------------------------
+           * ONGLET : Alertes
+           * -------------------------------------------------------- */}
+          {activeTab === "alertes" && (
+            <section className="card p-6 sm:p-8" aria-label="Alertes email">
+              <h2
+                className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                <Bell
+                  size={20}
+                  style={{ color: "var(--color-primary)" }}
+                  aria-hidden="true"
+                />
+                Preferences d&apos;alertes
+              </h2>
+
+              <p
+                className="mb-6 text-sm"
+                style={{ color: "var(--color-text-secondary)" }}
+              >
+                Choisissez les notifications que vous souhaitez recevoir par
+                email.
+              </p>
+
+              {/* Liste de toggles */}
+              <div className="space-y-5">
+                {/* Toggle : Nouvelles analyses */}
+                <AlertToggle
+                  id="alert-new-analysis"
+                  label="Nouvelles analyses"
+                  description="Recevoir une alerte quand une nouvelle analyse est disponible sur un sujet suivi."
+                  checked={alertNewAnalysis}
+                  onChange={setAlertNewAnalysis}
+                />
+
+                {/* Toggle : Politicien suivi */}
+                <AlertToggle
+                  id="alert-followed-politician"
+                  label="Interventions de politiciens suivis"
+                  description="Recevoir une alerte quand un politicien que vous suivez prend la parole."
+                  checked={alertFollowedPolitician}
+                  onChange={setAlertFollowedPolitician}
+                />
+
+                {/* Toggle : Resume hebdomadaire */}
+                <AlertToggle
+                  id="alert-weekly-digest"
+                  label="Resume hebdomadaire"
+                  description="Recevoir chaque lundi un resume des faits marquants de la semaine politique."
+                  checked={alertWeeklyDigest}
+                  onChange={setAlertWeeklyDigest}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* --------------------------------------------------------
+           * ONGLET : Politiciens suivis
+           * -------------------------------------------------------- */}
+          {activeTab === "politiciens" && (
+            <section
+              className="card p-6 sm:p-8"
+              aria-label="Politiciens suivis"
+            >
+              <h2
+                className="mb-6 flex items-center gap-2 text-lg font-semibold"
+                style={{ color: "var(--color-text-primary)" }}
+              >
+                <Shield
+                  size={20}
+                  style={{ color: "var(--color-primary)" }}
+                  aria-hidden="true"
+                />
+                Politiciens suivis
+              </h2>
+
+              {/* Liste des politiciens */}
+              <ul className="divide-y" style={{ borderColor: "var(--color-border)" }}>
+                {MOCK_FOLLOWED_POLITICIANS.map((politician) => (
+                  <li
+                    key={politician.id}
+                    className="flex items-center justify-between py-4 first:pt-0 last:pb-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Avatar placeholder */}
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                        style={{
+                          backgroundColor: "var(--color-primary-light)",
+                          color: "var(--color-primary)",
+                        }}
+                        aria-hidden="true"
+                      >
+                        {politician.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </div>
+                      <div>
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: "var(--color-text-primary)" }}
+                        >
+                          {politician.name}
+                        </p>
+                        <p
+                          className="text-xs"
+                          style={{ color: "var(--color-text-muted)" }}
+                        >
+                          {politician.party}
+                        </p>
+                      </div>
+                    </div>
+                    {/* Lien vers la fiche du politicien */}
+                    <Link
+                      href={`/politiciens/${politician.slug}`}
+                      className="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        backgroundColor: "var(--color-primary-light)",
+                        color: "var(--color-primary)",
+                      }}
+                    >
+                      Voir la fiche
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        {/* ==============================================================
+         * Bouton de deconnexion
+         * ============================================================== */}
+        <div className="mt-10 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              // TODO : Remplacer par un appel Supabase Auth (signOut)
+              console.log("[Dixipolis] Deconnexion demandee");
+            }}
+            className="inline-flex items-center gap-2 rounded-lg border-2 px-5 py-2.5 text-sm font-semibold transition-colors hover:opacity-80"
+            style={{
+              borderColor: "var(--color-error)",
+              color: "var(--color-error)",
+              backgroundColor: "transparent",
+            }}
+          >
+            <LogOut size={18} aria-hidden="true" />
+            Se deconnecter
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/* =============================================================================
+ * AlertToggle — Composant reutilisable pour un toggle d'alerte
+ *
+ * Affiche un interrupteur (switch) stylise avec label et description.
+ * Utilise un <input type="checkbox"> natif pour l'accessibilite,
+ * avec un style custom en CSS via le pattern "peer".
+ *
+ * @param id          - Identifiant unique pour le htmlFor / aria
+ * @param label       - Titre de l'alerte
+ * @param description - Description courte
+ * @param checked     - Etat actuel du toggle
+ * @param onChange    - Callback de changement d'etat
+ * ============================================================================= */
+function AlertToggle({
+  id,
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div
+      className="flex items-start justify-between gap-4 rounded-lg border p-4"
+      style={{ borderColor: "var(--color-border)" }}
+    >
+      {/* Texte */}
+      <div className="flex-1">
+        <label
+          htmlFor={id}
+          className="text-sm font-medium"
+          style={{ color: "var(--color-text-primary)" }}
+        >
+          {label}
+        </label>
+        <p
+          className="mt-0.5 text-xs leading-relaxed"
+          style={{ color: "var(--color-text-muted)" }}
+        >
+          {description}
+        </p>
+      </div>
+
+      {/* Switch toggle personnalise */}
+      <button
+        id={id}
+        role="switch"
+        type="button"
+        aria-checked={checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={cn(
+          "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200",
+          "focus:outline-none focus:ring-2 focus:ring-offset-2"
+        )}
+        style={{
+          backgroundColor: checked
+            ? "var(--color-primary)"
+            : "var(--color-border)",
+        }}
+      >
+        {/* Rond du toggle */}
+        <span
+          className={cn(
+            "inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200",
+            checked ? "translate-x-6" : "translate-x-1"
+          )}
+          aria-hidden="true"
+        />
+      </button>
+    </div>
+  );
+}
