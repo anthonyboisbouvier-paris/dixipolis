@@ -1,14 +1,15 @@
 /* =============================================================================
  * app/analytique/page.tsx
  *
- * Page Analytique — Dashboard complet Dixipolis.
- * Layout amélioré : header immersif, sections nommées, meilleur spacing.
+ * Page Analytique — Dashboard complet avec croisements de données.
+ * Sections : KPI > Fiche politicien > Croisement thème×politicien >
+ *            Comparaison > Thèmes & Classement > Idéologie & Mots > Timeline
  *
  * Composant serveur (Server Component).
  * ============================================================================= */
 
 import type { Metadata } from "next";
-import { BarChart3, TrendingUp, GitCompare, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, GitCompare, Activity, User, Table2 } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import FilterBar from "@/components/analytique/FilterBar";
 import StatsOverview from "@/components/analytique/StatsOverview";
@@ -17,19 +18,22 @@ import TopPoliticians from "@/components/analytique/TopPoliticians";
 import IdeologicalMatrix from "@/components/analytique/IdeologicalMatrix";
 import WordCloudPreview from "@/components/analytique/WordCloudPreview";
 import ActivityTimeline from "@/components/analytique/ActivityTimeline";
+import PoliticianSpotlight from "@/components/analytique/PoliticianSpotlight";
+import ThemeCrossTable from "@/components/analytique/ThemeCrossTable";
+import ComparePoliticians from "@/components/analytique/ComparePoliticians";
 
 /* -------------------------------------------------------------------------- */
 export const metadata: Metadata = {
   title: "Analytique | Dixipolis",
   description:
-    "Dashboard analytique Dixipolis : KPI discursifs, fact-checking, propagande, distance id\u00e9ologique et mots sur-repr\u00e9sent\u00e9s par politicien.",
+    "Dashboard analytique Dixipolis : KPI discursifs, fiche politicien, croisement th\u00e8me\u00d7politicien, comparaison, distance id\u00e9ologique.",
 };
 
 /* -------------------------------------------------------------------------- */
 export default function AnalytiquePage() {
   return (
     <PageWrapper className="py-8">
-      {/* En-tête immersif */}
+      {/* En-tête */}
       <section className="mb-8">
         <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-[var(--color-bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]">
           <BarChart3 className="h-3.5 w-3.5 text-[var(--color-primary)]" aria-hidden="true" />
@@ -39,8 +43,8 @@ export default function AnalytiquePage() {
           Analytique
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-[var(--color-text-secondary)] sm:text-lg">
-          Explorez 45&nbsp;000+ discours politiques &mdash; th&egrave;mes, tendances,
-          proximit&eacute; id&eacute;ologique et mots distinctifs de chaque politicien.
+          Explorez 45&nbsp;000+ discours &mdash; croisez th&egrave;mes, politiciens et partis.
+          Descendez jusqu&apos;&agrave; la fiche d&eacute;taill&eacute;e d&apos;un politicien pr&eacute;cis.
         </p>
       </section>
 
@@ -55,7 +59,22 @@ export default function AnalytiquePage() {
         <StatsOverview />
       </div>
 
-      {/* ── Section 2 : Thèmes + Top Politiciens ─────────────────────── */}
+      {/* ── Section 2 : Fiche Politicien + Comparaison ───────────────── */}
+      <div className="mb-8">
+        <SectionLabel icon={<User className="h-3.5 w-3.5" />} label="Focus politicien" />
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <PoliticianSpotlight />
+          <ComparePoliticians />
+        </div>
+      </div>
+
+      {/* ── Section 3 : Croisement Thème × Politicien ─────────────────── */}
+      <div className="mb-8">
+        <SectionLabel icon={<Table2 className="h-3.5 w-3.5" />} label="Croisement des donn\u00e9es" />
+        <ThemeCrossTable />
+      </div>
+
+      {/* ── Section 4 : Thèmes + Top Politiciens ─────────────────────── */}
       <div className="mb-8">
         <SectionLabel icon={<BarChart3 className="h-3.5 w-3.5" />} label="Th\u00e8mes &amp; Classement" />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -68,7 +87,7 @@ export default function AnalytiquePage() {
         </div>
       </div>
 
-      {/* ── Section 3 : Idéologie + Mots ─────────────────────────────── */}
+      {/* ── Section 5 : Idéologie + Mots ─────────────────────────────── */}
       <div className="mb-8">
         <SectionLabel icon={<GitCompare className="h-3.5 w-3.5" />} label="Analyse linguistique" />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -77,7 +96,7 @@ export default function AnalytiquePage() {
         </div>
       </div>
 
-      {/* ── Section 4 : Timeline ──────────────────────────────────────── */}
+      {/* ── Section 6 : Timeline ──────────────────────────────────────── */}
       <div>
         <SectionLabel icon={<Activity className="h-3.5 w-3.5" />} label="Activit\u00e9 r\u00e9cente" />
         <ActivityTimeline />
@@ -86,9 +105,7 @@ export default function AnalytiquePage() {
   );
 }
 
-/* --------------------------------------------------------------------------
- * SectionLabel — petit label au-dessus de chaque section du dashboard
- * -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 function SectionLabel({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div className="mb-4 flex items-center gap-2">
