@@ -1,0 +1,73 @@
+# =============================================================================
+# Deploy Pipeline — Dixipolis
+#
+# Déploie automatiquement sur Vercel à chaque push sur main.
+# Nécessite le secret GitHub suivant :
+#   - VERCEL_TOKEN : Token d'authentification Vercel
+#     (Créer sur https://vercel.com/account/tokens)
+#
+# Les IDs du projet et de l'org sont en variables d'environnement dans le job.
+# =============================================================================
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Un seul déploiement à la fois
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job : Déploiement en production sur Vercel
+  # ---------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Vercel Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    environment:
+      name: production
+      url: https://dixipolis.vercel.app
+
+    steps:
+      # 1. Récupérer le code source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurer Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      # 3. Installer Vercel CLI
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      # 4. Pull la config du projet Vercel
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      # 5. Build avec Vercel
+      - name: Build project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # 6. Déployer en production
+      - name: Deploy to production
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deploy_url=$url" >> $GITHUB_OUTPUT
+
+      # 7. Résumé du déploiement
+      - name: Deployment summary
+        run: echo "✅ Deployed to ${{ steps.deploy.outputs.deploy_url }}"

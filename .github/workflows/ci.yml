@@ -1,0 +1,64 @@
+# =============================================================================
+# CI Pipeline — Dixipolis
+#
+# Déclenchée sur chaque push et pull request vers main.
+# Étapes :
+#   1. Lint (ESLint) — Vérifie la qualité du code
+#   2. Type-check (TypeScript) — Vérifie les types statiques
+#   3. Build (Next.js) — Vérifie que le projet compile sans erreur
+#
+# Bonnes pratiques :
+#   - Cache npm pour accélérer les builds
+#   - Node.js LTS pinné via .nvmrc
+#   - Fail-fast : si une étape échoue, les suivantes sont annulées
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Annuler les runs précédents si un nouveau push arrive sur la même branche
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job : Qualité du code (lint + types + build)
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Lint, Type-check & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # 1. Récupérer le code source
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configurer Node.js avec cache npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      # 3. Installer les dépendances
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Vérifier le lint ESLint
+      - name: Run ESLint
+        run: npm run lint
+
+      # 5. Vérifier les types TypeScript
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      # 6. Vérifier que le build passe
+      - name: Build
+        run: npm run build
