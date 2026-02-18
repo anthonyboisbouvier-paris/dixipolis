@@ -1,0 +1,130 @@
+{
+  "name": "Dixipolis — Submit Transcription Job",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "transcriptions",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook POST /transcriptions",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate a simple job_id and extract youtube_video_id\nconst input = $input.first().json.body || $input.first().json;\nconst youtube_video_id = input.youtube_video_id;\n\nif (!youtube_video_id) {\n  throw new Error('youtube_video_id is required');\n}\n\n// Simple job_id: timestamp + random hex\nconst job_id = `job_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;\n\nreturn [{\n  json: {\n    job_id,\n    youtube_video_id,\n    youtube_url: `https://www.youtube.com/watch?v=${youtube_video_id}`,\n  }\n}];"
+      },
+      "id": "generate-job-id",
+      "name": "Generate Job ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "command": "=yt-dlp --extract-audio --audio-format wav --audio-quality 0 --output \"/data/audio/{{ $json.job_id }}.%(ext)s\" \"{{ $json.youtube_url }}\" 2>&1 && echo \"SUCCESS\" || echo \"FAILED\""
+      },
+      "id": "download-audio",
+      "name": "yt-dlp Download Audio",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify download succeeded and prepare file path\nconst prev = $input.first().json;\nconst stdout = prev.stdout || '';\n\nif (!stdout.includes('SUCCESS')) {\n  throw new Error(`yt-dlp failed: ${stdout}`);\n}\n\nconst job_id = $('Generate Job ID').first().json.job_id;\nconst youtube_video_id = $('Generate Job ID').first().json.youtube_video_id;\nconst audio_path = `/data/audio/${job_id}.wav`;\n\nreturn [{\n  json: {\n    job_id,\n    youtube_video_id,\n    audio_path,\n  }\n}];"
+      },
+      "id": "prepare-upload",
+      "name": "Prepare Audio Path",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.runpod.ai/v2/{{ $env.RUNPOD_ENDPOINT_ID }}/run",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.RUNPOD_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"audio_url\": \"{{ $json.audio_serve_url }}\",\n    \"job_id\": \"{{ $json.job_id }}\",\n    \"language\": \"fr\",\n    \"model_size\": \"large-v3\",\n    \"compute_type\": \"int8\"\n  }\n}",
+        "options": {}
+      },
+      "id": "call-runpod",
+      "name": "Call Runpod Serverless",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine Runpod response with job info\nconst runpodResponse = $input.first().json;\nconst jobInfo = $('Prepare Audio Path').first().json;\n\nreturn [{\n  json: {\n    job_id: jobInfo.job_id,\n    runpod_job_id: runpodResponse.id,\n    status: runpodResponse.status,\n    youtube_video_id: jobInfo.youtube_video_id,\n  }\n}];"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1540, 300]
+    }
+  ],
+  "connections": {
+    "Webhook POST /transcriptions": {
+      "main": [
+        [{ "node": "Generate Job ID", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Job ID": {
+      "main": [
+        [{ "node": "yt-dlp Download Audio", "type": "main", "index": 0 }]
+      ]
+    },
+    "yt-dlp Download Audio": {
+      "main": [
+        [{ "node": "Prepare Audio Path", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Audio Path": {
+      "main": [
+        [{ "node": "Call Runpod Serverless", "type": "main", "index": 0 }]
+      ]
+    },
+    "Call Runpod Serverless": {
+      "main": [
+        [{ "node": "Format Response", "type": "main", "index": 0 }]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
