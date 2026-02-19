@@ -39,9 +39,31 @@ import os
 import time
 import tempfile
 import logging
+import functools
+import inspect
 import requests
 import torch
 import numpy as np
+
+# ---------------------------------------------------------------------------
+# Patch huggingface_hub to support use_auth_token → token migration
+# pyannote.audio 3.x uses use_auth_token which was removed in hf_hub >= 0.24
+# ---------------------------------------------------------------------------
+import huggingface_hub
+_original_hf_hub_download = huggingface_hub.hf_hub_download
+
+@functools.wraps(_original_hf_hub_download)
+def _patched_hf_hub_download(*args, **kwargs):
+    if "use_auth_token" in kwargs:
+        kwargs["token"] = kwargs.pop("use_auth_token")
+    return _original_hf_hub_download(*args, **kwargs)
+
+huggingface_hub.hf_hub_download = _patched_hf_hub_download
+
+# Also patch hf_hub_download in the file_download module
+if hasattr(huggingface_hub, 'file_download'):
+    huggingface_hub.file_download.hf_hub_download = _patched_hf_hub_download
+
 from faster_whisper import WhisperModel
 from pyannote.audio import Pipeline as DiarizationPipeline
 
@@ -82,6 +104,8 @@ def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
 
         log.info("Loading pyannote speaker-diarization-3.1...")
         t0 = time.time()
+        # Let huggingface_hub auto-detect HF_TOKEN from env
+        # The monkey-patch above handles use_auth_token→token migration
         DIARIZATION_PIPELINE = DiarizationPipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
             use_auth_token=hf_token,

@@ -37,7 +37,6 @@ RUN python -m pip install --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir \
     faster-whisper==1.1.0 \
     pyannote.audio==3.3.2 \
-    huggingface_hub==0.23.5 \
     torch==2.4.1 \
     torchaudio==2.4.1 \
     runpod==1.7.7 \
