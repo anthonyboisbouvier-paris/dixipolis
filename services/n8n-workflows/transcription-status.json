@@ -27,15 +27,13 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "=https://api.runpod.ai/v2/{{ $env.RUNPOD_ENDPOINT_ID }}/status/{{ $json.job_id }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "=https://api.runpod.ai/v2/YOUR_RUNPOD_ENDPOINT_ID/status/{{ $json.job_id }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $env.RUNPOD_API_KEY }}"
+              "value": "Bearer YOUR_RUNPOD_API_KEY"
             }
           ]
         },

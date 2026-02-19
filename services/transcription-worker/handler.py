@@ -1,7 +1,7 @@
 """
 Runpod Serverless Handler — Whisper + Diarisation
 
-Input:
+Input (option A — direct audio URL):
   {
     "input": {
       "audio_url": "https://...",        # URL du fichier audio (S3 ou direct)
@@ -9,6 +9,15 @@ Input:
       "language": "fr",                  # Optionnel, default "fr"
       "model_size": "large-v3",          # Optionnel, default "large-v3"
       "compute_type": "int8"             # Optionnel, default "int8"
+    }
+  }
+
+Input (option B — YouTube video ID, downloaded via yt-dlp):
+  {
+    "input": {
+      "youtube_video_id": "dQw4w9WgXcQ", # ID de la video YouTube
+      "job_id": "abc123",
+      "language": "fr"
     }
   }
 
@@ -38,6 +47,7 @@ Output:
 import os
 import time
 import tempfile
+import subprocess
 import logging
 import functools
 import inspect
@@ -125,6 +135,44 @@ def download_audio(url: str, dest: str):
             f.write(chunk)
     size_mb = os.path.getsize(dest) / (1024 * 1024)
     log.info(f"Downloaded {size_mb:.1f} MB in {time.time() - t0:.1f}s")
+
+
+def download_youtube_audio(video_id: str, dest: str):
+    """Download audio from YouTube using yt-dlp and convert to WAV."""
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    log.info(f"Downloading YouTube audio: {video_id}...")
+    t0 = time.time()
+
+    # yt-dlp: extract audio, convert to wav via ffmpeg
+    cmd = [
+        "yt-dlp",
+        "--extract-audio",
+        "--audio-format", "wav",
+        "--audio-quality", "0",
+        "--output", dest.replace(".wav", ".%(ext)s"),
+        "--no-playlist",
+        "--quiet",
+        url,
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+    if result.returncode != 0:
+        raise RuntimeError(f"yt-dlp failed: {result.stderr}")
+
+    # Verify file exists
+    if not os.path.exists(dest):
+        # yt-dlp may have created the file with slightly different name
+        import glob
+        base = dest.rsplit(".", 1)[0]
+        candidates = glob.glob(f"{base}.*")
+        if candidates:
+            # Rename to expected dest
+            os.rename(candidates[0], dest)
+        else:
+            raise RuntimeError(f"yt-dlp did not produce output file at {dest}")
+
+    size_mb = os.path.getsize(dest) / (1024 * 1024)
+    log.info(f"YouTube audio downloaded in {time.time() - t0:.1f}s ({size_mb:.1f} MB)")
 
 
 def transcribe(audio_path: str, language: str = "fr"):
@@ -222,13 +270,14 @@ def handler(job):
     # Parse input
     job_input = job.get("input", {})
     audio_url = job_input.get("audio_url")
+    youtube_video_id = job_input.get("youtube_video_id")
     job_id = job_input.get("job_id", job.get("id", "unknown"))
     language = job_input.get("language", "fr")
     model_size = job_input.get("model_size", "large-v3")
     compute_type = job_input.get("compute_type", "int8")
 
-    if not audio_url:
-        return {"error": "audio_url is required"}
+    if not audio_url and not youtube_video_id:
+        return {"error": "audio_url or youtube_video_id is required"}
 
     log.info(f"=== Job {job_id} started ===")
 
@@ -238,7 +287,11 @@ def handler(job):
     # Download audio to temp file
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
         audio_path = tmp.name
-        download_audio(audio_url, audio_path)
+
+        if youtube_video_id:
+            download_youtube_audio(youtube_video_id, audio_path)
+        else:
+            download_audio(audio_url, audio_path)
 
         # Transcription
         segments, duration = transcribe(audio_path, language)

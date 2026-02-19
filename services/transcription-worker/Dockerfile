@@ -41,7 +41,8 @@ RUN pip install --no-cache-dir \
     torchaudio==2.4.1 \
     runpod==1.7.7 \
     requests==2.32.3 \
-    numpy==1.26.4
+    numpy==1.26.4 \
+    yt-dlp==2024.12.23
 
 # Pre-telecharger le modele Whisper large-v3 dans l'image
 # Cela evite un cold-start de 60-90s au premier appel
