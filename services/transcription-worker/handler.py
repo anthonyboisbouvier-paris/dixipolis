@@ -80,11 +80,12 @@ def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
             log.warning("HF_TOKEN not set — diarization disabled")
             return
 
+        # huggingface_hub reads HF_TOKEN from env automatically
+        # No need to pass token= or use_auth_token= explicitly
         log.info("Loading pyannote speaker-diarization-3.1...")
         t0 = time.time()
         DIARIZATION_PIPELINE = DiarizationPipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
-            token=hf_token,
         )
         DIARIZATION_PIPELINE.to(torch.device("cuda"))
         log.info(f"Pyannote loaded in {time.time() - t0:.1f}s")
