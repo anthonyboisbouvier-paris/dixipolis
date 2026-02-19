@@ -90,6 +90,7 @@ log = logging.getLogger("transcription-worker")
 # ---------------------------------------------------------------------------
 WHISPER_MODEL = None
 DIARIZATION_PIPELINE = None
+_YTDLP_UPDATED = False
 
 
 def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
@@ -137,8 +138,30 @@ def download_audio(url: str, dest: str):
     log.info(f"Downloaded {size_mb:.1f} MB in {time.time() - t0:.1f}s")
 
 
+def _ensure_ytdlp_updated():
+    """Self-update yt-dlp to latest nightly to keep up with YouTube changes."""
+    global _YTDLP_UPDATED
+    if _YTDLP_UPDATED:
+        return
+    log.info("Updating yt-dlp to latest version...")
+    try:
+        result = subprocess.run(
+            ["pip", "install", "--upgrade", "yt-dlp"],
+            capture_output=True, text=True, timeout=120,
+        )
+        if result.returncode == 0:
+            log.info("yt-dlp updated successfully")
+        else:
+            log.warning(f"yt-dlp update failed (non-critical): {result.stderr[:200]}")
+    except Exception as e:
+        log.warning(f"yt-dlp update error (non-critical): {e}")
+    _YTDLP_UPDATED = True
+
+
 def download_youtube_audio(video_id: str, dest: str):
     """Download audio from YouTube using yt-dlp and convert to WAV."""
+    _ensure_ytdlp_updated()
+
     url = f"https://www.youtube.com/watch?v={video_id}"
     log.info(f"Downloading YouTube audio: {video_id}...")
     t0 = time.time()
@@ -152,6 +175,7 @@ def download_youtube_audio(video_id: str, dest: str):
         "--output", dest.replace(".wav", ".%(ext)s"),
         "--no-playlist",
         "--quiet",
+        "--no-check-certificates",
         url,
     ]
 
