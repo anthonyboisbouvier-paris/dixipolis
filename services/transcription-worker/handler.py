@@ -167,6 +167,7 @@ def download_youtube_audio(video_id: str, dest: str):
     t0 = time.time()
 
     # yt-dlp: extract audio, convert to wav via ffmpeg
+    # --js-runtimes nodejs: required by recent yt-dlp for YouTube JS extraction
     cmd = [
         "yt-dlp",
         "--extract-audio",
@@ -176,6 +177,7 @@ def download_youtube_audio(video_id: str, dest: str):
         "--no-playlist",
         "--quiet",
         "--no-check-certificates",
+        "--js-runtimes", "nodejs",
         url,
     ]
 
