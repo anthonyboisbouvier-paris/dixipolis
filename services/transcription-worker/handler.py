@@ -84,7 +84,7 @@ def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
         t0 = time.time()
         DIARIZATION_PIPELINE = DiarizationPipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
-            use_auth_token=hf_token,
+            token=hf_token,
         )
         DIARIZATION_PIPELINE.to(torch.device("cuda"))
         log.info(f"Pyannote loaded in {time.time() - t0:.1f}s")
