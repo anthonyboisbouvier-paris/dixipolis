@@ -47,4 +47,8 @@ next-env.d.ts
 # transcription pipeline temp files
 temp_audio/
 temp-workflow.json
+temp_*.json
 benchmarks/
+
+# Claude session state (contient des references aux secrets)
+CLAUDE_STATE.md

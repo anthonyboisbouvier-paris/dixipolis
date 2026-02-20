@@ -1,6 +1,6 @@
 # Dixipolis — Pipeline Transcription + Diarisation
 
-Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube) avec identification des locuteurs (diarisation). Basee sur **faster-whisper large-v3-turbo** et **pyannote speaker-diarization-3.1**, deployee sur **Runpod Serverless**.
+Pipeline GPU serverless pour transcrire de l'audio avec identification des locuteurs (diarisation). Basee sur **faster-whisper large-v3-turbo** et **pyannote speaker-diarization-3.1**, deployee sur **Runpod Serverless**, orchestree par **n8n** avec stockage persistant sur **Supabase Storage**.
 
 ## Architecture
 
@@ -9,134 +9,143 @@ Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube)
                         |        Client / App       |
                         +---------------------------+
                                     |
-                        POST /transcriptions
-                        (youtube_video_id ou audio_url)
+                    3 endpoints n8n (webhooks prod)
                                     |
                                     v
                         +---------------------------+
                         |     n8n Orchestrateur      |
                         |     (CPU, self-hosted)     |
                         |                           |
-                        |  - Genere un job_id       |
-                        |  - Construit le payload   |
-                        |  - Appelle Runpod API     |
-                        |  - Retourne job_id        |
-                        +---------------------------+
-                                    |
-                        POST /v2/{endpoint}/run
-                                    |
-                                    v
-                        +---------------------------+
-                        |   Runpod Serverless GPU   |
-                        |   (16 GB VRAM tier)       |
+                        |  POST /transcriptions     |
+                        |    → submit job Runpod    |
                         |                           |
-                        |  1. yt-dlp (si YouTube)   |
-                        |  2. faster-whisper turbo  |
-                        |     (transcription)       |
-                        |  3. pyannote 3.1          |
-                        |     (diarisation)         |
-                        |  4. Merge segments +      |
-                        |     speakers              |
+                        |  GET /transcription-status|
+                        |    → poll Runpod          |
+                        |    → auto-save Supabase   |
+                        |                           |
+                        |  GET /transcription-result|
+                        |    → fetch depuis Supabase|
                         +---------------------------+
-                                    |
-                                    v
-                        +---------------------------+
-                        |   JSON Transcript         |
-                        |   - segments + timestamps |
-                        |   - speaker labels        |
-                        +---------------------------+
+                              |               |
+                              v               v
+                +------------------+  +------------------+
+                | Runpod Serverless|  | Supabase Storage |
+                | GPU (16 GB VRAM) |  | Bucket: dixipolis|
+                |                  |  |                  |
+                | 1. faster-whisper|  | transcripts/     |
+                |    turbo         |  |   {job_id}.json  |
+                | 2. pyannote 3.1  |  |                  |
+                +------------------+  +------------------+
 ```
 
 ### Flux de donnees
 
-1. Le client envoie un `youtube_video_id` ou un `audio_url` via l'API n8n
-2. n8n genere un `job_id`, construit le payload Runpod et soumet le job
+1. Le client envoie un `audio_url` via `POST /webhook/transcriptions`
+2. n8n genere un `job_id`, construit le payload et soumet le job a Runpod
 3. Le worker GPU demarre (cold start ~10s si idle)
-4. Si YouTube : yt-dlp telecharge l'audio en WAV (via Node.js runtime)
-5. faster-whisper transcrit l'audio avec timestamps par segment
-6. pyannote identifie les locuteurs par analyse du signal audio
-7. Les segments sont fusionnes avec les labels de locuteurs
-8. Le resultat JSON est retourne via l'API Runpod status
+4. faster-whisper transcrit l'audio avec timestamps par segment
+5. pyannote identifie les locuteurs par analyse du signal audio
+6. Les segments sont fusionnes avec les labels de locuteurs
+7. Le client poll `GET /webhook/transcription-status?job_id=XXX`
+8. Quand COMPLETED : n8n sauvegarde automatiquement le JSON dans Supabase Storage
+9. Le client recupere le transcript via `GET /webhook/transcription-result?job_id=XXX`
 
-## API Endpoints
+## API Endpoints (3 webhooks n8n)
 
-### Methode 1 : Via n8n (recommande pour les applications)
-
-#### Soumettre une transcription
+### 1. Soumettre une transcription
 
 ```bash
-# Par YouTube video ID
 curl -X POST https://n8n.srv1262078.hstgr.cloud/webhook/transcriptions \
   -H "Content-Type: application/json" \
-  -d '{"youtube_video_id": "dQw4w9WgXcQ", "language": "fr"}'
-
-# Par URL audio directe
-curl -X POST https://n8n.srv1262078.hstgr.cloud/webhook/transcriptions \
-  -H "Content-Type: application/json" \
-  -d '{"audio_url": "https://example.com/audio.wav", "language": "en"}'
-```
-
-**Reponse :**
-```json
-{
-  "job_id": "job_1708123456789_a1b2c3",
-  "runpod_job_id": "abc123-def456-...",
-  "status": "IN_QUEUE",
-  "youtube_video_id": "dQw4w9WgXcQ"
-}
-```
-
-#### Verifier le statut / Recuperer le transcript
-
-```bash
-curl https://n8n.srv1262078.hstgr.cloud/webhook/transcriptions/{runpod_job_id}
-```
-
-**Statuts possibles :** `IN_QUEUE` → `IN_PROGRESS` → `COMPLETED` | `FAILED`
-
-### Methode 2 : API Runpod directe
-
-Pour un controle total sans passer par n8n.
-
-#### Soumettre un job
-
-```bash
-curl -X POST "https://api.runpod.ai/v2/uds4rmzb61uph6/run" \
-  -H "Authorization: Bearer YOUR_RUNPOD_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": {
-      "youtube_video_id": "dQw4w9WgXcQ",
-      "language": "fr",
-      "job_id": "my_custom_id"
-    }
-  }'
+  -d '{"audio_url": "https://example.com/audio.mp3", "language": "fr"}'
 ```
 
 **Parametres d'entree :**
 
 | Parametre | Type | Requis | Description |
 |-----------|------|--------|-------------|
-| `youtube_video_id` | string | oui* | ID de la video YouTube |
-| `audio_url` | string | oui* | URL directe du fichier audio |
+| `audio_url` | string | oui | URL directe du fichier audio (HTTP/HTTPS) |
 | `language` | string | non | Code langue (default: `fr`) |
-| `job_id` | string | non | ID personnalise (auto-genere sinon) |
-| `model_size` | string | non | Taille du modele Whisper (default: `large-v3-turbo`) |
-| `compute_type` | string | non | Type de calcul (default: `int8_float16`) |
-
-*Un des deux (`youtube_video_id` ou `audio_url`) est requis.
 
 **Reponse :**
 ```json
 {
-  "id": "abc123-def456-...",
-  "status": "IN_QUEUE"
+  "job_id": "job_1708123456789_a1b2c3",
+  "runpod_job_id": "abc123-def456-...-u1",
+  "status": "IN_QUEUE",
+  "audio_url": "https://example.com/audio.mp3",
+  "language": "fr"
 }
 ```
 
-#### Verifier le statut
+> **Important** : Utiliser le `runpod_job_id` (pas le `job_id`) pour les appels Status et Result.
+
+### 2. Verifier le statut
 
 ```bash
+curl "https://n8n.srv1262078.hstgr.cloud/webhook/transcription-status?job_id=RUNPOD_JOB_ID"
+```
+
+**Statuts possibles :** `IN_QUEUE` → `IN_PROGRESS` → `COMPLETED` | `FAILED` | `ERROR`
+
+**Reponse (en cours) :**
+```json
+{
+  "job_id": "abc123-def456-...-u1",
+  "status": "IN_PROGRESS",
+  "execution_time": null,
+  "delay_time": 12415,
+  "error": null
+}
+```
+
+**Reponse (termine — auto-save Supabase) :**
+```json
+{
+  "job_id": "abc123-def456-...-u1",
+  "status": "COMPLETED",
+  "execution_time": 122065,
+  "delay_time": 12415,
+  "transcript_saved": true,
+  "transcript_path": "transcripts/abc123-def456-...-u1.json"
+}
+```
+
+### 3. Recuperer la transcription
+
+```bash
+curl "https://n8n.srv1262078.hstgr.cloud/webhook/transcription-result?job_id=RUNPOD_JOB_ID"
+```
+
+**Reponse (succes) :** le JSON complet de transcription (voir format ci-dessous)
+
+**Reponse (pas encore pret) :**
+```json
+{
+  "error": "Transcript not found",
+  "job_id": "xxx",
+  "message": "The transcript file does not exist yet. The job may still be processing."
+}
+```
+
+### API Runpod directe (avance)
+
+Pour un controle total sans passer par n8n :
+
+```bash
+# Soumettre
+curl -X POST "https://api.runpod.ai/v2/uds4rmzb61uph6/run" \
+  -H "Authorization: Bearer YOUR_RUNPOD_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": {
+      "audio_url": "https://example.com/audio.mp3",
+      "language": "fr",
+      "job_id": "my_custom_id"
+    }
+  }'
+
+# Statut
 curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
   -H "Authorization: Bearer YOUR_RUNPOD_API_KEY"
 ```
@@ -146,18 +155,18 @@ curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
 ```json
 {
   "job_id": "my_custom_id",
-  "duration_seconds": 38.76,
-  "language": "en",
-  "processing_time_seconds": 24.92,
+  "duration_seconds": 1692.93,
+  "language": "fr",
+  "processing_time_seconds": 121.84,
   "segments": [
     {
-      "start": 0.27,
-      "end": 2.17,
-      "text": "This is my voice on the left.",
+      "start": 0.0,
+      "end": 4.44,
+      "text": "Bonjour Daniel Timonet, vous etes candidate...",
       "speaker": "SPEAKER_00"
     }
   ],
-  "speakers": ["SPEAKER_00", "SPEAKER_01"]
+  "speakers": ["SPEAKER_00", "SPEAKER_01", "SPEAKER_02"]
 }
 ```
 
@@ -184,57 +193,44 @@ Le modele **large-v3-turbo** est ~2.7x plus rapide que large-v3 en conditions re
 
 ### Benchmarks reels (large-v3-turbo + pyannote 3.1, GPU 16 GB)
 
-| Source audio | Duree audio | Temps traitement | Speakers | Ratio | Delay (warm) |
-|-------------|-------------|------------------|----------|-------|--------------|
-| Macron Voeux 2025 (MP3) | 9 min 55s | **37.1s** | 1 | **0.062x** | 8.6s* |
-| Macron Davos 2025 (MP3) | 18 min 56s | **75.2s** | 1 | **0.066x** | 8.6s |
-| QAG Assemblee Nationale (MP3) | 57 min 15s | **235.1s** | 22 | **0.068x** | 83.4s** |
-
-*Premier job apres cold start, delay plus long (~2000s) lors du premier test.
-**Delay plus long car le worker traitait un job precedent (1 worker actif).
+| Source audio | Duree audio | Temps traitement | Speakers | Ratio | Cout |
+|-------------|-------------|------------------|----------|-------|------|
+| Debat LFI-Modem (LCI) | 28 min | **122s** | 3 | **0.07x** | ~$0.020 |
+| Debat Attal/Bardella/Bompard (TF1) | 108 min | **512s** | 13 | **0.079x** | $0.082 |
+| QAG Assemblee Nationale | 57 min 15s | **235s** | 22 | **0.068x** | $0.038 |
+| Macron Voeux 2025 | 9 min 55s | **37s** | 1 | **0.062x** | $0.006 |
+| Macron Davos 2025 | 18 min 56s | **75s** | 1 | **0.066x** | $0.012 |
 
 ### Comparaison avant/apres
 
 | Metrique | large-v3 (avant) | large-v3-turbo (apres) | Gain |
 |----------|------------------|------------------------|------|
-| Ratio traitement | 0.17x | **0.065x** | **2.6x** |
-| GPU pour 1h audio | 10.2 min | **3.9 min** | 2.6x |
-| Cout / heure audio | $0.147 | **$0.037** | **4x** |
+| Ratio traitement | 0.17x | **0.07x** | **2.4x** |
+| GPU pour 1h audio | 10.2 min | **4.2 min** | 2.4x |
+| Cout / heure audio | $0.098 | **$0.046** | **2.1x** |
 
 ### Extrapolation a grande echelle
 
 | Duree audio | Temps GPU | Avec 3 workers en parallele |
 |-------------|-----------|----------------------------|
-| 5 min | ~20s | 20s |
-| 15 min | ~59s | 59s |
-| 30 min | ~1 min 58s | 1 min 58s |
-| 1 heure | ~3 min 54s | 3 min 54s |
-| 2 heures | ~7 min 48s | 7 min 48s |
-| 10x 1 heure (batch) | ~3 min 54s chacun | ~13 min total (3 workers) |
+| 5 min | ~21s | 21s |
+| 15 min | ~63s | 63s |
+| 30 min | ~126s | 126s |
+| 1 heure | ~252s | 252s |
+| 2 heures | ~504s | 504s |
+| 10x 1 heure (batch) | ~4 min 12s chacun | ~14 min total (3 workers) |
 
 ### Latences
 
 | Metrique | Valeur |
 |----------|--------|
 | Cold start (image pull + init) | ~2-3 min (image 13 GB) |
-| Warm start (queue delay) | ~8-10s |
+| Warm start (queue delay) | ~8-12s |
 | Chargement modeles | Inclus dans l'image Docker (pre-telecharge) |
-
-### Throughput
-
-Avec N workers actifs et le modele turbo, le throughput est de **N × ~15 heures d'audio/heure** :
-
-| Workers | Throughput (audio/heure) | Jobs 1h/heure |
-|---------|--------------------------|---------------|
-| 1 | ~15h d'audio | ~15 jobs |
-| 3 | ~46h d'audio | ~46 jobs |
-| 5 | ~77h d'audio | ~77 jobs |
 
 ## Pricing
 
 ### GPU Runpod Serverless (pay-per-second)
-
-Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU specifique) :
 
 | Tier VRAM | Supply | Prix/seconde | Prix/heure |
 |-----------|--------|-------------|------------|
@@ -243,16 +239,16 @@ Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU spec
 | 24 GB PRO | High | $0.00031/s | $1.116/h |
 | 48 GB | High | $0.00034/s | $1.224/h |
 
-### Cout par transcription (16 GB tier + turbo, ratio 0.065x)
+### Cout par transcription (16 GB tier + turbo, ratio ~0.07x)
 
 | Duree audio | Temps GPU | Cout GPU |
 |-------------|-----------|----------|
-| 5 min | ~20s | **$0.003** |
-| 15 min | ~59s | **$0.009** |
-| 30 min | ~1 min 58s | **$0.019** |
-| 1 heure | ~3 min 54s | **$0.037** |
-| 2 heures | ~7 min 48s | **$0.075** |
-| 100 jobs de 1h | ~6.5h GPU | **$3.74** |
+| 5 min | ~21s | **$0.003** |
+| 15 min | ~63s | **$0.010** |
+| 30 min | ~126s | **$0.020** |
+| 1 heure | ~252s | **$0.040** |
+| 2 heures | ~504s | **$0.081** |
+| 100 jobs de 1h | ~7h GPU | **$4.03** |
 
 **Note :** Zero cout quand aucun job n'est en cours (scale-to-zero).
 
@@ -260,11 +256,11 @@ Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU spec
 
 | Service | Cout pour 1h d'audio | Ratio |
 |---------|----------------------|-------|
-| **Dixipolis (cette pipeline)** | **~$0.037** | **1x** |
-| OpenAI Whisper API | ~$0.36 | 10x plus cher |
-| AssemblyAI | ~$0.65 | 18x plus cher |
-| Google Speech-to-Text | ~$1.44 | 39x plus cher |
-| AWS Transcribe | ~$1.44 | 39x plus cher |
+| **Dixipolis (cette pipeline)** | **~$0.040** | **1x** |
+| OpenAI Whisper API | ~$0.36 | 9x plus cher |
+| AssemblyAI | ~$0.65 | 16x plus cher |
+| Google Speech-to-Text | ~$1.44 | 36x plus cher |
+| AWS Transcribe | ~$1.44 | 36x plus cher |
 
 > *Prix concurrents indicatifs, basees sur les tarifs publics (fev. 2026). Dixipolis inclut la diarisation dans le prix.*
 
@@ -273,6 +269,7 @@ Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU spec
 | Composant | Cout |
 |-----------|------|
 | n8n self-hosted (Hostinger VPS) | ~$5/mois |
+| Supabase Storage (free tier) | Gratuit (1 GB) |
 | GHCR (stockage image Docker) | Gratuit (public) |
 | GitHub Actions (CI/CD) | Gratuit (quota public) |
 
@@ -280,11 +277,11 @@ Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU spec
 
 | Composant | Technologie | Role |
 |-----------|------------|------|
-| Transcription | faster-whisper large-v3-turbo (CTranslate2, int8_float16) | 6x plus rapide que large-v3, qualite quasi identique |
+| Transcription | faster-whisper large-v3-turbo (CTranslate2, int8_float16) | ~2.7x plus rapide que large-v3, qualite quasi identique |
 | Diarisation | pyannote/speaker-diarization-3.1 | Identification des locuteurs |
-| Download YouTube | yt-dlp + Node.js runtime | Extraction audio YouTube → WAV |
 | GPU | Runpod Serverless | Pay-per-second, auto scale-to-zero |
 | Orchestration | n8n (self-hosted) | Webhooks, routing, API gateway |
+| Stockage | Supabase Storage | Persistance JSON transcripts (bucket public) |
 | Container | Docker (CUDA 12.1 + Python 3.11) | Image ~13 GB avec modele turbo pre-charge |
 | CI/CD | GitHub Actions | Build & push image automatique |
 | Registry | GHCR (GitHub Container Registry) | Stockage image Docker publique |
@@ -294,12 +291,14 @@ Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU spec
 ```
 services/
 ├── transcription-worker/
-│   ├── Dockerfile              # Image GPU (CUDA 12.1, Whisper, pyannote, yt-dlp)
-│   └── handler.py              # Handler Runpod serverless
+│   ├── Dockerfile                      # Image GPU (CUDA 12.1, Whisper, pyannote)
+│   ├── handler.py                      # Handler Runpod serverless
+│   └── requirements.txt
 ├── n8n-workflows/
-│   ├── transcription-submit.json   # Workflow n8n : soumettre un job
-│   └── transcription-status.json   # Workflow n8n : verifier le statut
-└── README.md                   # Ce fichier
+│   ├── transcription-submit.json       # POST /webhook/transcriptions
+│   ├── transcription-status.json       # GET /webhook/transcription-status
+│   └── transcription-result.json       # GET /webhook/transcription-result
+└── README.md                           # Ce fichier
 ```
 
 ## Setup / Deploiement
@@ -308,7 +307,8 @@ services/
 
 - Compte Runpod avec credit
 - Token HuggingFace (accepter les conditions de pyannote)
-- Instance n8n self-hosted (optionnel, pour les webhooks)
+- Instance n8n self-hosted
+- Projet Supabase avec bucket Storage
 
 ### 1. Variables d'environnement
 
@@ -319,6 +319,8 @@ HF_TOKEN=hf_xxxxx               # Token HuggingFace (pour pyannote)
 # Local / CI
 RUNPOD_API_KEY=rpa_xxxxx         # API key Runpod
 RUNPOD_ENDPOINT_ID=xxxxx         # ID de l'endpoint serverless
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=xxx    # Service role key (pour upload)
 ```
 
 ### 2. Build & Push Docker image
@@ -338,23 +340,27 @@ docker push ghcr.io/YOUR_USER/dixipolis-worker:latest
 2. Configuration :
    - **Container Image** : `ghcr.io/YOUR_USER/dixipolis-worker:latest`
    - **Container Disk** : 50 GB (image ~13 GB)
-   - **GPU** : 16 GB VRAM tier (le moins cher, turbo ~1.5GB + pyannote ~1.6GB = 3.1GB)
+   - **GPU** : 16 GB VRAM tier (turbo ~1.5GB + pyannote ~1.6GB = 3.1GB VRAM)
    - **Min Workers** : 0 (scale-to-zero)
    - **Max Workers** : 3-5 (selon le parallelisme souhaite)
    - **Idle Timeout** : 5s
-   - **FlashBoot** : Desactive (image custom volumineuse)
    - **Environment Variables** : `HF_TOKEN`
 
-### 4. Configurer n8n (optionnel)
+### 4. Configurer n8n
 
-1. Importer les workflows JSON dans n8n
-2. Remplacer les placeholders dans les nodes HTTP :
-   - `YOUR_RUNPOD_API_KEY` → votre API key Runpod
-   - `YOUR_RUNPOD_ENDPOINT_ID` → ID de l'endpoint
-3. Activer les workflows
-4. Les webhooks seront disponibles sur :
+1. Importer les 3 fichiers JSON de `n8n-workflows/` dans l'editeur n8n via **Import from file**
+2. Activer chaque workflow (toggle Active)
+3. Les webhooks seront disponibles sur :
    - `POST /webhook/transcriptions`
-   - `GET /webhook/transcriptions/:job_id`
+   - `GET /webhook/transcription-status`
+   - `GET /webhook/transcription-result`
+
+> **Important** : Les workflows doivent etre importes via l'editeur n8n. Les workflows crees via API REST ne registrent pas les webhooks production dans n8n v2.2.6.
+
+### 5. Configurer Supabase
+
+1. Creer un bucket `dixipolis` (public)
+2. Les credentials Supabase (service_role key) sont deja integrees dans le workflow `transcription-status.json`
 
 ## Langues supportees
 
@@ -374,14 +380,8 @@ Le modele Whisper large-v3-turbo supporte 99 langues. Passer le code langue via 
 
 ## Limitations connues
 
-- **YouTube** : Le telechargement YouTube via yt-dlp est bloque par les mesures anti-bot de YouTube sur les serveurs. **Recommandation :** telecharger l'audio YouTube cote client ou via n8n, puis envoyer l'`audio_url` au worker GPU.
+- **Audio URL uniquement** : L'API accepte uniquement des URLs audio directes (HTTP/HTTPS). Les URLs YouTube ne sont pas supportees (anti-bot sur les serveurs cloud).
 - **Diarisation** : La precision diminue avec plus de 5-6 locuteurs simultanes.
-- **Cold start** : Premier job apres une periode d'inactivite prend ~15-30s de plus.
+- **Cold start** : Premier job apres une periode d'inactivite prend ~2-3 min (pull image 13 GB).
 - **Taille audio** : Pas de limite theorique, mais les fichiers > 3h peuvent timeout (default 600s).
-- **Tous les formats audio** sont acceptes (MP3, WAV, FLAC, OGG, M4A...) — le handler convertit automatiquement en WAV 16kHz mono avant traitement.
-
-## Bugs connus a corriger
-
-| Bug | Severite | Impact | Fix |
-|-----|----------|--------|-----|
-| YouTube anti-bot | Externe | YouTube bloque les serveurs | Gerer le download YouTube cote client/n8n |
+- **Formats audio** : MP3, WAV, FLAC, OGG, M4A... tous acceptes — conversion automatique en WAV 16kHz mono.

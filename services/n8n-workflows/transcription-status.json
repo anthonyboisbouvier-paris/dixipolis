@@ -4,19 +4,19 @@
     {
       "parameters": {
         "httpMethod": "GET",
-        "path": "transcriptions/:job_id",
+        "path": "transcription-status",
         "responseMode": "responseNode",
         "options": {}
       },
       "id": "webhook-get",
-      "name": "Webhook GET /transcriptions/:job_id",
+      "name": "Webhook GET /transcription-status",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [220, 300]
     },
     {
       "parameters": {
-        "jsCode": "// Extract the runpod_job_id from the path parameter\n// The job_id from our system maps to a runpod job id\n// For simplicity, we use the runpod_job_id directly\nconst params = $input.first().json.params || {};\nconst query = $input.first().json.query || {};\nconst job_id = params.job_id || query.job_id;\n\nif (!job_id) {\n  throw new Error('job_id is required');\n}\n\nreturn [{\n  json: { job_id }\n}];"
+        "jsCode": "const query = $input.first().json.query || {};\nconst job_id = query.job_id;\n\nif (!job_id) {\n  throw new Error('job_id query parameter is required. Usage: /webhook/transcription-status?job_id=YOUR_RUNPOD_JOB_ID');\n}\n\nreturn [{ json: { job_id } }];"
       },
       "id": "extract-job-id",
       "name": "Extract Job ID",
@@ -27,17 +27,23 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "=https://api.runpod.ai/v2/YOUR_RUNPOD_ENDPOINT_ID/status/{{ $json.job_id }}",
+        "url": "=https://api.runpod.ai/v2/uds4rmzb61uph6/status/{{ $json.job_id }}",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_RUNPOD_API_KEY"
+              "value": "Bearer ${RUNPOD_API_KEY}"
             }
           ]
         },
-        "options": {}
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "id": "check-runpod-status",
       "name": "Check Runpod Status",
@@ -47,49 +53,136 @@
     },
     {
       "parameters": {
-        "jsCode": "// Format the response based on Runpod status\nconst runpod = $input.first().json;\nconst job_id = $('Extract Job ID').first().json.job_id;\n\n// Runpod statuses: IN_QUEUE, IN_PROGRESS, COMPLETED, FAILED, CANCELLED, TIMED_OUT\nconst status = runpod.status;\n\nconst result = {\n  job_id,\n  status,\n};\n\nif (status === 'COMPLETED' && runpod.output) {\n  // Return the full transcript\n  result.transcript = runpod.output;\n} else if (status === 'FAILED') {\n  result.error = runpod.error || 'Job failed';\n}\n\nreturn [{ json: result }];"
+        "jsCode": "const runpod = $input.first().json;\nconst job_id = $('Extract Job ID').first().json.job_id;\n\n// Handle HTTP error responses from Runpod\nif (!runpod.status && (runpod.statusCode || runpod.error)) {\n  return [{ json: {\n    job_id,\n    status: 'ERROR',\n    error: runpod.message || runpod.error || `Runpod returned HTTP ${runpod.statusCode || 'error'}`\n  }}];\n}\n\nconst status = runpod.status;\nconst result = {\n  job_id,\n  status,\n  execution_time: runpod.executionTime || null,\n  delay_time: runpod.delayTime || null\n};\n\nif (status === 'COMPLETED' && runpod.output) {\n  result.saved_to_supabase = true;\n  result.transcript_path = `transcripts/${job_id}.json`;\n  result.output = runpod.output;\n} else if (status === 'FAILED') {\n  result.error = runpod.error || 'Job failed';\n}\n\nreturn [{ json: result }];"
       },
       "id": "format-status",
-      "name": "Format Status Response",
+      "name": "Format Status & Check Completed",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [880, 300]
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ JSON.stringify($json) }}"
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "condition-completed",
+              "leftValue": "={{ $json.saved_to_supabase }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
       },
-      "id": "respond-status",
+      "id": "is-completed",
+      "name": "Is Completed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1100, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://pijmvnlqljtnwhcltqwn.supabase.co/storage/v1/object/dixipolis/transcripts/{{ $json.job_id }}.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer ${SUPABASE_SERVICE_ROLE_KEY}"
+            },
+            {
+              "name": "apikey",
+              "value": "${SUPABASE_SERVICE_ROLE_KEY}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-upsert",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.output) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "upload-supabase",
+      "name": "Save JSON to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Format Status & Check Completed').first().json;\nconst supabaseResult = $input.first().json;\n\n// Check if Supabase upload succeeded\nconst uploadOk = supabaseResult.Key || supabaseResult.Id || (!supabaseResult.statusCode && !supabaseResult.error);\n\nreturn [{\n  json: {\n    job_id: prev.job_id,\n    status: prev.status,\n    execution_time: prev.execution_time,\n    delay_time: prev.delay_time,\n    transcript_saved: uploadOk ? true : false,\n    transcript_path: prev.transcript_path,\n    upload_error: uploadOk ? undefined : (supabaseResult.message || supabaseResult.error || 'Supabase upload failed')\n  }\n}];"
+      },
+      "id": "response-completed",
+      "name": "Response (Completed)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Format Status & Check Completed').first().json;\nreturn [{\n  json: {\n    job_id: prev.job_id,\n    status: prev.status,\n    execution_time: prev.execution_time,\n    delay_time: prev.delay_time,\n    error: prev.error || null\n  }\n}];"
+      },
+      "id": "response-not-completed",
+      "name": "Response (Not Completed)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem"
+      },
+      "id": "respond-webhook",
       "name": "Respond to Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [1100, 300]
+      "position": [1760, 300]
     }
   ],
   "connections": {
-    "Webhook GET /transcriptions/:job_id": {
-      "main": [
-        [{ "node": "Extract Job ID", "type": "main", "index": 0 }]
-      ]
+    "Webhook GET /transcription-status": {
+      "main": [[{ "node": "Extract Job ID", "type": "main", "index": 0 }]]
     },
     "Extract Job ID": {
-      "main": [
-        [{ "node": "Check Runpod Status", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Check Runpod Status", "type": "main", "index": 0 }]]
     },
     "Check Runpod Status": {
+      "main": [[{ "node": "Format Status & Check Completed", "type": "main", "index": 0 }]]
+    },
+    "Format Status & Check Completed": {
+      "main": [[{ "node": "Is Completed?", "type": "main", "index": 0 }]]
+    },
+    "Is Completed?": {
       "main": [
-        [{ "node": "Format Status Response", "type": "main", "index": 0 }]
+        [{ "node": "Save JSON to Supabase", "type": "main", "index": 0 }],
+        [{ "node": "Response (Not Completed)", "type": "main", "index": 0 }]
       ]
     },
-    "Format Status Response": {
-      "main": [
-        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
-      ]
+    "Save JSON to Supabase": {
+      "main": [[{ "node": "Response (Completed)", "type": "main", "index": 0 }]]
+    },
+    "Response (Completed)": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    },
+    "Response (Not Completed)": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
     }
   },
-  "settings": {
-    "executionOrder": "v1"
-  }
+  "settings": { "executionOrder": "v1" }
 }

@@ -1,0 +1,81 @@
+{
+  "name": "Dixipolis — Get Transcription Result",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "transcription-result",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-get",
+      "name": "Webhook GET /transcription-result",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $input.first().json.query || {};\nconst job_id = query.job_id;\n\nif (!job_id) {\n  throw new Error('job_id query parameter is required. Usage: /webhook/transcription-result?job_id=YOUR_RUNPOD_JOB_ID');\n}\n\nreturn [{ json: { job_id } }];"
+      },
+      "id": "extract-job-id",
+      "name": "Extract Job ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://pijmvnlqljtnwhcltqwn.supabase.co/storage/v1/object/public/dixipolis/transcripts/{{ $json.job_id }}.json",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "fetch-supabase",
+      "name": "Fetch from Supabase Storage",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconst job_id = $('Extract Job ID').first().json.job_id;\n\n// Check if Supabase returned an error (404 = file not found)\nif (result.statusCode === '404' || result.statusCode === 404 || result.error === 'Not found' || result.message === 'Object not found') {\n  return [{ json: {\n    error: 'Transcript not found',\n    job_id,\n    message: 'The transcript file does not exist yet. The job may still be processing. Use /webhook/transcription-status?job_id=' + job_id + ' to check.'\n  }}];\n}\n\n// If we got valid transcript data, return it as-is\nreturn [{ json: result }];"
+      },
+      "id": "check-result",
+      "name": "Check Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [880, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "Webhook GET /transcription-result": {
+      "main": [[{ "node": "Extract Job ID", "type": "main", "index": 0 }]]
+    },
+    "Extract Job ID": {
+      "main": [[{ "node": "Fetch from Supabase Storage", "type": "main", "index": 0 }]]
+    },
+    "Fetch from Supabase Storage": {
+      "main": [[{ "node": "Check Result", "type": "main", "index": 0 }]]
+    },
+    "Check Result": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" }
+}

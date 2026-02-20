@@ -16,10 +16,10 @@
     },
     {
       "parameters": {
-        "jsCode": "// Extract youtube_video_id and generate a job_id\nconst input = $input.first().json.body || $input.first().json;\nconst youtube_video_id = input.youtube_video_id;\nconst audio_url = input.audio_url;\nconst language = input.language || 'fr';\n\nif (!youtube_video_id && !audio_url) {\n  throw new Error('youtube_video_id or audio_url is required');\n}\n\n// Simple job_id: timestamp + random hex\nconst job_id = `job_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;\n\n// Build Runpod input payload\nconst runpodInput = { job_id, language };\nif (youtube_video_id) {\n  runpodInput.youtube_video_id = youtube_video_id;\n} else {\n  runpodInput.audio_url = audio_url;\n}\n\nreturn [{\n  json: {\n    job_id,\n    youtube_video_id: youtube_video_id || null,\n    audio_url: audio_url || null,\n    runpod_payload: { input: runpodInput },\n  }\n}];"
+        "jsCode": "const input = $input.first().json.body || $input.first().json;\nconst audio_url = input.audio_url;\nconst language = input.language || 'fr';\n\nif (!audio_url) {\n  throw new Error('audio_url is required');\n}\n\nif (!audio_url.match(/^https?:\\/\\/.+/)) {\n  throw new Error('audio_url must be a valid HTTP(S) URL');\n}\n\nconst job_id = `job_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;\n\nreturn [{\n  json: {\n    job_id,\n    audio_url,\n    language,\n    runpod_payload: {\n      input: {\n        job_id,\n        audio_url,\n        language\n      }\n    }\n  }\n}];"
       },
       "id": "prepare-payload",
-      "name": "Prepare Runpod Payload",
+      "name": "Validate & Prepare Payload",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [440, 300]
@@ -27,30 +27,36 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.runpod.ai/v2/YOUR_RUNPOD_ENDPOINT_ID/run",
+        "url": "https://api.runpod.ai/v2/uds4rmzb61uph6/run",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer YOUR_RUNPOD_API_KEY"
+              "value": "Bearer ${RUNPOD_API_KEY}"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json.runpod_payload) }}",
-        "options": {}
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "id": "call-runpod",
-      "name": "Call Runpod Serverless",
+      "name": "Call Runpod /run",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [660, 300]
     },
     {
       "parameters": {
-        "jsCode": "// Combine Runpod response with job info\nconst runpodResponse = $input.first().json;\nconst jobInfo = $('Prepare Runpod Payload').first().json;\n\nreturn [{\n  json: {\n    job_id: jobInfo.job_id,\n    runpod_job_id: runpodResponse.id,\n    status: runpodResponse.status,\n    youtube_video_id: jobInfo.youtube_video_id,\n  }\n}];"
+        "jsCode": "const runpod = $input.first().json;\nconst jobInfo = $('Validate & Prepare Payload').first().json;\n\n// Handle Runpod API errors\nif (!runpod.id && (runpod.statusCode || runpod.error)) {\n  return [{ json: {\n    error: 'Runpod API error',\n    message: runpod.message || runpod.error || `Runpod returned HTTP ${runpod.statusCode || 'error'}`,\n    job_id: jobInfo.job_id\n  }}];\n}\n\nreturn [{\n  json: {\n    job_id: jobInfo.job_id,\n    runpod_job_id: runpod.id,\n    status: runpod.status,\n    audio_url: jobInfo.audio_url,\n    language: jobInfo.language\n  }\n}];"
       },
       "id": "format-response",
       "name": "Format Response",
@@ -60,8 +66,7 @@
     },
     {
       "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ JSON.stringify($json) }}"
+        "respondWith": "firstIncomingItem"
       },
       "id": "respond-webhook",
       "name": "Respond to Webhook",
@@ -72,27 +77,17 @@
   ],
   "connections": {
     "Webhook POST /transcriptions": {
-      "main": [
-        [{ "node": "Prepare Runpod Payload", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Validate & Prepare Payload", "type": "main", "index": 0 }]]
     },
-    "Prepare Runpod Payload": {
-      "main": [
-        [{ "node": "Call Runpod Serverless", "type": "main", "index": 0 }]
-      ]
+    "Validate & Prepare Payload": {
+      "main": [[{ "node": "Call Runpod /run", "type": "main", "index": 0 }]]
     },
-    "Call Runpod Serverless": {
-      "main": [
-        [{ "node": "Format Response", "type": "main", "index": 0 }]
-      ]
+    "Call Runpod /run": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
     },
     "Format Response": {
-      "main": [
-        [{ "node": "Respond to Webhook", "type": "main", "index": 0 }]
-      ]
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
     }
   },
-  "settings": {
-    "executionOrder": "v1"
-  }
+  "settings": { "executionOrder": "v1" }
 }
