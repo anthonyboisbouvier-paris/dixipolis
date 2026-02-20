@@ -28,7 +28,7 @@ Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube)
                                     v
                         +---------------------------+
                         |   Runpod Serverless GPU   |
-                        |   (RTX 2000 Ada 6 GB)    |
+                        |   (16 GB VRAM tier)       |
                         |                           |
                         |  1. yt-dlp (si YouTube)   |
                         |  2. faster-whisper turbo  |
@@ -102,7 +102,7 @@ Pour un controle total sans passer par n8n.
 #### Soumettre un job
 
 ```bash
-curl -X POST "https://api.runpod.ai/v2/nu0o7k8jf02mjd/run" \
+curl -X POST "https://api.runpod.ai/v2/uds4rmzb61uph6/run" \
   -H "Authorization: Bearer YOUR_RUNPOD_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +138,7 @@ curl -X POST "https://api.runpod.ai/v2/nu0o7k8jf02mjd/run" \
 #### Verifier le statut
 
 ```bash
-curl "https://api.runpod.ai/v2/nu0o7k8jf02mjd/status/{job_id}" \
+curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
   -H "Authorization: Bearer YOUR_RUNPOD_API_KEY"
 ```
 
@@ -185,72 +185,85 @@ curl "https://api.runpod.ai/v2/nu0o7k8jf02mjd/status/{job_id}" \
 
 ## KPI & Benchmarks
 
-Tests realises sur l'endpoint Runpod `nu0o7k8jf02mjd`.
+Tests realises sur l'endpoint Runpod `uds4rmzb61uph6` (GPU 16 GB VRAM tier, $0.00016/s).
 
 ### Modele Whisper large-v3-turbo
 
-Le modele **large-v3-turbo** est 6x plus rapide que large-v3 avec une perte de qualite negligeable (-1-2% WER). Il utilise un decodeur reduit (4 couches au lieu de 32) pour 809M params au lieu de 1.55B.
+Le modele **large-v3-turbo** est ~2.7x plus rapide que large-v3 en conditions reelles (transcription + diarisation). Il utilise un decodeur reduit (4 couches au lieu de 32) pour 809M params au lieu de 1.55B, avec une perte de qualite negligeable (-1-2% WER).
 
-### Benchmarks reels (audio_url, large-v3 — avant turbo)
+> Note : Le gain theorique est de 6x sur la transcription seule, mais pyannote (diarisation) represente ~50% du temps total, ce qui ramene le gain reel a ~2.7x.
 
-| Source audio | Duree audio | Temps traitement | Delay (queue) | Ratio |
-|-------------|-------------|------------------|---------------|-------|
-| WAV mono (test technique) | 38.76s | 23.65s | 7.8s | 0.61x |
-| MP3 LibriVox (speech EN) | 4 min 36s (275s) | 47.12s | 10.0s | 0.17x |
+### Benchmarks reels (large-v3-turbo + pyannote 3.1, GPU 16 GB)
 
-### Performances estimees avec large-v3-turbo (6x plus rapide)
+| Source audio | Duree audio | Temps traitement | Speakers | Ratio | Delay (warm) |
+|-------------|-------------|------------------|----------|-------|--------------|
+| Macron Voeux 2025 (MP3) | 9 min 55s | **37.1s** | 1 | **0.062x** | 8.6s* |
+| Macron Davos 2025 (MP3) | 18 min 56s | **75.2s** | 1 | **0.066x** | 8.6s |
+| QAG Assemblee Nationale (MP3) | 57 min 15s | **235.1s** | 22 | **0.068x** | 83.4s** |
 
-A grande echelle (workers warm, jobs en continu), le ratio de traitement effectif est de **~0.03x temps reel** avec le modele turbo.
+*Premier job apres cold start, delay plus long (~2000s) lors du premier test.
+**Delay plus long car le worker traitait un job precedent (1 worker actif).
 
-| Duree audio | Temps GPU estime | Avec 3 workers en parallele |
-|-------------|------------------|-----------------------------|
-| 5 min | ~9s | 9s |
-| 15 min | ~27s | 27s |
-| 30 min | ~54s | 54s |
-| 1 heure | ~1 min 48s | 1 min 48s |
-| 2 heures | ~3 min 36s | 3 min 36s |
-| 10x 1 heure (batch) | ~1 min 48s chacun | ~6 min total (3 workers) |
+### Comparaison avant/apres
+
+| Metrique | large-v3 (avant) | large-v3-turbo (apres) | Gain |
+|----------|------------------|------------------------|------|
+| Ratio traitement | 0.17x | **0.065x** | **2.6x** |
+| GPU pour 1h audio | 10.2 min | **3.9 min** | 2.6x |
+| Cout / heure audio | $0.147 | **$0.037** | **4x** |
+
+### Extrapolation a grande echelle
+
+| Duree audio | Temps GPU | Avec 3 workers en parallele |
+|-------------|-----------|----------------------------|
+| 5 min | ~20s | 20s |
+| 15 min | ~59s | 59s |
+| 30 min | ~1 min 58s | 1 min 58s |
+| 1 heure | ~3 min 54s | 3 min 54s |
+| 2 heures | ~7 min 48s | 7 min 48s |
+| 10x 1 heure (batch) | ~3 min 54s chacun | ~13 min total (3 workers) |
 
 ### Latences
 
 | Metrique | Valeur |
 |----------|--------|
-| Cold start (worker idle → ready) | ~15-30s |
+| Cold start (image pull + init) | ~2-3 min (image 13 GB) |
 | Warm start (queue delay) | ~8-10s |
-| Chargement modeles (premiere requete) | Inclus dans l'image Docker |
+| Chargement modeles | Inclus dans l'image Docker (pre-telecharge) |
 
 ### Throughput
 
-Avec N workers actifs et le modele turbo, le throughput est de **N × ~33 heures d'audio/heure** :
+Avec N workers actifs et le modele turbo, le throughput est de **N × ~15 heures d'audio/heure** :
 
 | Workers | Throughput (audio/heure) | Jobs 1h/heure |
 |---------|--------------------------|---------------|
-| 1 | ~33h d'audio | ~33 jobs |
-| 3 | ~100h d'audio | ~100 jobs |
-| 5 | ~166h d'audio | ~166 jobs |
+| 1 | ~15h d'audio | ~15 jobs |
+| 3 | ~46h d'audio | ~46 jobs |
+| 5 | ~77h d'audio | ~77 jobs |
 
 ## Pricing
 
 ### GPU Runpod Serverless (pay-per-second)
 
-| GPU | Prix/seconde | Prix/heure |
-|-----|-------------|------------|
-| RTX 2000 Ada (6 GB) | $0.00012/s | $0.43/h |
-| RTX 4000 Ada (16 GB) | $0.00028/s | $1.01/h |
-| RTX A4500 (20 GB) | $0.00024/s | $0.86/h |
+Runpod Serverless utilise un systeme de tiers par VRAM (pas de choix de GPU specifique) :
 
-### Cout par transcription a grande echelle (RTX 2000 Ada + turbo)
+| Tier VRAM | Supply | Prix/seconde | Prix/heure |
+|-----------|--------|-------------|------------|
+| **16 GB** (recommande) | Medium | $0.00016/s | $0.576/h |
+| 24 GB | Medium | $0.00019/s | $0.684/h |
+| 24 GB PRO | High | $0.00031/s | $1.116/h |
+| 48 GB | High | $0.00034/s | $1.224/h |
 
-Basee sur le ratio de **~0.03x** estime avec large-v3-turbo sur RTX 2000 Ada ($0.43/h) :
+### Cout par transcription (16 GB tier + turbo, ratio 0.065x)
 
 | Duree audio | Temps GPU | Cout GPU |
 |-------------|-----------|----------|
-| 5 min | ~9s | **$0.001** |
-| 15 min | ~27s | **$0.003** |
-| 30 min | ~54s | **$0.006** |
-| 1 heure | ~1 min 48s | **$0.013** |
-| 2 heures | ~3 min 36s | **$0.026** |
-| 100 jobs de 1h | ~3h GPU | **$1.29** |
+| 5 min | ~20s | **$0.003** |
+| 15 min | ~59s | **$0.009** |
+| 30 min | ~1 min 58s | **$0.019** |
+| 1 heure | ~3 min 54s | **$0.037** |
+| 2 heures | ~7 min 48s | **$0.075** |
+| 100 jobs de 1h | ~6.5h GPU | **$3.74** |
 
 **Note :** Zero cout quand aucun job n'est en cours (scale-to-zero).
 
@@ -258,11 +271,11 @@ Basee sur le ratio de **~0.03x** estime avec large-v3-turbo sur RTX 2000 Ada ($0
 
 | Service | Cout pour 1h d'audio | Ratio |
 |---------|----------------------|-------|
-| **Dixipolis (cette pipeline)** | **~$0.013** | **1x** |
-| OpenAI Whisper API | ~$0.36 | 28x plus cher |
-| AssemblyAI | ~$0.65 | 50x plus cher |
-| Google Speech-to-Text | ~$1.44 | 110x plus cher |
-| AWS Transcribe | ~$1.44 | 110x plus cher |
+| **Dixipolis (cette pipeline)** | **~$0.037** | **1x** |
+| OpenAI Whisper API | ~$0.36 | 10x plus cher |
+| AssemblyAI | ~$0.65 | 18x plus cher |
+| Google Speech-to-Text | ~$1.44 | 39x plus cher |
+| AWS Transcribe | ~$1.44 | 39x plus cher |
 
 > *Prix concurrents indicatifs, basees sur les tarifs publics (fev. 2026). Dixipolis inclut la diarisation dans le prix.*
 
@@ -336,7 +349,7 @@ docker push ghcr.io/YOUR_USER/dixipolis-worker:latest
 2. Configuration :
    - **Container Image** : `ghcr.io/YOUR_USER/dixipolis-worker:latest`
    - **Container Disk** : 50 GB (image ~13 GB)
-   - **GPU** : RTX 2000 Ada (6 GB VRAM suffisent — turbo ~1.5GB + pyannote ~1.6GB)
+   - **GPU** : 16 GB VRAM tier (le moins cher, turbo ~1.5GB + pyannote ~1.6GB = 3.1GB)
    - **Min Workers** : 0 (scale-to-zero)
    - **Max Workers** : 3-5 (selon le parallelisme souhaite)
    - **Idle Timeout** : 5s
