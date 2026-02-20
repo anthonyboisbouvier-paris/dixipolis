@@ -17,7 +17,7 @@ FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# Deps systeme + Node.js (requis par yt-dlp pour l'extraction YouTube JS)
+# Deps systeme (ffmpeg pour conversion audio)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 \
     python3.11-venv \
@@ -25,11 +25,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     curl \
     ca-certificates \
-    gnupg \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" > /etc/apt/sources.list.d/nodesource.list \
-    && apt-get update && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Faire de python3.11 le python par defaut
@@ -47,8 +42,7 @@ RUN pip install --no-cache-dir \
     torchaudio==2.4.1 \
     runpod==1.7.7 \
     requests==2.32.3 \
-    numpy==1.26.4 \
-    yt-dlp
+    numpy==1.26.4
 
 # Pre-telecharger le modele Whisper large-v3-turbo dans l'image
 # Turbo = 6x plus rapide que large-v3, qualite quasi identique (-1-2% WER)

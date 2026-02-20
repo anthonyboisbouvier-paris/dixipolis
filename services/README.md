@@ -150,6 +150,43 @@ curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
   -H "Authorization: Bearer YOUR_RUNPOD_API_KEY"
 ```
 
+## Audio de test
+
+Fichiers audio politiques heberges sur GitHub Releases (URLs permanentes, copier-coller pour tester) :
+
+| Audio | Duree | Speakers | Taille | Cout GPU | Release |
+|-------|-------|----------|--------|----------|---------|
+| Debat Simonnet/Millienne (LCI) | 28 min | 3 | 19 MB | ~$0.020 | benchmarks-v2 |
+| Debat Attal/Bardella/Bompard (TF1) | 108 min | 13 | 84 MB | ~$0.082 | benchmarks-v2 |
+| Macron Voeux 2025 | 10 min | 1 | — | ~$0.006 | bench-audio-v1 |
+| Macron Davos 2025 | 19 min | 1 | — | ~$0.012 | bench-audio-v1 |
+| QAG Assemblee Nationale | 57 min | 22 | — | ~$0.038 | bench-audio-v1 |
+
+### URLs copier-coller
+
+```
+https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/benchmarks-v2/debat_lfi_modem.mp3
+https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/benchmarks-v2/debat_attal_bardella_bompard.mp3
+https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/bench-audio-v1/macron_voeux.mp3
+https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/bench-audio-v1/macron_davos.mp3
+https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/bench-audio-v1/qag_assemblee.mp3
+```
+
+### Test rapide (copier-coller)
+
+```bash
+# 1. Soumettre le debat court (28 min, ~$0.02)
+curl -X POST https://n8n.srv1262078.hstgr.cloud/webhook/transcriptions \
+  -H "Content-Type: application/json" \
+  -d '{"audio_url": "https://github.com/anthonyboisbouvier-paris/dixipolis/releases/download/benchmarks-v2/debat_lfi_modem.mp3"}'
+
+# 2. Noter le runpod_job_id dans la reponse, puis verifier le statut
+curl "https://n8n.srv1262078.hstgr.cloud/webhook/transcription-status?job_id=RUNPOD_JOB_ID"
+
+# 3. Quand status=COMPLETED, recuperer le resultat
+curl "https://n8n.srv1262078.hstgr.cloud/webhook/transcription-result?job_id=RUNPOD_JOB_ID"
+```
+
 ## Format de sortie (COMPLETED)
 
 ```json

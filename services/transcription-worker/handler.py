@@ -1,23 +1,14 @@
 """
 Runpod Serverless Handler — Whisper + Diarisation
 
-Input (option A — direct audio URL):
+Input:
   {
     "input": {
-      "audio_url": "https://...",        # URL du fichier audio (S3 ou direct)
+      "audio_url": "https://...",        # URL du fichier audio (HTTP/HTTPS)
       "job_id": "abc123",                # ID unique du job
       "language": "fr",                  # Optionnel, default "fr"
       "model_size": "large-v3-turbo",     # Optionnel, default "large-v3-turbo"
       "compute_type": "int8_float16"     # Optionnel, default "int8_float16"
-    }
-  }
-
-Input (option B — YouTube video ID, downloaded via yt-dlp):
-  {
-    "input": {
-      "youtube_video_id": "dQw4w9WgXcQ", # ID de la video YouTube
-      "job_id": "abc123",
-      "language": "fr"
     }
   }
 
@@ -84,7 +75,6 @@ log = logging.getLogger("transcription-worker")
 # ---------------------------------------------------------------------------
 WHISPER_MODEL = None
 DIARIZATION_PIPELINE = None
-_YTDLP_UPDATED = False
 
 
 def load_models(model_size: str = "large-v3-turbo", compute_type: str = "int8_float16"):
@@ -154,69 +144,6 @@ def download_audio(url: str, dest: str):
             f.write(chunk)
     size_mb = os.path.getsize(dest) / (1024 * 1024)
     log.info(f"Downloaded {size_mb:.1f} MB in {time.time() - t0:.1f}s")
-
-
-def _ensure_ytdlp_updated():
-    """Self-update yt-dlp to latest nightly to keep up with YouTube changes."""
-    global _YTDLP_UPDATED
-    if _YTDLP_UPDATED:
-        return
-    log.info("Updating yt-dlp to latest version...")
-    try:
-        result = subprocess.run(
-            ["pip", "install", "--upgrade", "yt-dlp"],
-            capture_output=True, text=True, timeout=120,
-        )
-        if result.returncode == 0:
-            log.info("yt-dlp updated successfully")
-        else:
-            log.warning(f"yt-dlp update failed (non-critical): {result.stderr[:200]}")
-    except Exception as e:
-        log.warning(f"yt-dlp update error (non-critical): {e}")
-    _YTDLP_UPDATED = True
-
-
-def download_youtube_audio(video_id: str, dest: str):
-    """Download audio from YouTube using yt-dlp and convert to WAV."""
-    _ensure_ytdlp_updated()
-
-    url = f"https://www.youtube.com/watch?v={video_id}"
-    log.info(f"Downloading YouTube audio: {video_id}...")
-    t0 = time.time()
-
-    # yt-dlp: extract audio, convert to wav via ffmpeg
-    # --js-runtimes nodejs: required by recent yt-dlp for YouTube JS extraction
-    cmd = [
-        "yt-dlp",
-        "--extract-audio",
-        "--audio-format", "wav",
-        "--audio-quality", "0",
-        "--output", dest.replace(".wav", ".%(ext)s"),
-        "--no-playlist",
-        "--quiet",
-        "--no-check-certificates",
-        "--js-runtimes", "node",
-        url,
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
-    if result.returncode != 0:
-        raise RuntimeError(f"yt-dlp failed: {result.stderr}")
-
-    # Verify file exists
-    if not os.path.exists(dest):
-        # yt-dlp may have created the file with slightly different name
-        import glob
-        base = dest.rsplit(".", 1)[0]
-        candidates = glob.glob(f"{base}.*")
-        if candidates:
-            # Rename to expected dest
-            os.rename(candidates[0], dest)
-        else:
-            raise RuntimeError(f"yt-dlp did not produce output file at {dest}")
-
-    size_mb = os.path.getsize(dest) / (1024 * 1024)
-    log.info(f"YouTube audio downloaded in {time.time() - t0:.1f}s ({size_mb:.1f} MB)")
 
 
 def transcribe(audio_path: str, language: str = "fr"):
@@ -305,14 +232,13 @@ def handler(job):
     # Parse input
     job_input = job.get("input", {})
     audio_url = job_input.get("audio_url")
-    youtube_video_id = job_input.get("youtube_video_id")
     job_id = job_input.get("job_id", job.get("id", "unknown"))
     language = job_input.get("language", "fr")
     model_size = job_input.get("model_size", "large-v3-turbo")
     compute_type = job_input.get("compute_type", "int8_float16")
 
-    if not audio_url and not youtube_video_id:
-        return {"error": "audio_url or youtube_video_id is required"}
+    if not audio_url:
+        return {"error": "audio_url is required"}
 
     log.info(f"=== Job {job_id} started ===")
 
@@ -323,10 +249,7 @@ def handler(job):
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=True) as tmp:
         audio_path = tmp.name
 
-        if youtube_video_id:
-            download_youtube_audio(youtube_video_id, audio_path)
-        else:
-            download_audio(audio_url, audio_path)
+        download_audio(audio_url, audio_path)
 
         # Normalise audio to 16kHz mono WAV (fixes pyannote MP3 crash)
         wav_path = ensure_wav(audio_path)
