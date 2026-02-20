@@ -235,7 +235,7 @@ Le modele **large-v3-turbo** est ~2.7x plus rapide que large-v3 en conditions re
 | Debat LFI-Modem (LCI) | 28 min | **122s** | 3 | **0.07x** | ~$0.020 |
 | Debat Attal/Bardella/Bompard (TF1) | 108 min | **512s** | 13 | **0.079x** | $0.082 |
 | QAG Assemblee Nationale | 57 min 15s | **235s** | 22 | **0.068x** | $0.038 |
-| Macron Voeux 2025 | 9 min 55s | **37s** | 1 | **0.062x** | $0.006 |
+| Macron Voeux 2025 | 9 min 55s | **39s** | 1 | **0.065x** | $0.006 |
 | Macron Davos 2025 | 18 min 56s | **75s** | 1 | **0.066x** | $0.012 |
 
 ### Comparaison avant/apres
@@ -329,8 +329,7 @@ Le modele **large-v3-turbo** est ~2.7x plus rapide que large-v3 en conditions re
 services/
 ├── transcription-worker/
 │   ├── Dockerfile                      # Image GPU (CUDA 12.1, Whisper, pyannote)
-│   ├── handler.py                      # Handler Runpod serverless
-│   └── requirements.txt
+│   └── handler.py                      # Handler Runpod serverless
 ├── n8n-workflows/
 │   ├── transcription-submit.json       # POST /webhook/transcriptions
 │   ├── transcription-status.json       # GET /webhook/transcription-status

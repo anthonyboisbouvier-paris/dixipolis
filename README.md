@@ -65,11 +65,14 @@ Retourne le JSON complet de transcription avec segments, speakers et timestamps.
 
 | Source | Duree | Traitement | Speakers | Ratio | Cout |
 |--------|-------|------------|----------|-------|------|
+| Macron Voeux 2025 | 10 min | 39s | 1 | 0.065x | ~$0.006 |
 | Debat LFI-Modem (LCI) | 28 min | 122s | 3 | 0.07x | ~$0.020 |
-| Debat Attal/Bardella/Bompard (TF1) | 108 min | 512s | 13 | 0.079x | $0.082 |
-| QAG Assemblee Nationale | 57 min | 235s | 22 | 0.068x | $0.038 |
+| QAG Assemblee Nationale | 57 min | 235s | 22 | 0.068x | ~$0.038 |
+| Debat Attal/Bardella/Bompard (TF1) | 108 min | 512s | 13 | 0.079x | ~$0.082 |
 
-**8x moins cher** qu'OpenAI Whisper API, **31x moins cher** que Google Speech-to-Text.
+**9x moins cher** qu'OpenAI Whisper API, **36x moins cher** que Google Speech-to-Text.
+
+> Benchmarks complets et comparaison detaillee dans [services/README.md](services/README.md#kpi--benchmarks).
 
 ## Stack technique
 
@@ -100,21 +103,22 @@ dixipolis/
 ├── services/
 │   ├── transcription-worker/         # Worker GPU Runpod
 │   │   ├── handler.py                # Handler serverless (whisper + pyannote)
-│   │   ├── Dockerfile                # Image CUDA 12.1 + Python 3.11
-│   │   └── requirements.txt
+│   │   └── Dockerfile                # Image CUDA 12.1 + Python 3.11
 │   │
-│   └── n8n-workflows/                # Workflows n8n (a importer via editeur)
-│       ├── transcription-submit.json
-│       ├── transcription-status.json
-│       └── transcription-result.json
+│   ├── n8n-workflows/                # Workflows n8n (a importer via editeur)
+│   │   ├── transcription-submit.json
+│   │   ├── transcription-status.json
+│   │   └── transcription-result.json
+│   │
+│   └── README.md                     # Doc detaillee pipeline (API, benchmarks, setup)
 │
-├── benchmarks/                       # Fichiers de benchmark
-│   ├── debat_lfi_modem.mp3
-│   ├── debat_attal_bardella_bompard.mp3
-│   └── *_result.json
+├── public/                           # Assets statiques
+│   └── images/                       # Images du frontend
 │
-└── CLAUDE_STATE.md                   # Etat du projet pour reprise Claude
+└── .env.example                      # Variables d'environnement (template)
 ```
+
+> Les fichiers audio de test sont heberges sur [GitHub Releases](https://github.com/anthonyboisbouvier-paris/dixipolis/releases) (pas dans le repo).
 
 ## Demarrage rapide
 
@@ -133,7 +137,9 @@ docker build -t dixipolis-worker .
 ```
 
 ### Workflows n8n
-Les fichiers JSON dans `services/n8n-workflows/` doivent etre importes manuellement dans l'editeur n8n (les workflows crees via API ne registrent pas les webhooks production dans n8n v2.2.6).
+Les fichiers JSON dans `services/n8n-workflows/` doivent etre importes manuellement dans l'editeur n8n (les workflows crees via API ne registrent pas les webhooks production).
+
+> **Note :** Les secrets (RUNPOD_API_KEY, SUPABASE_SERVICE_ROLE_KEY) dans les JSON utilisent des placeholders `${VAR}`. Remplacer par les vraies valeurs dans n8n ou utiliser les variables d'environnement n8n.
 
 ## Deploiement
 
