@@ -44,7 +44,6 @@ Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube)
                         |   JSON Transcript         |
                         |   - segments + timestamps |
                         |   - speaker labels        |
-                        |   - word-level timing     |
                         +---------------------------+
 ```
 
@@ -54,7 +53,7 @@ Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube)
 2. n8n genere un `job_id`, construit le payload Runpod et soumet le job
 3. Le worker GPU demarre (cold start ~10s si idle)
 4. Si YouTube : yt-dlp telecharge l'audio en WAV (via Node.js runtime)
-5. faster-whisper transcrit l'audio avec timestamps mot-a-mot
+5. faster-whisper transcrit l'audio avec timestamps par segment
 6. pyannote identifie les locuteurs par analyse du signal audio
 7. Les segments sont fusionnes avec les labels de locuteurs
 8. Le resultat JSON est retourne via l'API Runpod status
@@ -155,16 +154,7 @@ curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
       "start": 0.27,
       "end": 2.17,
       "text": "This is my voice on the left.",
-      "speaker": "SPEAKER_00",
-      "words": [
-        {"word": "This", "start": 0.27, "end": 0.73},
-        {"word": "is", "start": 0.73, "end": 0.91},
-        {"word": "my", "start": 0.91, "end": 1.17},
-        {"word": "voice", "start": 1.17, "end": 1.45},
-        {"word": "on", "start": 1.45, "end": 1.81},
-        {"word": "the", "start": 1.81, "end": 1.97},
-        {"word": "left.", "start": 1.97, "end": 2.17}
-      ]
+      "speaker": "SPEAKER_00"
     }
   ],
   "speakers": ["SPEAKER_00", "SPEAKER_01"]
@@ -180,7 +170,6 @@ curl "https://api.runpod.ai/v2/uds4rmzb61uph6/status/{job_id}" \
 | `segments[].start/end` | Timestamps en secondes |
 | `segments[].text` | Texte transcrit du segment |
 | `segments[].speaker` | Label du locuteur (SPEAKER_00, 01, ...) |
-| `segments[].words[]` | Timestamps mot-a-mot (pour sous-titrage) |
 | `speakers` | Liste des locuteurs uniques detectes |
 
 ## KPI & Benchmarks

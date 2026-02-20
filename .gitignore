@@ -43,3 +43,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# transcription pipeline temp files
+temp_audio/
+temp-workflow.json
+benchmarks/

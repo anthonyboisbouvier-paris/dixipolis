@@ -31,11 +31,7 @@ Output:
         "start": 0.0,
         "end": 4.52,
         "text": "Bonjour et bienvenue...",
-        "speaker": "SPEAKER_00",
-        "words": [
-          {"word": "Bonjour", "start": 0.0, "end": 0.45},
-          ...
-        ]
+        "speaker": "SPEAKER_00"
       },
       ...
     ],
@@ -50,10 +46,8 @@ import tempfile
 import subprocess
 import logging
 import functools
-import inspect
 import requests
 import torch
-import numpy as np
 
 # ---------------------------------------------------------------------------
 # Patch huggingface_hub to support use_auth_token → token migration
@@ -226,7 +220,7 @@ def download_youtube_audio(video_id: str, dest: str):
 
 
 def transcribe(audio_path: str, language: str = "fr"):
-    """Run faster-whisper transcription with word-level timestamps."""
+    """Run faster-whisper transcription (segment-level timestamps)."""
     log.info(f"Transcribing (language={language})...")
     t0 = time.time()
 
@@ -234,7 +228,7 @@ def transcribe(audio_path: str, language: str = "fr"):
         audio_path,
         language=language,
         beam_size=5,
-        word_timestamps=True,
+        word_timestamps=False,
         vad_filter=True,
         vad_parameters=dict(
             min_silence_duration_ms=500,
@@ -244,19 +238,10 @@ def transcribe(audio_path: str, language: str = "fr"):
     # Materialize generator
     segments = []
     for seg in segments_raw:
-        words = []
-        if seg.words:
-            for w in seg.words:
-                words.append({
-                    "word": w.word.strip(),
-                    "start": round(w.start, 3),
-                    "end": round(w.end, 3),
-                })
         segments.append({
             "start": round(seg.start, 3),
             "end": round(seg.end, 3),
             "text": seg.text.strip(),
-            "words": words,
         })
 
     duration = info.duration
