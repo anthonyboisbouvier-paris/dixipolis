@@ -1,6 +1,6 @@
 # Dixipolis — Pipeline Transcription + Diarisation
 
-Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube) avec identification des locuteurs (diarisation). Basee sur **faster-whisper large-v3** et **pyannote speaker-diarization-3.1**, deployee sur **Runpod Serverless**.
+Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube) avec identification des locuteurs (diarisation). Basee sur **faster-whisper large-v3-turbo** et **pyannote speaker-diarization-3.1**, deployee sur **Runpod Serverless**.
 
 ## Architecture
 
@@ -28,10 +28,10 @@ Pipeline GPU serverless pour transcrire de l'audio (fichiers directs ou YouTube)
                                     v
                         +---------------------------+
                         |   Runpod Serverless GPU   |
-                        |   (RTX A4500 / A4000 Ada) |
+                        |   (RTX 2000 Ada 6 GB)    |
                         |                           |
                         |  1. yt-dlp (si YouTube)   |
-                        |  2. faster-whisper v3     |
+                        |  2. faster-whisper turbo  |
                         |     (transcription)       |
                         |  3. pyannote 3.1          |
                         |     (diarisation)         |
@@ -122,8 +122,8 @@ curl -X POST "https://api.runpod.ai/v2/nu0o7k8jf02mjd/run" \
 | `audio_url` | string | oui* | URL directe du fichier audio |
 | `language` | string | non | Code langue (default: `fr`) |
 | `job_id` | string | non | ID personnalise (auto-genere sinon) |
-| `model_size` | string | non | Taille du modele Whisper (default: `large-v3`) |
-| `compute_type` | string | non | Type de calcul (default: `int8`) |
+| `model_size` | string | non | Taille du modele Whisper (default: `large-v3-turbo`) |
+| `compute_type` | string | non | Type de calcul (default: `int8_float16`) |
 
 *Un des deux (`youtube_video_id` ou `audio_url`) est requis.
 
@@ -185,29 +185,31 @@ curl "https://api.runpod.ai/v2/nu0o7k8jf02mjd/status/{job_id}" \
 
 ## KPI & Benchmarks
 
-Tests realises sur l'endpoint Runpod `nu0o7k8jf02mjd` avec des GPU RTX A4500 / RTX 2000 Ada.
+Tests realises sur l'endpoint Runpod `nu0o7k8jf02mjd`.
 
-### Benchmarks reels (audio_url)
+### Modele Whisper large-v3-turbo
+
+Le modele **large-v3-turbo** est 6x plus rapide que large-v3 avec une perte de qualite negligeable (-1-2% WER). Il utilise un decodeur reduit (4 couches au lieu de 32) pour 809M params au lieu de 1.55B.
+
+### Benchmarks reels (audio_url, large-v3 — avant turbo)
 
 | Source audio | Duree audio | Temps traitement | Delay (queue) | Ratio |
 |-------------|-------------|------------------|---------------|-------|
 | WAV mono (test technique) | 38.76s | 23.65s | 7.8s | 0.61x |
 | MP3 LibriVox (speech EN) | 4 min 36s (275s) | 47.12s | 10.0s | 0.17x |
 
-> **Note :** Le ratio s'ameliore significativement avec des fichiers plus longs car le modele Whisper traite par batch et amortit l'overhead d'initialisation. Sur des fichiers courts (<1 min), l'overhead domine ; sur des fichiers longs (>5 min), le ratio converge vers **~0.17x temps reel**.
+### Performances estimees avec large-v3-turbo (6x plus rapide)
 
-### Performances a grande echelle (startup negligeable)
-
-A grande echelle (workers warm, jobs en continu), le cout de demarrage (queue delay ~8-10s) devient negligeable. Le ratio de traitement effectif est de **~0.17x temps reel** pour des fichiers audio de duree standard (5-60 min).
+A grande echelle (workers warm, jobs en continu), le ratio de traitement effectif est de **~0.03x temps reel** avec le modele turbo.
 
 | Duree audio | Temps GPU estime | Avec 3 workers en parallele |
 |-------------|------------------|-----------------------------|
-| 5 min | ~51s | 51s |
-| 15 min | ~2 min 33s | 2 min 33s |
-| 30 min | ~5 min 06s | 5 min 06s |
-| 1 heure | ~10 min 12s | 10 min 12s |
-| 2 heures | ~20 min 24s | 20 min 24s |
-| 10x 1 heure (batch) | ~10 min 12s chacun | ~34 min total (3 workers) |
+| 5 min | ~9s | 9s |
+| 15 min | ~27s | 27s |
+| 30 min | ~54s | 54s |
+| 1 heure | ~1 min 48s | 1 min 48s |
+| 2 heures | ~3 min 36s | 3 min 36s |
+| 10x 1 heure (batch) | ~1 min 48s chacun | ~6 min total (3 workers) |
 
 ### Latences
 
@@ -219,13 +221,13 @@ A grande echelle (workers warm, jobs en continu), le cout de demarrage (queue de
 
 ### Throughput
 
-Avec N workers actifs, le throughput est de **N × 5.9 heures d'audio/heure** :
+Avec N workers actifs et le modele turbo, le throughput est de **N × ~33 heures d'audio/heure** :
 
 | Workers | Throughput (audio/heure) | Jobs 1h/heure |
 |---------|--------------------------|---------------|
-| 1 | ~5.9h d'audio | ~5.9 jobs |
-| 3 | ~17.7h d'audio | ~17.7 jobs |
-| 5 | ~29.4h d'audio | ~29.4 jobs |
+| 1 | ~33h d'audio | ~33 jobs |
+| 3 | ~100h d'audio | ~100 jobs |
+| 5 | ~166h d'audio | ~166 jobs |
 
 ## Pricing
 
@@ -237,18 +239,18 @@ Avec N workers actifs, le throughput est de **N × 5.9 heures d'audio/heure** :
 | RTX 4000 Ada (16 GB) | $0.00028/s | $1.01/h |
 | RTX A4500 (20 GB) | $0.00024/s | $0.86/h |
 
-### Cout par transcription a grande echelle (RTX A4500)
+### Cout par transcription a grande echelle (RTX 2000 Ada + turbo)
 
-Basee sur le ratio de **0.17x** mesure en conditions reelles (startup negligeable) :
+Basee sur le ratio de **~0.03x** estime avec large-v3-turbo sur RTX 2000 Ada ($0.43/h) :
 
 | Duree audio | Temps GPU | Cout GPU |
 |-------------|-----------|----------|
-| 5 min | ~51s | **$0.012** |
-| 15 min | ~2.5 min | **$0.036** |
-| 30 min | ~5.1 min | **$0.073** |
-| 1 heure | ~10.2 min | **$0.147** |
-| 2 heures | ~20.4 min | **$0.293** |
-| 100 jobs de 1h | ~17h GPU | **$14.69** |
+| 5 min | ~9s | **$0.001** |
+| 15 min | ~27s | **$0.003** |
+| 30 min | ~54s | **$0.006** |
+| 1 heure | ~1 min 48s | **$0.013** |
+| 2 heures | ~3 min 36s | **$0.026** |
+| 100 jobs de 1h | ~3h GPU | **$1.29** |
 
 **Note :** Zero cout quand aucun job n'est en cours (scale-to-zero).
 
@@ -256,11 +258,11 @@ Basee sur le ratio de **0.17x** mesure en conditions reelles (startup negligeabl
 
 | Service | Cout pour 1h d'audio | Ratio |
 |---------|----------------------|-------|
-| **Dixipolis (cette pipeline)** | **~$0.15** | **1x** |
-| OpenAI Whisper API | ~$0.36 | 2.4x plus cher |
-| Google Speech-to-Text | ~$1.44 | 9.6x plus cher |
-| AWS Transcribe | ~$1.44 | 9.6x plus cher |
-| AssemblyAI | ~$0.65 | 4.3x plus cher |
+| **Dixipolis (cette pipeline)** | **~$0.013** | **1x** |
+| OpenAI Whisper API | ~$0.36 | 28x plus cher |
+| AssemblyAI | ~$0.65 | 50x plus cher |
+| Google Speech-to-Text | ~$1.44 | 110x plus cher |
+| AWS Transcribe | ~$1.44 | 110x plus cher |
 
 > *Prix concurrents indicatifs, basees sur les tarifs publics (fev. 2026). Dixipolis inclut la diarisation dans le prix.*
 
@@ -276,12 +278,12 @@ Basee sur le ratio de **0.17x** mesure en conditions reelles (startup negligeabl
 
 | Composant | Technologie | Role |
 |-----------|------------|------|
-| Transcription | faster-whisper large-v3 (CTranslate2, int8) | 4x plus rapide que Whisper original |
+| Transcription | faster-whisper large-v3-turbo (CTranslate2, int8_float16) | 6x plus rapide que large-v3, qualite quasi identique |
 | Diarisation | pyannote/speaker-diarization-3.1 | Identification des locuteurs |
 | Download YouTube | yt-dlp + Node.js runtime | Extraction audio YouTube → WAV |
 | GPU | Runpod Serverless | Pay-per-second, auto scale-to-zero |
 | Orchestration | n8n (self-hosted) | Webhooks, routing, API gateway |
-| Container | Docker (CUDA 12.1 + Python 3.11) | Image ~15 GB avec modeles pre-charges |
+| Container | Docker (CUDA 12.1 + Python 3.11) | Image ~13 GB avec modele turbo pre-charge |
 | CI/CD | GitHub Actions | Build & push image automatique |
 | Registry | GHCR (GitHub Container Registry) | Stockage image Docker publique |
 
@@ -333,8 +335,8 @@ docker push ghcr.io/YOUR_USER/dixipolis-worker:latest
 1. Creer un endpoint serverless sur https://console.runpod.io/serverless
 2. Configuration :
    - **Container Image** : `ghcr.io/YOUR_USER/dixipolis-worker:latest`
-   - **Container Disk** : 50 GB (image ~15 GB)
-   - **GPU** : RTX A4500 ou superieur (20 GB VRAM recommande)
+   - **Container Disk** : 50 GB (image ~13 GB)
+   - **GPU** : RTX 2000 Ada (6 GB VRAM suffisent — turbo ~1.5GB + pyannote ~1.6GB)
    - **Min Workers** : 0 (scale-to-zero)
    - **Max Workers** : 3-5 (selon le parallelisme souhaite)
    - **Idle Timeout** : 5s
@@ -354,7 +356,7 @@ docker push ghcr.io/YOUR_USER/dixipolis-worker:latest
 
 ## Langues supportees
 
-Le modele Whisper large-v3 supporte 99 langues. Passer le code langue via le parametre `language` :
+Le modele Whisper large-v3-turbo supporte 99 langues. Passer le code langue via le parametre `language` :
 
 | Code | Langue |
 |------|--------|
@@ -371,15 +373,13 @@ Le modele Whisper large-v3 supporte 99 langues. Passer le code langue via le par
 ## Limitations connues
 
 - **YouTube** : Le telechargement YouTube via yt-dlp est bloque par les mesures anti-bot de YouTube sur les serveurs. **Recommandation :** telecharger l'audio YouTube cote client ou via n8n, puis envoyer l'`audio_url` au worker GPU.
-- **Format MP3 et diarisation** : Un bug connu de pyannote 3.x cause un crash (`Sizes of tensors must match`) sur certains fichiers MP3 dont le dernier segment audio n'est pas un multiple exact de la taille de batch. **Workaround :** convertir en WAV avant envoi, ou envoyer des fichiers WAV directement. Fix prevu : ajouter un padding dans le handler.
 - **Diarisation** : La precision diminue avec plus de 5-6 locuteurs simultanes.
 - **Cold start** : Premier job apres une periode d'inactivite prend ~15-30s de plus.
 - **Taille audio** : Pas de limite theorique, mais les fichiers > 3h peuvent timeout (default 600s).
+- **Tous les formats audio** sont acceptes (MP3, WAV, FLAC, OGG, M4A...) — le handler convertit automatiquement en WAV 16kHz mono avant traitement.
 
 ## Bugs connus a corriger
 
 | Bug | Severite | Impact | Fix |
 |-----|----------|--------|-----|
-| pyannote crash sur MP3 (tensor size mismatch) | Haute | Diarisation echoue sur certains MP3 | Ajouter padding waveform dans `handler.py` avant diarisation |
-| yt-dlp `--js-runtimes nodejs` incorrect | Basse | YouTube ne fonctionne pas | Changer en `--js-runtimes node` |
 | YouTube anti-bot | Externe | YouTube bloque les serveurs | Gerer le download YouTube cote client/n8n |

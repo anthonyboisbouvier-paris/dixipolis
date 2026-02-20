@@ -7,8 +7,8 @@ Input (option A — direct audio URL):
       "audio_url": "https://...",        # URL du fichier audio (S3 ou direct)
       "job_id": "abc123",                # ID unique du job
       "language": "fr",                  # Optionnel, default "fr"
-      "model_size": "large-v3",          # Optionnel, default "large-v3"
-      "compute_type": "int8"             # Optionnel, default "int8"
+      "model_size": "large-v3-turbo",     # Optionnel, default "large-v3-turbo"
+      "compute_type": "int8_float16"     # Optionnel, default "int8_float16"
     }
   }
 
@@ -93,7 +93,7 @@ DIARIZATION_PIPELINE = None
 _YTDLP_UPDATED = False
 
 
-def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
+def load_models(model_size: str = "large-v3-turbo", compute_type: str = "int8_float16"):
     """Load Whisper + pyannote models into GPU memory (cold start)."""
     global WHISPER_MODEL, DIARIZATION_PIPELINE
 
@@ -123,6 +123,30 @@ def load_models(model_size: str = "large-v3", compute_type: str = "int8"):
         )
         DIARIZATION_PIPELINE.to(torch.device("cuda"))
         log.info(f"Pyannote loaded in {time.time() - t0:.1f}s")
+
+
+def ensure_wav(audio_path: str) -> str:
+    """Convert any audio to 16kHz mono PCM WAV for maximum compatibility.
+
+    This fixes the pyannote tensor-size-mismatch crash on MP3 files and
+    normalises the input for Whisper (which expects 16kHz).
+    """
+    wav_path = audio_path.rsplit(".", 1)[0] + "_pcm.wav"
+    cmd = [
+        "ffmpeg", "-y", "-i", audio_path,
+        "-ar", "16000",       # 16 kHz (optimal for Whisper)
+        "-ac", "1",           # mono
+        "-c:a", "pcm_s16le",  # PCM 16-bit
+        wav_path,
+    ]
+    log.info("Converting audio to 16kHz mono WAV...")
+    t0 = time.time()
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+    if result.returncode != 0:
+        log.warning(f"ffmpeg conversion failed, using original: {result.stderr[:200]}")
+        return audio_path
+    log.info(f"Audio converted in {time.time() - t0:.1f}s")
+    return wav_path
 
 
 def download_audio(url: str, dest: str):
@@ -177,7 +201,7 @@ def download_youtube_audio(video_id: str, dest: str):
         "--no-playlist",
         "--quiet",
         "--no-check-certificates",
-        "--js-runtimes", "nodejs",
+        "--js-runtimes", "node",
         url,
     ]
 
@@ -299,8 +323,8 @@ def handler(job):
     youtube_video_id = job_input.get("youtube_video_id")
     job_id = job_input.get("job_id", job.get("id", "unknown"))
     language = job_input.get("language", "fr")
-    model_size = job_input.get("model_size", "large-v3")
-    compute_type = job_input.get("compute_type", "int8")
+    model_size = job_input.get("model_size", "large-v3-turbo")
+    compute_type = job_input.get("compute_type", "int8_float16")
 
     if not audio_url and not youtube_video_id:
         return {"error": "audio_url or youtube_video_id is required"}
@@ -319,11 +343,18 @@ def handler(job):
         else:
             download_audio(audio_url, audio_path)
 
+        # Normalise audio to 16kHz mono WAV (fixes pyannote MP3 crash)
+        wav_path = ensure_wav(audio_path)
+
         # Transcription
-        segments, duration = transcribe(audio_path, language)
+        segments, duration = transcribe(wav_path, language)
 
         # Diarization
-        diarization = diarize(audio_path)
+        diarization = diarize(wav_path)
+
+        # Clean up converted file if different from original
+        if wav_path != audio_path and os.path.exists(wav_path):
+            os.remove(wav_path)
 
     # Merge
     segments = merge_transcript_diarization(segments, diarization)

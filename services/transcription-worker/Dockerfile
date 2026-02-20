@@ -7,8 +7,8 @@
 #   - pyannote-audio 3.1 pour la diarisation
 #   - runpod SDK pour le handler serverless
 #
-# Le modele Whisper large-v3 est pre-telecharge dans l'image
-# pour eliminer le cold-start de telechargement (~3 GB).
+# Le modele Whisper large-v3-turbo est pre-telecharge dans l'image
+# pour eliminer le cold-start de telechargement (~800 MB).
 # =============================================================================
 
 FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
@@ -50,9 +50,10 @@ RUN pip install --no-cache-dir \
     numpy==1.26.4 \
     yt-dlp
 
-# Pre-telecharger le modele Whisper large-v3 dans l'image
-# Cela evite un cold-start de 60-90s au premier appel
-RUN python -c "from faster_whisper import WhisperModel; WhisperModel('large-v3', device='cpu', compute_type='int8')"
+# Pre-telecharger le modele Whisper large-v3-turbo dans l'image
+# Turbo = 6x plus rapide que large-v3, qualite quasi identique (-1-2% WER)
+# Cela evite un cold-start de telechargement au premier appel
+RUN python -c "from faster_whisper import WhisperModel; WhisperModel('large-v3-turbo', device='cpu', compute_type='int8')"
 
 # Copier le handler
 WORKDIR /app
