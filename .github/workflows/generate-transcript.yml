@@ -1,0 +1,81 @@
+name: Generate Transcript
+
+on:
+  push:
+    branches: [claude/review-github-repo-MsQQe]
+    paths: ['.github/workflows/generate-transcript.yml']
+  workflow_dispatch:
+    inputs:
+      youtube_url:
+        description: 'YouTube URL'
+        required: true
+        default: 'https://www.youtube.com/watch?v=H6w4Hu1y-NY'
+
+permissions:
+  contents: write
+
+env:
+  N8N_BASE: https://n8n.srv1262078.hstgr.cloud/webhook
+  RELEASE_TAG: bench-audio-v1
+  DEFAULT_URL: https://www.youtube.com/watch?v=H6w4Hu1y-NY
+
+jobs:
+  transcribe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg jq
+          python3 -m pip install -U yt-dlp
+
+      - name: Resolve URL
+        id: url
+        run: |
+          URL="${{ github.event.inputs.youtube_url || env.DEFAULT_URL }}"
+          VID=$(python3 -c "import re,sys; m=re.search(r'(?:v=|youtu\.be/)([\w-]{11})', sys.argv[1]); print(m.group(1))" "$URL")
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "vid=$VID" >> "$GITHUB_OUTPUT"
+
+      - name: Download audio
+        run: yt-dlp -x --audio-format mp3 --no-playlist -o "/tmp/audio.%(ext)s" "${{ steps.url.outputs.url }}"
+
+      - name: Upload to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          F="yt_${{ steps.url.outputs.vid }}.mp3"
+          cp /tmp/audio.mp3 "/tmp/$F"
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --title "Benchmark Audio" --notes "."
+          gh release delete-asset "$RELEASE_TAG" "$F" --repo "$GITHUB_REPOSITORY" -y 2>/dev/null || true
+          gh release upload "$RELEASE_TAG" "/tmp/$F" --repo "$GITHUB_REPOSITORY"
+          echo "AUDIO_URL=https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG/$F" >> "$GITHUB_ENV"
+
+      - name: Submit to n8n
+        id: submit
+        run: |
+          R=$(curl -sfS -X POST "$N8N_BASE/transcriptions" -H "Content-Type: application/json" -d "{\"audio_url\":\"$AUDIO_URL\",\"language\":\"fr\"}")
+          echo "$R" | jq .
+          echo "job=$(echo "$R" | jq -r '.runpod_job_id // .job_id')" >> "$GITHUB_OUTPUT"
+
+      - name: Poll
+        run: |
+          for i in $(seq 1 240); do
+            S=$(curl -sfS "$N8N_BASE/transcription-status?job_id=${{ steps.submit.outputs.job }}" | jq -r '.status // "?"')
+            echo "[$i] $S"
+            [ "$S" = "COMPLETED" ] && exit 0
+            [ "$S" = "FAILED" ] || [ "$S" = "CANCELLED" ] && exit 1
+            sleep 10
+          done
+          exit 1
+
+      - name: Fetch & commit JSON
+        run: |
+          mkdir -p services/test-fixtures
+          OUT="services/test-fixtures/yt_${{ steps.url.outputs.vid }}.json"
+          curl -sfS "$N8N_BASE/transcription-result?job_id=${{ steps.submit.outputs.job }}" | jq . > "$OUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUT"
+          git diff --cached --quiet || { git commit -m "Add transcription JSON for ${{ steps.url.outputs.vid }}"; git push; }
