@@ -1,0 +1,587 @@
+{
+  "name": "Daily YouTube Political Video Discovery V2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "discover/political-videosV2",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "5c116bd9-6048-47ea-945c-93e5b65c919e",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-1040, 128],
+      "webhookId": "6e358609-9cdd-43c6-b24a-eb564c0cd40f",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "TO_RECONFIGURE_HEADER_AUTH",
+          "name": "Discovery Webhook Bearer"
+        }
+      },
+      "notes": "POST /discover/political-videosV2 - Auth obligatoire: header 'Authorization: Bearer <token>' (credential Header Auth, name=Authorization, value=Bearer <token>)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalisation des paramètres du webhook (spec DIX-33)\nconst body = $json.body ?? {};\n\nconst mode = body.mode === \"prod\" ? \"prod\" : \"test\";\n\nconst today = new Date().toISOString().slice(0, 10);\nconst dateRegex = /^\\d{4}-\\d{2}-\\d{2}$/;\nconst publication_day = (typeof body.publication_day === \"string\" && dateRegex.test(body.publication_day))\n  ? body.publication_day\n  : today;\n\nconst days_after = Number.isFinite(Number(body.days_after)) ? Math.max(0, Number(body.days_after)) : 1;\nconst min_score = Number.isFinite(Number(body.min_score)) ? Math.min(1, Math.max(0, Number(body.min_score))) : 0.4;\n\nconst published_after = `${publication_day}T00:00:00Z`;\nconst end = new Date(published_after);\nend.setUTCDate(end.getUTCDate() + days_after + 1);\nconst published_before = end.toISOString();\n\nreturn [{ json: { mode, publication_day, days_after, min_score, published_after, published_before } }];\n"
+      },
+      "id": "98846358-4d58-4cdf-8913-7c6fefcbe881",
+      "name": "Set Workflow Params",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-800, 128],
+      "notes": "Defaults spec DIX-33: mode=test, publication_day=aujourd'hui, days_after=1, min_score=0.4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Configuration des requêtes YouTube selon le mode\nconst mode = $json?.mode ?? \"prod\";\n\nconst YT_QUERIES_PROD = [\n  \"discours président de la république\",\n  \"allocution président de la république\",\n  \"déclaration président de la république\",\n  \"interview président de la république\",\n  \"discours premier ministre\",\n  \"allocution premier ministre\",\n  \"interview premier ministre\",\n  \"déclaration premier ministre\",\n  \"discours ministre\",\n  \"interview ministre\",\n  \"conférence de presse ministre\",\n  \"déclaration ministre\",\n  \"prise de parole ministre\",\n  \"déplacement ministre\",\n  \"interview député\",\n  \"débat député\",\n  \"déclaration député\",\n  \"prise de parole député\",\n  \"interview sénateur\",\n  \"débat sénateur\",\n  \"déclaration sénateur\",\n  \"interview maire\",\n  \"déclaration maire\",\n  \"prise de parole maire\",\n  \"meeting politique\",\n  \"discours meeting\",\n  \"débat politique France\",\n  \"interview politique France\",\n  \"discours politique France\",\n  \"Assemblée nationale débat\",\n  \"Assemblée nationale questions au gouvernement\",\n  \"Assemblée nationale audition\",\n  \"Assemblée nationale commission\",\n  \"Sénat audition\",\n  \"Sénat commission\",\n  \"Sénat séance\",\n  \"Élysée allocution\",\n  \"Élysée déclaration\",\n  \"Matignon conférence de presse\",\n  \"Conseil des ministres déclaration\",\n  \"campagne électorale discours\",\n  \"campagne électorale interview\",\n  \"meeting électoral\",\n  \"débat élections\",\n  \"soirée électorale débat\",\n  \"discours réforme\",\n  \"annonce gouvernement\",\n  \"projet de loi débat\",\n  \"motion de censure débat\",\n  \"budget débat parlement\"\n];\n\nconst YT_QUERIES_TEST = [\n  \"interview ministre\",\n  \"discours président de la république\"\n];\n\nconst queries = mode === \"test\" ? YT_QUERIES_TEST : YT_QUERIES_PROD;\n\nreturn queries.map(query => ({\n  json: {\n    query,\n    mode,\n    source_type: \"youtube_search\"\n  }\n}));\n"
+      },
+      "id": "8c2255fe-5f81-437c-9aa9-41d668ace83c",
+      "name": "Build YouTube Queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-336, 144],
+      "notes": "Génère les requêtes de recherche YouTube selon le mode (test/prod)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Configuration des requêtes SerpAPI selon le mode\nconst mode = $json?.mode ?? \"prod\";\n\nconst SERP_QUERIES_PROD = [\n  \"interview d'un ministre français\",\n  \"interview d'un député français\",\n  \"interview d'un sénateur français\",\n  \"interview d'un maire français\",\n  \"prise de parole d'un élu français\",\n  \"discours politique en France\",\n  \"allocution du président de la république\",\n  \"déclaration du premier ministre français\",\n  \"conférence de presse du gouvernement français\",\n  \"débat entre responsables politiques français\",\n  \"débat politique français plateau tv\",\n  \"face à face politique français\",\n  \"questions au gouvernement assemblée nationale\",\n  \"séance à l'assemblée nationale intervention député\",\n  \"audition commission assemblée nationale\",\n  \"audition au sénat intervention sénateur\",\n  \"meeting politique en France discours\",\n  \"discours meeting électoral France\",\n  \"soirée électorale débat politique\",\n  \"réforme gouvernement français déclaration\",\n  \"projet de loi débat parlement français\",\n  \"motion de censure débat assemblée nationale\",\n  \"budget débat assemblée nationale\"\n];\n\nconst SERP_QUERIES_TEST = [\n  \"interview ministre français\",\n  \"interview député français\",\n  \"prise de parole élu français\",\n  \"discours politique France\",\n  \"débat politique français\",\n  \"conférence de presse gouvernement français\",\n  \"questions au gouvernement assemblée nationale\"\n];\n\nconst queries = mode === \"test\" ? SERP_QUERIES_TEST : SERP_QUERIES_PROD;\n\nreturn queries.map(query => ({\n  json: {\n    query,\n    mode,\n    source_type: \"serpapi_search\"\n  }\n}));\n"
+      },
+      "id": "1583e5e4-aaa1-4c3c-aacd-ddadc6d49527",
+      "name": "Build SerpAPI Queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-336, 384],
+      "notes": "Génère les requêtes SerpAPI selon le mode (test/prod)"
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "options": {
+          "timeout": 30000
+        },
+        "queryParametersUi": {
+          "parameter": [
+            { "name": "part", "value": "snippet" },
+            { "name": "q", "value": "={{ $json.query }}" },
+            { "name": "type", "value": "video" },
+            { "name": "publishedAfter", "value": "={{ $('Set Workflow Params').first().json.published_after }}" },
+            { "name": "publishedBefore", "value": "={{ $('Set Workflow Params').first().json.published_before }}" },
+            { "name": "maxResults", "value": "20" },
+            { "name": "relevanceLanguage", "value": "fr" },
+            { "name": "regionCode", "value": "FR" },
+            { "name": "order", "value": "date" },
+            { "name": "safeSearch", "value": "none" }
+          ]
+        }
+      },
+      "id": "1f5967bb-bc51-452b-bce7-bbd661760a24",
+      "name": "YouTube Keyword Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-32, 144],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "TO_RECONFIGURE_YOUTUBE_OAUTH",
+          "name": "YouTube API OAuth2"
+        }
+      },
+      "notes": "Fenêtre de dates pilotée par publication_day / days_after (spec DIX-33)",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/subscriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "part", "value": "snippet" },
+            { "name": "mine", "value": "true" },
+            { "name": "maxResults", "value": "50" }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "d177306b-f4b5-46a2-b442-1da11aa6253f",
+      "name": "Get YouTube Subscriptions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-416, -112],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "TO_RECONFIGURE_YOUTUBE_OAUTH",
+          "name": "YouTube API OAuth2"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": "Récupère la liste des chaînes abonnées"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraction des channels depuis les abonnements\ntry {\n  const subscriptions = items[0]?.json?.items ?? [];\n\n  const channels = subscriptions\n    .filter(sub => sub?.snippet?.resourceId?.channelId)\n    .map(sub => ({\n      json: {\n        channel_id: sub.snippet.resourceId.channelId,\n        channel_title: sub.snippet?.title ?? \"Unknown Channel\"\n      }\n    }));\n\n  return channels;\n\n} catch (error) {\n  console.error('Channel extraction error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "86d73f26-edf6-4d0e-8dd9-4330fc78ebec",
+      "name": "Extract Channels",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-224, -112],
+      "notes": "Extraction des IDs de channels depuis les abonnements YouTube"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "part", "value": "snippet" },
+            { "name": "channelId", "value": "={{$json.channel_id}}" },
+            { "name": "type", "value": "video" },
+            { "name": "order", "value": "date" },
+            { "name": "publishedAfter", "value": "={{ $('Set Workflow Params').first().json.published_after }}" },
+            { "name": "publishedBefore", "value": "={{ $('Set Workflow Params').first().json.published_before }}" },
+            { "name": "maxResults", "value": "50" }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "03fc6427-d9fe-42a0-bde7-f9d791a73b67",
+      "name": "Get Channel New Videos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-32, -112],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "TO_RECONFIGURE_YOUTUBE_OAUTH",
+          "name": "YouTube API OAuth2"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": "Vidéos récentes de chaque chaîne abonnée, fenêtre pilotée par les paramètres"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalisation des vidéos de channels\ntry {\n  const normalized = [];\n\n  for (const response of items) {\n    const videos = response.json?.items ?? [];\n\n    for (const video of videos) {\n      const videoId = video.id?.videoId;\n\n      if (!videoId) continue;\n\n      normalized.push({\n        json: {\n          video_id: videoId,\n          source: \"youtube_channel\",\n          channel_title: video.snippet?.channelTitle ?? \"Unknown\"\n        }\n      });\n    }\n  }\n\n  return normalized;\n\n} catch (error) {\n  console.error('Channel videos normalization error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "16f3400b-402e-4152-9af9-c68832a3e90e",
+      "name": "Normalize Channel Videos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, -80],
+      "notes": "Extrait les IDs des vidéos des chaînes abonnées"
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "serpApi",
+        "url": "https://serpapi.com/search.json",
+        "options": {
+          "timeout": 30000
+        },
+        "queryParametersUi": {
+          "parameter": [
+            { "name": "engine", "value": "youtube" },
+            { "name": "search_query", "value": "={{ $json.query }}" }
+          ]
+        }
+      },
+      "id": "7c2a8298-af3c-49a7-8d3f-a9fad438149c",
+      "name": "SerpApi Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [-32, 384],
+      "credentials": {
+        "serpApi": {
+          "id": "TO_RECONFIGURE_SERPAPI",
+          "name": "SerpAPI account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pré-filtre grossier SerpAPI (dates relatives type \"1 day ago\").\n// Le filtrage précis par fenêtre publication_day/days_after est appliqué\n// après enrichissement métadonnées (node Merge Scores & Filter).\nfunction isRecent(dateString) {\n  if (typeof dateString !== 'string') return false;\n  const normalized = dateString.trim().toLowerCase();\n  return /^(\\d+)\\s+(hour|day)s?\\s+ago$/.test(normalized) || normalized === \"1 day ago\";\n}\n\ntry {\n  const filtered = [];\n\n  for (const item of items) {\n    const data = JSON.parse(JSON.stringify(item.json ?? {}));\n\n    if (Array.isArray(data.video_results)) {\n      data.video_results = data.video_results.filter(video =>\n        isRecent(video.published_date ?? video.published_time)\n      );\n    }\n\n    if (Array.isArray(data.shorts_results)) {\n      for (const block of data.shorts_results) {\n        if (Array.isArray(block.shorts)) {\n          block.shorts = block.shorts.filter(short =>\n            isRecent(short.published_date ?? short.published_time)\n          );\n        }\n      }\n    }\n\n    const hasVideos = (data.video_results?.length ?? 0) > 0;\n    const hasShorts = (data.shorts_results ?? []).some(b => (b.shorts?.length ?? 0) > 0);\n\n    if (hasVideos || hasShorts) {\n      filtered.push({ json: data });\n    }\n  }\n\n  return filtered;\n\n} catch (error) {\n  console.error('Date filter error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "ccf60c6c-e090-46c1-ade2-551fe3102901",
+      "name": "Filter Recent SerpAPI",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [176, 384],
+      "notes": "Pré-filtre: garde les vidéos récentes (heures/jours). Filtre exact appliqué en aval."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalisation des résultats SerpAPI\ntry {\n  const normalized = [];\n\n  for (const item of items) {\n    const data = item.json ?? {};\n\n    const videoResults = data.video_results ?? [];\n    for (const video of videoResults) {\n      const match = video.link?.match(/v=([^&]+)/);\n      if (match?.[1]) {\n        normalized.push({\n          json: {\n            video_id: match[1],\n            source: \"serpapi_video\"\n          }\n        });\n      }\n    }\n\n    const shortsResults = data.shorts_results ?? [];\n    for (const block of shortsResults) {\n      const shorts = block.shorts ?? [];\n      for (const short of shorts) {\n        if (short.video_id) {\n          normalized.push({\n            json: {\n              video_id: short.video_id,\n              source: \"serpapi_shorts\"\n            }\n          });\n        }\n      }\n    }\n  }\n\n  return normalized;\n\n} catch (error) {\n  console.error('SerpAPI normalization error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "0230c42f-41a7-42bb-b6ca-c6f0fbb51e70",
+      "name": "Normalize SerpAPI Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [432, 384],
+      "notes": "Extraction sécurisée des IDs depuis SerpAPI (videos + shorts)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalisation des résultats YouTube Search API\ntry {\n  const normalized = items\n    .map(item => {\n      const videos = item.json?.items ?? [];\n      return videos;\n    })\n    .flat()\n    .filter(video => video?.id?.videoId)\n    .map(video => ({\n      json: {\n        video_id: video.id.videoId,\n        source: \"youtube_search\"\n      }\n    }));\n\n  return normalized;\n\n} catch (error) {\n  console.error('YouTube normalization error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "8d1e98ce-19ca-4372-81b7-77ce1cec6130",
+      "name": "Normalize YouTube Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, 144],
+      "notes": "Extraction sécurisée des video IDs depuis YouTube Search"
+    },
+    {
+      "parameters": {},
+      "id": "14d90790-1a9a-49da-8f3e-a82f98210cd2",
+      "name": "Merge All Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [496, 48]
+    },
+    {
+      "parameters": {},
+      "id": "4fde9203-8648-43a0-bab1-93ecc34e900b",
+      "name": "Merge Normalized Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [720, 144]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Déduplication optimisée avec Set (O(1) lookup)\nconst seen = new Set();\nconst deduplicated = [];\n\ntry {\n  for (const item of $input.all()) {\n    const videoId = item.json?.video_id;\n\n    if (!videoId || typeof videoId !== 'string') {\n      continue;\n    }\n\n    if (!seen.has(videoId)) {\n      seen.add(videoId);\n      deduplicated.push({\n        json: {\n          video_id: videoId\n        }\n      });\n    }\n  }\n\n  return deduplicated;\n\n} catch (error) {\n  console.error('Deduplication error:', error.message);\n  return [];\n}\n"
+      },
+      "id": "82923017-4704-4a27-b8f9-6f043eab22f5",
+      "name": "Deduplicate Videos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [944, 144],
+      "notes": "Performance optimisée avec Set au lieu d'array search"
+    },
+    {
+      "parameters": {
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "youTubeOAuth2Api",
+        "url": "https://www.googleapis.com/youtube/v3/videos",
+        "options": {
+          "timeout": 30000,
+          "batching": {
+            "batch": {
+              "batchSize": 10,
+              "batchInterval": 1000
+            }
+          }
+        },
+        "queryParametersUi": {
+          "parameter": [
+            { "name": "part", "value": "snippet,contentDetails,statistics" },
+            { "name": "id", "value": "={{$json.video_id}}" }
+          ]
+        }
+      },
+      "id": "db9cf611-ccc3-4558-9fe5-20168b2fd212",
+      "name": "YouTube Metadata Enricher",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [1168, 144],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "TO_RECONFIGURE_YOUTUBE_OAUTH",
+          "name": "YouTube API OAuth2"
+        }
+      },
+      "notes": "Batching pour respecter les quotas YouTube API",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "id": "18205ed1-4e71-4719-b19a-4417b35e04fe",
+      "name": "Split Out Items",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [1376, 144]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Prépare le texte de scoring ET conserve les métadonnées (titre, chaîne, durée, date)\n// nécessaires à la réponse finale spec DIX-33 (+ channel_id pour la persistance BDD)\ntry {\n  const { snippet = {}, contentDetails = {}, id } = $json;\n  const { title = \"\", description = \"\", tags = [], channelId = null, channelTitle = null, publishedAt = null } = snippet;\n\n  if (!id) {\n    return {\n      json: {\n        video_id: null,\n        text_for_scoring: \"\",\n        error: \"missing_video_id\"\n      }\n    };\n  }\n\n  // Durée ISO8601 (PT1H2M3S) -> minutes\n  let duration_minutes = null;\n  const m = String(contentDetails.duration ?? \"\").match(/PT(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?/);\n  if (m && (m[1] || m[2] || m[3])) {\n    duration_minutes = Math.round((Number(m[1] ?? 0) * 60) + Number(m[2] ?? 0) + (Number(m[3] ?? 0) / 60));\n  }\n\n  const textForScoring = `\\nTITLE:\\n${title}\\n\\nDESCRIPTION:\\n${description}\\n\\nTAGS:\\n${Array.isArray(tags) ? tags.join(\", \") : \"\"}\\n`.trim();\n\n  return {\n    json: {\n      video_id: id,\n      title,\n      channel: channelTitle,\n      channel_id: channelId,\n      published_at: publishedAt,\n      duration_minutes,\n      tags,\n      description,\n      text_for_scoring: textForScoring\n    }\n  };\n\n} catch (error) {\n  console.error('Metadata extraction error:', error.message, 'video:', $json.id);\n  return {\n    json: {\n      video_id: $json.id ?? null,\n      text_for_scoring: \"\",\n      error: error.message\n    }\n  };\n}\n"
+      },
+      "id": "06158c1d-5351-48e7-bead-297ca9ca6b64",
+      "name": "Extract Metadata For Scoring",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1584, 144],
+      "notes": "Métadonnées complètes conservées pour la réponse finale (channel inclus)"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "prompt": {
+          "messages": [
+            {
+              "content": "=You are a scoring function.\n\nYour task:\nEstimate the probability (between 0 and 1) that a French politician is speaking in the video.\n\nInput data:\n- video_id: {{ $json.video_id }}\n- text_for_scoring: {{ $json.text_for_scoring }}\n\nSTRICT OUTPUT RULES (MANDATORY):\n- Return ONLY a valid JSON object\n- The JSON MUST contain EXACTLY these two fields:\n  - \"video_id\": string (same value as input video_id)\n  - \"score\": number between 0 and 1\n- Do NOT add any other fields\n- Do NOT add explanations\n- Do NOT wrap in markdown\n- Do NOT return an array\n- Do NOT return text outside JSON\n\nExpected output format (example):\n{\"video_id\":\"SLrPYLgN3eM\",\"score\":0.7}\n"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "572eae4b-297d-4608-850e-75a07f9f033b",
+      "name": "Semantic Scoring",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.5,
+      "position": [1808, 144],
+      "credentials": {
+        "openAiApi": {
+          "id": "TO_RECONFIGURE_OPENAI",
+          "name": "OpenAi account"
+        }
+      },
+      "notes": "Score de pertinence politique 0-1, filtré ensuite par min_score"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse JSON response de l'IA avec validation robuste\ntry {\n  const results = items.map(item => {\n    try {\n      const content = item.json?.message?.content;\n\n      if (!content) {\n        return {\n          json: {\n            video_id: null,\n            score: null,\n            error: \"missing_content\"\n          }\n        };\n      }\n\n      const parsed = JSON.parse(content);\n\n      if (!parsed.video_id || typeof parsed.score !== 'number') {\n        console.warn('Invalid AI response structure:', parsed);\n        return {\n          json: {\n            video_id: parsed.video_id ?? null,\n            score: null,\n            error: \"invalid_structure\"\n          }\n        };\n      }\n\n      const score = Math.max(0, Math.min(1, parsed.score));\n\n      return {\n        json: {\n          video_id: parsed.video_id,\n          score: score\n        }\n      };\n\n    } catch (parseError) {\n      console.error('JSON parse error for item:', parseError.message);\n      return {\n        json: {\n          video_id: null,\n          score: null,\n          error: \"parse_error\"\n        }\n      };\n    }\n  });\n\n  return results;\n\n} catch (error) {\n  console.error('Fatal error in JSON cleaning:', error.message);\n  return [];\n}\n"
+      },
+      "id": "942634ae-4f2b-4d39-80a8-132b1a3a010d",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2016, 144],
+      "notes": "Parse JSON IA avec validation robuste et gestion d'erreurs"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fusionne les scores IA avec les métadonnées, applique min_score,\n// la fenêtre de dates exacte, et le cap de 8 vidéos en mode test (spec DIX-33)\nconst params = $('Set Workflow Params').first().json;\n\nconst metaById = {};\nfor (const item of $('Extract Metadata For Scoring').all()) {\n  const v = item.json ?? {};\n  if (v.video_id) metaById[v.video_id] = v;\n}\n\nconst after = new Date(params.published_after).getTime();\nconst before = new Date(params.published_before).getTime();\n\nconst merged = [];\nfor (const item of $input.all()) {\n  const { video_id, score } = item.json ?? {};\n  if (!video_id || typeof score !== 'number') continue;\n  if (score < params.min_score) continue;\n\n  const meta = metaById[video_id] ?? {};\n  const publishedTs = meta.published_at ? new Date(meta.published_at).getTime() : null;\n  if (publishedTs !== null && (publishedTs < after || publishedTs >= before)) continue;\n\n  merged.push({\n    json: {\n      video_id,\n      score: Math.round(score * 100) / 100,\n      title: meta.title ?? null,\n      channel: meta.channel ?? null,\n      channel_id: meta.channel_id ?? null,\n      duration_minutes: meta.duration_minutes ?? null,\n      published_at: meta.published_at ?? null\n    }\n  });\n}\n\nmerged.sort((a, b) => b.json.score - a.json.score);\n\nconst capped = params.mode === 'test' ? merged.slice(0, 8) : merged;\n\n// Sentinel pour garantir la réponse webhook même sans résultat\nif (capped.length === 0) {\n  return [{ json: { __empty: true } }];\n}\n\nreturn capped;\n"
+      },
+      "id": "bd8bd507-38f8-4f1c-9052-dc9fca7c576b",
+      "name": "Merge Scores & Filter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2240, 144],
+      "notes": "min_score dynamique (défaut 0.4), fenêtre publication_day/days_after, cap test=8"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construit la réponse finale au format spec DIX-33 (statistics + videos)\nconst params = $('Set Workflow Params').first().json;\n\nconst videos = $input.all()\n  .map(i => i.json)\n  .filter(v => v && v.video_id && !v.__empty);\n\nconst durations = videos.map(v => v.duration_minutes).filter(d => typeof d === 'number');\nconst dates = videos.map(v => v.published_at).filter(Boolean).sort();\nconst scores = videos.map(v => v.score).filter(s => typeof s === 'number');\n\nconst totalMin = durations.reduce((a, b) => a + b, 0);\nconst fmt = (mins) => `${Math.floor(mins / 60)}h ${mins % 60}m`;\nconst round3 = (n) => Math.round(n * 1000) / 1000;\n\nconst distribution = { \"0.0-0.2\": 0, \"0.2-0.4\": 0, \"0.4-0.6\": 0, \"0.6-0.8\": 0, \"0.8-1.0\": 0 };\nfor (const s of scores) {\n  if (s < 0.2) distribution[\"0.0-0.2\"]++;\n  else if (s < 0.4) distribution[\"0.2-0.4\"]++;\n  else if (s < 0.6) distribution[\"0.4-0.6\"]++;\n  else if (s < 0.8) distribution[\"0.6-0.8\"]++;\n  else distribution[\"0.8-1.0\"]++;\n}\n\nconst byChannel = {};\nfor (const v of videos) {\n  const key = v.channel ?? \"Unknown\";\n  byChannel[key] = byChannel[key] ?? { channel: key, count: 0, total_duration_minutes: 0, score_sum: 0 };\n  byChannel[key].count++;\n  byChannel[key].total_duration_minutes += v.duration_minutes ?? 0;\n  byChannel[key].score_sum += v.score ?? 0;\n}\nconst top_channels = Object.values(byChannel)\n  .map(c => ({\n    channel: c.channel,\n    count: c.count,\n    total_duration_minutes: c.total_duration_minutes,\n    avg_score: c.count ? round3(c.score_sum / c.count) : null\n  }))\n  .sort((a, b) => b.count - a.count)\n  .slice(0, 10);\n\nreturn [{\n  json: {\n    success: true,\n    mode: params.mode,\n    timestamp: new Date().toISOString(),\n    statistics: {\n      global: {\n        total_videos: videos.length,\n        total_duration_formatted: fmt(totalMin),\n        avg_duration_minutes: durations.length ? Math.round(totalMin / durations.length) : 0,\n        min_duration_minutes: durations.length ? Math.min(...durations) : 0,\n        max_duration_minutes: durations.length ? Math.max(...durations) : 0,\n        total_duration_minutes: totalMin,\n        min_date: dates[0] ?? null,\n        max_date: dates[dates.length - 1] ?? null\n      },\n      scores: {\n        avg_score: scores.length ? round3(scores.reduce((a, b) => a + b, 0) / scores.length) : null,\n        min_score: scores.length ? Math.min(...scores) : null,\n        max_score: scores.length ? Math.max(...scores) : null,\n        distribution\n      },\n      channels: {\n        total_channels: Object.keys(byChannel).length,\n        top_channels\n      }\n    },\n    videos: videos.map(v => ({\n      video_id: v.video_id,\n      score: v.score,\n      title: v.title,\n      channel: v.channel,\n      channel_id: v.channel_id,\n      duration_minutes: v.duration_minutes,\n      published_at: v.published_at\n    }))\n  }\n}];\n"
+      },
+      "id": "7be8f84d-2874-4f39-a7e0-0d63826b9e79",
+      "name": "Build Response JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2672, 128],
+      "notes": "Réponse au format DIX-33: statistics (global/scores/channels) + videos. channel_id inclus pour la persistance BDD côté ingestion."
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "34bb7e3e-884b-4662-a7a1-c93665bf9534",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [2896, 144]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Set Workflow Params", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Set Workflow Params": {
+      "main": [
+        [
+          { "node": "Build YouTube Queries", "type": "main", "index": 0 },
+          { "node": "Build SerpAPI Queries", "type": "main", "index": 0 },
+          { "node": "Get YouTube Subscriptions", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build YouTube Queries": {
+      "main": [
+        [
+          { "node": "YouTube Keyword Search", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build SerpAPI Queries": {
+      "main": [
+        [
+          { "node": "SerpApi Search", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "YouTube Keyword Search": {
+      "main": [
+        [
+          { "node": "Normalize YouTube Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Get YouTube Subscriptions": {
+      "main": [
+        [
+          { "node": "Extract Channels", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Extract Channels": {
+      "main": [
+        [
+          { "node": "Get Channel New Videos", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Get Channel New Videos": {
+      "main": [
+        [
+          { "node": "Normalize Channel Videos", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalize Channel Videos": {
+      "main": [
+        [
+          { "node": "Merge All Sources", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalize YouTube Results": {
+      "main": [
+        [
+          { "node": "Merge All Sources", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "SerpApi Search": {
+      "main": [
+        [
+          { "node": "Filter Recent SerpAPI", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Filter Recent SerpAPI": {
+      "main": [
+        [
+          { "node": "Normalize SerpAPI Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalize SerpAPI Results": {
+      "main": [
+        [
+          { "node": "Merge Normalized Sources", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Merge All Sources": {
+      "main": [
+        [
+          { "node": "Merge Normalized Sources", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Normalized Sources": {
+      "main": [
+        [
+          { "node": "Deduplicate Videos", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Deduplicate Videos": {
+      "main": [
+        [
+          { "node": "YouTube Metadata Enricher", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "YouTube Metadata Enricher": {
+      "main": [
+        [
+          { "node": "Split Out Items", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Split Out Items": {
+      "main": [
+        [
+          { "node": "Extract Metadata For Scoring", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Extract Metadata For Scoring": {
+      "main": [
+        [
+          { "node": "Semantic Scoring", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Semantic Scoring": {
+      "main": [
+        [
+          { "node": "Parse AI Response", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          { "node": "Merge Scores & Filter", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Scores & Filter": {
+      "main": [
+        [
+          { "node": "Build Response JSON", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build Response JSON": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": [
+    {
+      "name": "DIX-33"
+    },
+    {
+      "name": "Discovery"
+    }
+  ]
+}
