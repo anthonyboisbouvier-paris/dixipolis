@@ -21,9 +21,10 @@ export const SITE_URL = "https://dixipolis.vercel.app";
 export const MAIN_NAV_ITEMS: NavItem[] = [
   { label: "Accueil", href: "/" },
   { label: "Prompt", href: "/prompt" },
+  { label: "Politiciens", href: "/politiciens" },
+  { label: "Vidéos", href: "/videos" },
   { label: "Analytique", href: "/analytique" },
   { label: "Contenu", href: "/contenu" },
-  { label: "API Pro", href: "/api-pro" },
   { label: "Tarifs", href: "/tarifs" },
 ];
 
@@ -31,6 +32,8 @@ export const MAIN_NAV_ITEMS: NavItem[] = [
  * NAVIGATION SECONDAIRE (menu hamburger)
  * -------------------------------------------------------------------------- */
 export const SECONDARY_NAV_ITEMS: NavItem[] = [
+  { label: "API Pro", href: "/api-pro" },
+  { label: "Du jour", href: "/du-jour" },
   { label: "À Propos", href: "/a-propos" },
   { label: "Contact", href: "/contact" },
   { label: "Compte", href: "/compte" },
@@ -43,7 +46,10 @@ export const SECONDARY_NAV_ITEMS: NavItem[] = [
 export const FOOTER_NAV = {
   product: [
     { label: "Prompt", href: "/prompt" },
+    { label: "Politiciens", href: "/politiciens" },
+    { label: "Vidéos", href: "/videos" },
     { label: "Analytique", href: "/analytique" },
+    { label: "Du jour", href: "/du-jour" },
     { label: "Contenu", href: "/contenu" },
     { label: "API Pro", href: "/api-pro" },
     { label: "Tarifs", href: "/tarifs" },

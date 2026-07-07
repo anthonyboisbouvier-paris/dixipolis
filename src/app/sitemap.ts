@@ -15,7 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     "",
     "/prompt",
+    "/politiciens",
+    "/videos",
     "/analytique",
+    "/du-jour",
     "/contenu",
     "/api-pro",
     "/tarifs",

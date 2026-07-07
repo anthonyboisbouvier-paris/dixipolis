@@ -3,10 +3,14 @@
  *
  * Route handler POST de la recherche Dixipolis.
  *
- * Corps attendu : { q: string (1-300 caractères), limit?: number }
+ * Corps attendu : { q: string (1-300 caractères), limit?: number,
+ *                   person?: string, from?: string (YYYY-MM-DD), to?: string }
  *
  * Pipeline :
- *   1. Recherche lexicale plein-texte via app_search_transcripts (toujours).
+ *   0. Filtres optionnels : `person` est résolu en person_id via
+ *      app_list_persons(person, 1) ; `from`/`to` bornent la période.
+ *   1. Recherche lexicale plein-texte via app_search_transcripts (toujours),
+ *      avec p_person_id / p_from / p_to.
  *   2. Si OPENAI_API_KEY est configurée :
  *      a. Embedding de la question (text-embedding-3-small)
  *      b. Recherche sémantique via app_search_semantic
@@ -182,7 +186,7 @@ async function fetchAnswer(
  * -------------------------------------------------------------------------- */
 export async function POST(request: Request) {
   /* --- Validation du corps de requête ------------------------------------ */
-  let body: { q?: unknown; limit?: unknown };
+  let body: { q?: unknown; limit?: unknown; person?: unknown; from?: unknown; to?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -200,13 +204,33 @@ export async function POST(request: Request) {
   const rawLimit = typeof body.limit === "number" ? body.limit : 20;
   const limit = Math.min(Math.max(Math.floor(rawLimit), 1), 50);
 
+  /* --- Filtres optionnels : intervenant + période ------------------------- */
+  const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const person = typeof body.person === "string" ? body.person.trim().slice(0, 100) : "";
+  const from = typeof body.from === "string" && DATE_RE.test(body.from.trim())
+    ? body.from.trim()
+    : null;
+  const to = typeof body.to === "string" && DATE_RE.test(body.to.trim())
+    ? body.to.trim()
+    : null;
+
   try {
+    /* --- 0. Résolution de l'intervenant (person → person_id) -------------- */
+    let personId: number | null = null;
+    if (person) {
+      const matches = await rpc<{ person_id: number }[]>("app_list_persons", {
+        p_query: person,
+        p_limit: 1,
+      });
+      personId = matches?.[0]?.person_id ?? null;
+    }
+
     /* --- a. Recherche lexicale (toujours) --------------------------------- */
     const lexical = await rpc<LexicalResponse>("app_search_transcripts", {
       p_query: q,
-      p_person_id: null,
-      p_from: null,
-      p_to: null,
+      p_person_id: personId,
+      p_from: from,
+      p_to: to,
       p_limit: limit,
     });
     if (!lexical) {
@@ -222,14 +246,20 @@ export async function POST(request: Request) {
     let answer: string | null = null;
 
     /* --- b. Enrichissement agent (si clé OpenAI configurée) --------------- */
+    /* Note : app_search_semantic ne supporte pas les filtres intervenant /
+       période — quand un filtre est actif, on saute la fusion sémantique pour
+       ne pas réintroduire des extraits hors filtre. La synthèse reste active. */
+    const hasFilters = personId !== null || from !== null || to !== null;
     const openaiKey = process.env.OPENAI_API_KEY;
     if (openaiKey) {
       const embedding = await fetchEmbedding(q, openaiKey);
       if (embedding) {
-        const semantic = await rpc<SemanticResult[]>("app_search_semantic", {
-          p_embedding: embedding,
-          p_limit: 10,
-        });
+        const semantic = hasFilters
+          ? null
+          : await rpc<SemanticResult[]>("app_search_semantic", {
+              p_embedding: embedding,
+              p_limit: 10,
+            });
 
         /* Fusion : déduplication par segment_id, lexical d'abord */
         if (semantic && semantic.length > 0) {

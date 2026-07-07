@@ -27,8 +27,20 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { cn, formatDate, formatTimecode, generateId } from "@/lib/utils";
-import { ArrowUp, ExternalLink, Info, Play, Sparkles, TriangleAlert } from "lucide-react";
+import {
+  ArrowUp,
+  CalendarDays,
+  ExternalLink,
+  Info,
+  Play,
+  Quote,
+  Sparkles,
+  TriangleAlert,
+  UserRound,
+} from "lucide-react";
 
 /* --------------------------------------------------------------------------
  * Types de la réponse de /api/recherche
@@ -81,8 +93,18 @@ export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
+  /* Filtres optionnels transmis à /api/recherche */
+  const [personFilter, setPersonFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  /* Requête initiale via /prompt?q=... (formulaire GET de la homepage) */
+  const searchParams = useSearchParams();
+  const initialQuery = searchParams.get("q")?.trim() ?? "";
+  const hasAutoSearched = useRef(false);
 
   /* Auto-scroll vers le bas à chaque mise à jour */
   useEffect(() => {
@@ -110,10 +132,17 @@ export default function ChatInterface() {
       setIsSearching(true);
 
       try {
+        /* Filtres optionnels : intervenant + période (transmis seulement si remplis) */
+        const person = personFilter.trim();
         const res = await fetch("/api/recherche", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ q }),
+          body: JSON.stringify({
+            q,
+            ...(person ? { person } : {}),
+            ...(fromDate ? { from: fromDate } : {}),
+            ...(toDate ? { to: toDate } : {}),
+          }),
         });
         const json = await res.json();
 
@@ -146,8 +175,16 @@ export default function ChatInterface() {
         inputRef.current?.focus();
       }
     },
-    [isSearching]
+    [isSearching, personFilter, fromDate, toDate]
   );
+
+  /* Lancement automatique de la recherche initiale (?q=), une seule fois */
+  useEffect(() => {
+    if (initialQuery && !hasAutoSearched.current) {
+      hasAutoSearched.current = true;
+      handleSendMessage(initialQuery);
+    }
+  }, [initialQuery, handleSendMessage]);
 
   /* Touche Entrée => envoi */
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -251,6 +288,53 @@ export default function ChatInterface() {
         className="shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-card)]"
       >
         <div className="mx-auto max-w-3xl px-4 py-3">
+          {/* ---- Filtres optionnels : période + intervenant ---- */}
+          <div className="mb-2.5 flex flex-wrap items-center gap-2">
+            <span
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+              P&eacute;riode
+            </span>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-2 py-1 text-xs"
+              style={{ color: "var(--color-text-secondary)" }}
+              aria-label="Filtrer à partir de cette date"
+            />
+            <span className="text-xs" style={{ color: "var(--color-text-muted)" }} aria-hidden="true">
+              &rarr;
+            </span>
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              className="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-2 py-1 text-xs"
+              style={{ color: "var(--color-text-secondary)" }}
+              aria-label="Filtrer jusqu'à cette date"
+            />
+            <span
+              className="ml-2 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ color: "var(--color-text-muted)" }}
+            >
+              <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+              Intervenant
+            </span>
+            <input
+              type="text"
+              value={personFilter}
+              onChange={(e) => setPersonFilter(e.target.value)}
+              maxLength={100}
+              placeholder="ex : Gabriel Attal"
+              className="min-w-0 flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-page)] px-2 py-1 text-xs sm:max-w-[180px]"
+              style={{ color: "var(--color-text-secondary)" }}
+              aria-label="Filtrer par intervenant"
+            />
+          </div>
+
           <div
             className={cn(
               "flex items-center gap-3 rounded-2xl px-4 py-3",
@@ -515,6 +599,16 @@ function ResultCard({ result }: { result: SearchResult }) {
         </span>
         <ExternalLink className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--color-text-muted)" }} aria-hidden="true" />
       </a>
+
+      {/* Vérification en contexte (anti « sorti de son contexte ») */}
+      <Link
+        href={`/segment/${result.segment_id}`}
+        className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium hover:underline"
+        style={{ color: "var(--color-primary)" }}
+      >
+        <Quote className="h-3 w-3" aria-hidden="true" />
+        Voir en contexte &rarr;
+      </Link>
     </div>
   );
 }

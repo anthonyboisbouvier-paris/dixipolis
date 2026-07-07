@@ -61,6 +61,17 @@ export default function TopPoliticians() {
           </Link>
         ))}
       </div>
+      {/* Lien vers l'annuaire complet (page /politiciens, donnees reelles) */}
+      <div className="mt-4 border-t pt-4 text-center" style={{ borderColor: "var(--color-border)" }}>
+        <Link
+          href="/politiciens"
+          className="inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+          style={{ color: "var(--color-primary)" }}
+        >
+          Voir tous les politiciens
+          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+        </Link>
+      </div>
     </section>
   );
 }

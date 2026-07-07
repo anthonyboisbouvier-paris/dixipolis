@@ -9,7 +9,6 @@
  * Composant serveur (Server Component).
  * ============================================================================= */
 
-import Link from "next/link";
 import {
   ArrowRight,
   Search,
@@ -78,8 +77,8 @@ export default function HeroSection({ stats }: { stats: GlobalStats | null }) {
             </span>
           </div>
 
-          {/* Titre h1 — le message clé */}
-          <h1 className="animate-fade-in-up mb-6 text-4xl font-extrabold leading-[1.06] tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-[3.75rem]">
+          {/* Titre h1 — le message clé (largeur resserrée pour la lisibilité) */}
+          <h1 className="animate-fade-in-up mx-auto mb-6 max-w-3xl text-4xl font-extrabold leading-[1.06] tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-[3.5rem]">
             Chaque mot prononc&eacute; par un{" "}
             <span
               style={{
@@ -227,28 +226,38 @@ export default function HeroSection({ stats }: { stats: GlobalStats | null }) {
             </div>
           </div>
 
-          {/* CTA barre de recherche */}
+          {/* Barre de recherche RÉELLE — formulaire GET vers /prompt?q=...
+              (la page /prompt lit ?q= et lance la recherche automatiquement) */}
           <div
             className="animate-fade-in-up"
             style={{ animationDelay: "250ms" }}
           >
-            <Link
-              href="/prompt"
-              className="group mx-auto inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-white px-6 py-4 text-base font-medium text-[var(--color-text-secondary)] shadow-[var(--shadow-md)] transition-all duration-300 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow)] sm:px-8 sm:text-lg"
+            <form
+              action="/prompt"
+              method="get"
+              role="search"
+              className="group mx-auto flex max-w-xl items-center gap-3 rounded-full border border-[var(--color-border)] bg-white py-2 pl-5 pr-2 shadow-[var(--shadow-md)] transition-all duration-300 focus-within:border-[var(--color-primary)] focus-within:shadow-[var(--shadow-glow)] hover:border-[var(--color-primary-200)]"
             >
               <Search
-                className="h-5 w-5 text-[var(--color-text-muted)] transition-colors group-hover:text-[var(--color-primary)]"
+                className="h-5 w-5 shrink-0 text-[var(--color-text-muted)]"
                 aria-hidden="true"
               />
-              <span>
-                &laquo; Qu&apos;a dit Macron sur la r&eacute;forme des
-                retraites ? &raquo;
-              </span>
-              <ArrowRight
-                className="h-5 w-5 text-[var(--color-primary)] transition-transform group-hover:translate-x-1"
-                aria-hidden="true"
+              <input
+                type="search"
+                name="q"
+                maxLength={300}
+                placeholder="Qu'a dit Macron sur la réforme des retraites ?"
+                className="min-w-0 flex-1 bg-transparent py-2 text-base text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+                aria-label="Rechercher dans les transcriptions politiques"
               />
-            </Link>
+              <button
+                type="submit"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-sm transition-all hover:bg-[var(--color-primary-hover)] hover:shadow-md"
+                aria-label="Lancer la recherche"
+              >
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </form>
           </div>
 
           {/* Compteurs chiffrés — statistiques réelles du corpus */}

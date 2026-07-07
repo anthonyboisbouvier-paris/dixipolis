@@ -3,23 +3,28 @@
  *
  * Page Analytique — données réelles du corpus Dixipolis.
  *
- * Composant serveur async : trois appels RPC Supabase côté serveur
- * (app_global_stats, app_top_speakers, app_theme_stats) via le helper rpc.
+ * Composant serveur async : cinq appels RPC Supabase côté serveur
+ * (app_global_stats, app_top_speakers, app_theme_stats, app_party_stats,
+ * app_videos_per_day) via le helper rpc.
  *
  * Sections :
  *   1. KPI réels (6 tuiles, mêmes chiffres que la page d'accueil)
  *   2. Top intervenants (temps de parole réel, lien vers /politicien/<slug>)
  *   3. Thèmes classifiés (barres réelles + disclaimer de couverture)
- *   4. Carte "Analyses avancées : en construction"
+ *   4. Temps de parole par parti (barres horizontales, badge nb d'orateurs)
+ *   5. Activité du corpus (mini bar-chart CSS pur, 60 derniers jours)
+ *   6. Carte "Analyses avancées : en construction"
  * ============================================================================= */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  Activity,
   BarChart3,
   Clock,
   Construction,
   FileText,
+  Landmark,
   Mic2,
   Radio,
   TrendingUp,
@@ -59,6 +64,20 @@ interface ThemeStats {
   topics: { topic: string; n: number }[];
 }
 
+/** Élément de app_party_stats() */
+interface PartyStat {
+  party: string;
+  speak_sec: number;
+  n_persons: number;
+}
+
+/** Élément de app_videos_per_day(p_days) — ordre chronologique */
+interface DayActivity {
+  day: string;
+  n_videos: number;
+  hours: number;
+}
+
 /* --------------------------------------------------------------------------
  * Helpers d'affichage
  * -------------------------------------------------------------------------- */
@@ -67,6 +86,13 @@ function fmtDuration(sec: number | null): string {
   const h = Math.floor(sec / 3600);
   const m = Math.round((sec % 3600) / 60);
   return h > 0 ? `${h}h ${String(m).padStart(2, "0")}` : `${m} min`;
+}
+
+function fmtDayFr(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "short",
+  });
 }
 
 /* --------------------------------------------------------------------------
@@ -113,11 +139,13 @@ function KpiTile({
 
 /* -------------------------------------------------------------------------- */
 export default async function AnalytiquePage() {
-  /* Données réelles — trois RPC en parallèle */
-  const [stats, speakers, themes] = await Promise.all([
+  /* Données réelles — cinq RPC en parallèle */
+  const [stats, speakers, themes, parties, activity] = await Promise.all([
     rpc<GlobalStats>("app_global_stats"),
     rpc<TopSpeaker[]>("app_top_speakers", { p_limit: 10 }),
     rpc<ThemeStats>("app_theme_stats"),
+    rpc<PartyStat[]>("app_party_stats"),
+    rpc<DayActivity[]>("app_videos_per_day", { p_days: 60 }),
   ]);
 
   const kpis = [
@@ -131,6 +159,14 @@ export default async function AnalytiquePage() {
 
   const topTopics = themes?.topics ? [...themes.topics].sort((a, b) => b.n - a.n) : [];
   const maxTopic = topTopics[0]?.n ?? 1;
+
+  /* Partis triés par temps de parole décroissant */
+  const partyStats = parties ? [...parties].sort((a, b) => b.speak_sec - a.speak_sec) : [];
+  const maxPartySec = partyStats[0]?.speak_sec ?? 1;
+
+  /* Activité du corpus : hauteur des colonnes proportionnelle aux heures */
+  const days = activity ?? [];
+  const maxHours = days.reduce((m, d) => Math.max(m, d.hours), 0) || 1;
 
   return (
     <PageWrapper className="py-8">
@@ -279,7 +315,117 @@ export default async function AnalytiquePage() {
         </section>
       </div>
 
-      {/* ── Section 4 : Analyses avancées (en construction) ───────────── */}
+      {/* ── Section 4 : Temps de parole par parti ─────────────────────── */}
+      <div className="mb-8">
+        <SectionLabel icon={<Landmark className="h-3.5 w-3.5" />} label="Partis politiques" />
+        <section className="card p-6" aria-label="Temps de parole par parti">
+          <div className="mb-5">
+            <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Temps de parole par parti
+            </h2>
+            <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-muted)" }}>
+              Temps de parole identifi&eacute; cumul&eacute; des orateurs de chaque parti
+            </p>
+          </div>
+          {partyStats.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Aucune donn&eacute;e de parti disponible pour le moment.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {partyStats.map((p) => (
+                <div key={p.party} className="flex items-center gap-3">
+                  <span
+                    className="flex w-40 shrink-0 items-center gap-2 sm:w-56"
+                    title={p.party}
+                  >
+                    <span className="truncate text-sm font-medium" style={{ color: "var(--color-text-primary)" }}>
+                      {p.party}
+                    </span>
+                    <span
+                      className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                      style={{
+                        backgroundColor: "var(--color-primary-light)",
+                        color: "var(--color-primary)",
+                      }}
+                      title={`${p.n_persons} orateur${p.n_persons > 1 ? "s" : ""} identifié${p.n_persons > 1 ? "s" : ""}`}
+                    >
+                      {p.n_persons}
+                    </span>
+                  </span>
+                  <div className="relative h-7 flex-1 overflow-hidden rounded-md" style={{ backgroundColor: "var(--color-bg-section)" }}>
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-md"
+                      style={{
+                        width: `${Math.max(2, (p.speak_sec / maxPartySec) * 100)}%`,
+                        backgroundColor: "var(--color-primary)",
+                        opacity: 0.85,
+                      }}
+                    />
+                  </div>
+                  <span className="w-16 shrink-0 text-right text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                    {fmtDuration(p.speak_sec)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {/* ── Section 5 : Activité du corpus (60 derniers jours) ────────── */}
+      <div className="mb-8">
+        <SectionLabel icon={<Activity className="h-3.5 w-3.5" />} label="Activité du corpus" />
+        <section className="card p-6" aria-label="Activité du corpus sur 60 jours">
+          <div className="mb-5">
+            <h2 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
+              Vid&eacute;os transcrites par jour
+            </h2>
+            <p className="mt-0.5 text-sm" style={{ color: "var(--color-text-muted)" }}>
+              Heures de contenu ajout&eacute;es au corpus sur les 60 derniers jours
+            </p>
+          </div>
+          {days.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+              Aucune activit&eacute; enregistr&eacute;e sur la p&eacute;riode.
+            </p>
+          ) : (
+            <>
+              {/* Mini bar-chart 100 % CSS : une colonne par jour, tooltip natif */}
+              <div className="overflow-x-auto pb-1">
+                <div className="flex h-32 min-w-[480px] items-end gap-[3px]">
+                  {days.map((d) => (
+                    <div
+                      key={d.day}
+                      className="group flex h-full min-w-[6px] flex-1 items-end"
+                      title={`${fmtDayFr(d.day)} : ${d.n_videos} vidéo${d.n_videos > 1 ? "s" : ""}, ${Math.round(d.hours * 10) / 10}h`}
+                    >
+                      <div
+                        className="w-full rounded-t-sm transition-opacity group-hover:opacity-100"
+                        style={{
+                          height: `${Math.max(d.hours > 0 ? 4 : 1, (d.hours / maxHours) * 100)}%`,
+                          backgroundColor: d.hours > 0 ? "var(--color-primary)" : "var(--color-border)",
+                          opacity: d.hours > 0 ? 0.8 : 1,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex min-w-[480px] justify-between text-[11px]" style={{ color: "var(--color-text-muted)" }}>
+                  <span>{fmtDayFr(days[0].day)}</span>
+                  <span>{fmtDayFr(days[days.length - 1].day)}</span>
+                </div>
+              </div>
+              <p className="mt-3 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                {formatNumber(days.reduce((s, d) => s + d.n_videos, 0))} vid&eacute;os
+                sur la p&eacute;riode &mdash; survolez une colonne pour le d&eacute;tail.
+              </p>
+            </>
+          )}
+        </section>
+      </div>
+
+      {/* ── Section 6 : Analyses avancées (en construction) ───────────── */}
       <div
         className="flex items-start gap-3 rounded-2xl border border-dashed p-5"
         style={{ borderColor: "var(--color-border)", backgroundColor: "var(--color-bg-card)" }}

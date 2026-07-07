@@ -213,7 +213,7 @@ export default function Header() {
            * (texte bleu + bordure inferieure coloree).
            * ================================================================ */}
           <nav
-            className="hidden md:flex items-center gap-1"
+            className="hidden lg:flex items-center gap-1"
             role="navigation"
             aria-label="Navigation principale"
           >
@@ -223,10 +223,10 @@ export default function Header() {
                 href={item.href}
                 className={cn(
                   // Style de base du lien de navigation
-                  "px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
-                  // Etat actif : fond bleu tres clair, texte bleu primaire
+                  "relative px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
+                  // Etat actif : texte bleu primaire + soulignement (span ci-dessous)
                   isActive(item.href)
-                    ? "text-[var(--color-primary)] bg-[var(--color-primary-light)]"
+                    ? "text-[var(--color-primary)] font-semibold"
                     // Etat inactif : texte gris fonce, hover vers bleu
                     : "text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-gray-50"
                 )}
@@ -234,6 +234,13 @@ export default function Header() {
                 aria-current={isActive(item.href) ? "page" : undefined}
               >
                 {item.label}
+                {/* Soulignement du lien actif */}
+                {isActive(item.href) && (
+                  <span
+                    className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-[var(--color-primary)]"
+                    aria-hidden="true"
+                  />
+                )}
               </Link>
             ))}
           </nav>
@@ -249,7 +256,7 @@ export default function Header() {
             <Link
               href="/connexion"
               className={cn(
-                "hidden md:inline-flex items-center gap-1.5",
+                "hidden lg:inline-flex items-center gap-1.5",
                 "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
                 "text-white bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)]",
                 "shadow-sm hover:shadow-md"
@@ -260,8 +267,8 @@ export default function Header() {
             </Link>
 
             {/* -- Bouton hamburger desktop (liens secondaires) -- */}
-            {/* Visible uniquement sur desktop (hidden md:flex) */}
-            <div className="hidden md:block relative">
+            {/* Visible uniquement sur desktop (hidden lg:block) */}
+            <div className="hidden lg:block relative">
               <button
                 type="button"
                 onClick={toggleDropdown}
@@ -329,15 +336,15 @@ export default function Header() {
               )}
             </div>
 
-            {/* -- Bouton hamburger mobile -- */}
-            {/* Visible uniquement sur mobile (md:hidden) */}
+            {/* -- Bouton hamburger mobile / tablette -- */}
+            {/* Visible sous le breakpoint lg (lg:hidden) */}
             <button
               type="button"
               onClick={toggleMobileMenu}
               className={cn(
-                "md:hidden flex items-center justify-center",
+                "lg:hidden flex items-center justify-center",
                 "h-10 w-10 rounded-md transition-colors duration-200",
-                "text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:bg-gray-50"
+                "text-[var(--color-text-primary)] hover:text-[var(--color-primary)] hover:bg-gray-100"
               )}
               aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               aria-expanded={isMobileMenuOpen}
@@ -363,8 +370,8 @@ export default function Header() {
         <div
           style={{ top: "var(--header-height)" }}
           className={cn(
-            // Visible uniquement sur mobile
-            "md:hidden",
+            // Visible uniquement sous le breakpoint lg (mobile + tablette)
+            "lg:hidden",
             // Position fixe sous le header, couvre tout l'ecran
             "fixed inset-x-0 bottom-0 z-40",
             // Fond blanc opaque avec defilement possible
