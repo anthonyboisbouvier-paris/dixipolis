@@ -8,9 +8,13 @@
 <meta name="theme-color" content="#ff6b57">
 <link rel="manifest" href="/escapade/manifest.webmanifest">
 <link rel="icon" href="/escapade/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://fr.wikipedia.org" crossorigin>
+<link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
+<link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
 <style>
 /* ==========================================================================
-   Escapade — thème sombre voyage. Aucune dépendance externe.
+   Escapade v2 — thème sombre voyage. Aucune dépendance externe.
    ========================================================================== */
 :root{
   --bg:#0f1117;
@@ -30,15 +34,16 @@
   --shadow:0 18px 40px rgba(0,0,0,.45);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;overscroll-behavior:none}
 body{
   background:var(--bg);
   color:var(--text);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  touch-action:manipulation;
 }
-button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;touch-action:manipulation}
 input,select,textarea{font:inherit}
 img{max-width:100%}
 
@@ -48,12 +53,12 @@ img{max-width:100%}
   min-height:100dvh;
   max-width:520px;
   margin:0 auto;
-  padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  padding:calc(20px + env(safe-area-inset-top)) calc(18px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(18px + env(safe-area-inset-left));
   flex-direction:column;
-  animation:screen-in .35s ease both;
+  animation:screen-in .2s ease both;
 }
 .screen.active{display:flex}
-@keyframes screen-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes screen-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ----- Boutons ------------------------------------------------------------ */
 .btn{
@@ -82,9 +87,11 @@ img{max-width:100%}
 .field:focus{border-color:var(--coral)}
 .field::placeholder{color:#5d6478}
 textarea.field{resize:vertical;min-height:64px}
+input[type=date].field{color-scheme:dark}
 .loc-status{font-size:13px;margin-top:10px;color:var(--muted);min-height:18px}
 .loc-status.err{color:var(--red)}
 .loc-status.ok{color:var(--green)}
+.app-footer{text-align:center;color:#5d6478;font-size:12px;margin-top:26px;padding-bottom:6px}
 
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{
@@ -123,30 +130,50 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap;
 }
 .pick-counter .h{color:var(--green)} .pick-counter .m{color:var(--amber)}
+.pick-counter .bump{display:inline-block;animation:bump .2s ease}
+@keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.45)}100%{transform:scale(1)}}
 
-.stack{position:relative;flex:1;min-height:430px;margin-bottom:14px;touch-action:none}
+.stack{position:relative;flex:1;min-height:430px;margin-bottom:14px;touch-action:pan-y}
 .card{
   position:absolute;inset:0;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;
-  box-shadow:var(--shadow);will-change:transform;user-select:none;-webkit-user-select:none;
+  box-shadow:var(--shadow);user-select:none;-webkit-user-select:none;
 }
 .card.behind-1{transform:translateY(12px) scale(.955);filter:brightness(.75);z-index:1}
 .card.behind-2{transform:translateY(24px) scale(.91);filter:brightness(.55);z-index:0}
-.card.top{z-index:2;cursor:grab}
+.card.top{z-index:2;cursor:grab;will-change:transform;touch-action:none}
 .card.top:active{cursor:grabbing}
-.card.leaving{transition:transform .4s ease,opacity .4s ease;pointer-events:none}
-.card.spring{transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
+.card.leaving{transition:transform .2s ease,opacity .2s ease;pointer-events:none}
+.card.spring{transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
 .card-img{
   position:relative;height:44%;min-height:170px;flex:none;
-  background-size:cover;background-position:center;
   display:flex;align-items:center;justify-content:center;font-size:74px;
+  overflow:hidden;
 }
-.card-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,var(--surface))}
+.card-img.loading::before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.09) 50%,transparent 70%);
+  background-size:220% 100%;animation:shimmer 1.1s linear infinite;
+}
+@keyframes shimmer{from{background-position:180% 0}to{background-position:-40% 0}}
+.card-photo{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity .2s ease;
+}
+.card-photo.loaded{opacity:1}
+.card-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,var(--surface));pointer-events:none}
 .badge{
-  position:absolute;top:14px;left:14px;z-index:1;
+  position:absolute;top:14px;left:14px;z-index:2;
   background:rgba(15,17,23,.72);backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.14);border-radius:999px;
   padding:6px 12px;font-size:12.5px;font-weight:600;
+}
+.card-info{
+  position:absolute;top:10px;right:10px;z-index:3;
+  width:38px;height:38px;border-radius:50%;font-size:18px;
+  background:rgba(15,17,23,.72);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.14);
+  display:flex;align-items:center;justify-content:center;touch-action:manipulation;
 }
 .card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
 .card-title{font-size:21px;font-weight:700;letter-spacing:-.3px;line-height:1.2}
@@ -190,6 +217,8 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .act-btn.maybe{color:var(--amber);width:50px;height:50px;font-size:20px} .act-btn.maybe:hover{border-color:var(--amber)}
 .act-btn.like{color:var(--green)} .act-btn.like:hover{border-color:var(--green)}
 .act-btn.undo{width:44px;height:44px;font-size:17px;color:var(--muted)}
+.kbd-hint{display:none;text-align:center;color:#5d6478;font-size:12px;margin-bottom:8px}
+@media (hover:hover) and (pointer:fine){.kbd-hint{display:block}}
 .deck-loading{
   display:none;align-items:center;justify-content:center;gap:9px;
   color:var(--muted);font-size:13px;margin-bottom:10px;
@@ -211,10 +240,10 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .list-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin:18px 0 10px}
 .list-title small{color:var(--muted);font-weight:500}
 .sel-item{
-  display:flex;align-items:center;gap:12px;background:var(--surface);
+  display:flex;align-items:flex-start;gap:12px;background:var(--surface);
   border:1px solid var(--border);border-radius:16px;padding:11px 13px;margin-bottom:8px;
 }
-.sel-emoji{font-size:24px;flex:none}
+.sel-emoji{font-size:24px;flex:none;padding-top:2px}
 .sel-info{flex:1;min-width:0}
 .sel-info b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sel-info span{font-size:12px;color:var(--muted)}
@@ -224,6 +253,14 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   border:1px solid var(--border);font-size:14px;display:flex;align-items:center;justify-content:center;
 }
 .mini-btn:hover{border-color:var(--muted)}
+.dur-step{display:inline-flex;align-items:center;gap:8px;margin-top:7px}
+.dur-step .mini-btn{width:28px;height:28px;font-size:15px;font-weight:700}
+.dur-step .dur-val{font-size:12.5px;font-weight:700;color:var(--sand);min-width:56px;text-align:center;font-variant-numeric:tabular-nums}
+.travel-chip{
+  display:flex;align-items:center;gap:7px;margin:-2px 0 8px 30px;
+  font-size:12px;color:var(--muted);
+}
+.travel-chip::before{content:"";width:10px;height:14px;border-left:2px dotted var(--border)}
 .empty-list{color:var(--muted);font-size:13.5px;padding:6px 2px 2px}
 #custom-form{display:none;margin-top:10px}
 #custom-form.on{display:block}
@@ -247,12 +284,24 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .pace-btn .p-emoji{font-size:24px;display:block}
 .pace-btn .p-label{font-size:13px;font-weight:600;margin-top:5px;display:block}
 .pace-btn[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.budget-line{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  background:var(--sand-soft);border:1px solid rgba(245,201,123,.3);border-radius:14px;
+  padding:11px 14px;font-size:13.5px;margin-top:14px;color:var(--sand);font-weight:600;
+}
+.budget-line small{color:var(--muted);font-weight:500;flex-basis:100%}
 .plan-day{margin-top:22px}
 .plan-day h3{
   font-size:15px;color:var(--sand);font-weight:800;text-transform:uppercase;
-  letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:10px;
+  letter-spacing:.07em;margin-bottom:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
 }
 .plan-day h3::after{content:"";flex:1;height:1px;background:var(--border)}
+.day-meta{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none;white-space:nowrap}
+.rain-tip{
+  font-size:12.5px;color:var(--amber);background:rgba(255,180,84,.1);
+  border:1px solid rgba(255,180,84,.3);border-radius:11px;padding:8px 11px;margin:6px 0 10px;
+}
+.plan-day .day-items{margin-top:8px}
 .tl-item{display:flex;gap:13px;position:relative;padding-bottom:4px}
 .tl-time{
   flex:none;width:52px;text-align:right;font-size:13.5px;font-weight:700;
@@ -260,7 +309,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 }
 .tl-body{
   flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:12px 14px;margin-bottom:4px;
+  padding:12px 14px;margin-bottom:4px;min-width:0;
 }
 .tl-body b{font-size:14.5px}
 .tl-body .dur{font-size:12px;color:var(--sand);margin-left:6px;white-space:nowrap}
@@ -277,12 +326,100 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .plan-loading.on{display:flex}
 .plan-loading .spinner{width:30px;height:30px;border-width:3px}
 .toast{
-  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);
+  position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(80px);
   background:var(--surface-2);border:1px solid var(--border);border-radius:14px;
-  padding:11px 18px;font-size:14px;font-weight:600;z-index:60;opacity:0;
-  transition:all .3s;box-shadow:var(--shadow);white-space:nowrap;
+  padding:11px 18px;font-size:14px;font-weight:600;z-index:80;opacity:0;
+  transition:all .2s;box-shadow:var(--shadow);white-space:nowrap;
 }
 .toast.on{transform:translateX(-50%);opacity:1}
+
+/* ----- Bottom-sheet (fiche détails) ---------------------------------------- */
+.sheet-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:65;
+  opacity:0;transition:opacity .2s;pointer-events:none;
+}
+.sheet-backdrop.on{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:70;max-width:520px;margin:0 auto;
+  background:var(--surface);border:1px solid var(--border);border-bottom:none;
+  border-radius:22px 22px 0 0;transform:translate3d(0,105%,0);transition:transform .2s ease;
+  max-height:78dvh;display:flex;flex-direction:column;box-shadow:var(--shadow);
+  padding-bottom:env(safe-area-inset-bottom);touch-action:none;
+}
+.sheet.on{transform:translate3d(0,0,0)}
+.sheet.dragging{transition:none}
+.sheet-grip{padding:10px 0 4px;display:flex;justify-content:center;cursor:grab}
+.sheet-grip span{width:44px;height:5px;border-radius:99px;background:var(--border)}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:4px 16px 10px}
+.sheet-head b{flex:1;font-size:17px;min-width:0}
+.sheet-body{overflow-y:auto;padding:2px 18px 20px;touch-action:pan-y}
+.detail-row{display:flex;gap:10px;font-size:13.5px;margin:9px 0;line-height:1.45}
+.detail-row .d-ico{flex:none}
+.detail-row .d-txt{color:var(--muted)}
+.detail-why{font-size:14.5px;line-height:1.55;margin-bottom:6px}
+.detail-tips{margin:10px 0 4px}
+.detail-tips li{font-size:13.5px;color:var(--muted);margin:7px 0 7px 18px;line-height:1.45}
+.sheet-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;padding:18px 0 26px}
+
+/* ----- Carte panoramique ---------------------------------------------------- */
+.map-wrap{
+  position:relative;overflow:hidden;border-radius:var(--radius);
+  border:1px solid var(--border);background:#1a1e2a;
+  height:min(58dvh,520px);min-height:320px;touch-action:none;
+}
+.map-world{position:absolute;inset:0;will-change:transform}
+.map-world .tile{
+  position:absolute;width:256px;height:256px;max-width:none;pointer-events:none;
+  filter:brightness(.82) saturate(.9);user-select:none;-webkit-user-drag:none;
+}
+.map-svg{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+.map-marker{
+  position:absolute;z-index:3;transform:translate(-50%,-100%);
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.5));
+}
+.map-marker .m-emoji{font-size:17px;line-height:1;margin-bottom:-4px}
+.map-marker .m-num{
+  width:26px;height:26px;border-radius:50% 50% 50% 4px;background:var(--coral);
+  color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;border:2px solid #fff;transform:rotate(-45deg);
+}
+.map-marker .m-num i{font-style:normal;transform:rotate(45deg)}
+.map-ctrls{position:absolute;right:10px;top:10px;z-index:5;display:flex;flex-direction:column;gap:7px}
+.map-ctrls button{
+  width:40px;height:40px;border-radius:12px;background:rgba(23,26,35,.92);
+  border:1px solid var(--border);font-size:19px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-attrib{
+  position:absolute;right:6px;bottom:6px;z-index:5;font-size:10.5px;
+  color:#c8cdda;background:rgba(15,17,23,.65);padding:2px 7px;border-radius:8px;
+  text-decoration:none;
+}
+.map-popup{
+  position:absolute;left:10px;right:10px;bottom:10px;z-index:6;
+  background:rgba(23,26,35,.96);border:1px solid var(--border);border-radius:16px;
+  padding:12px 14px;display:flex;flex-direction:column;gap:8px;
+}
+.map-popup b{font-size:14.5px}
+.map-popup .mp-meta{font-size:12.5px;color:var(--muted)}
+.map-popup .mp-btns{display:flex;gap:8px}
+.map-popup a{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--coral);color:#fff;border-radius:12px;padding:9px;font-size:13.5px;
+  font-weight:600;text-decoration:none;
+}
+.map-popup .mp-close{flex:none;width:38px;border-radius:12px;background:var(--surface-2);border:1px solid var(--border)}
+.travel-banner{margin-top:14px}
+.travel-banner ol{list-style:none}
+.travel-banner li{
+  font-size:13px;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--border);
+  display:flex;gap:8px;align-items:baseline;
+}
+.travel-banner li:last-child{border-bottom:none}
+.travel-banner .t-num{color:var(--coral);font-weight:700;flex:none}
+.travel-banner .t-time{margin-left:auto;color:var(--sand);font-weight:600;white-space:nowrap}
+.map-empty{padding:22px;text-align:center;color:var(--muted);font-size:14px}
 
 /* ----- Écrans d'erreur / no_key -------------------------------------------- */
 .center-box{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:20px}
@@ -339,6 +476,8 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   <div style="margin-top:18px">
     <button class="btn btn-primary" id="btn-discover" aria-label="Découvrir les activités">Découvrir les activités</button>
   </div>
+  <button class="btn btn-ghost" id="btn-reset-all" style="margin-top:10px" aria-label="Tout effacer et recommencer">🗑 Tout recommencer</button>
+  <footer class="app-footer">Escapade v2 · cartes © OpenStreetMap</footer>
 </section>
 
 <!-- ======================= ÉCRAN B : DECK DE SWIPE ======================= -->
@@ -355,6 +494,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   <div class="stack" id="stack"></div>
 
   <div class="deck-loading" id="deck-loading"><span class="spinner"></span> Recherche de nouvelles idées...</div>
+  <p class="kbd-hint">Clavier : ← passer · → garder · ↑ peut-être · U annuler</p>
 
   <div class="deck-actions">
     <button class="act-btn undo" id="btn-undo" aria-label="Annuler le dernier swipe">↩</button>
@@ -371,6 +511,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   <div class="deck-head">
     <button class="icon-btn" id="btn-sel-back" aria-label="Revenir au deck de cartes">←</button>
     <div class="deck-place"><b>Ma sélection</b><span>Ajustez avant de générer le planning</span></div>
+    <button class="icon-btn" id="btn-sel-map" aria-label="Voir la carte des activités">🗺</button>
   </div>
 
   <div class="list-title">♥ Sélection <small id="sel-liked-count"></small></div>
@@ -386,7 +527,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
     <input class="field" id="custom-title" type="text" placeholder="Titre (ex : Déjeuner chez tante Léa)" aria-label="Titre de l'activité">
     <div class="row">
       <select class="field" id="custom-cat" aria-label="Catégorie"></select>
-      <input class="field" id="custom-duration" type="number" min="10" step="5" value="60" placeholder="Durée (min)" aria-label="Durée en minutes">
+      <input class="field" id="custom-duration" type="number" min="15" max="480" step="15" value="60" placeholder="Durée (min)" aria-label="Durée en minutes">
       <input class="field" id="custom-cost" type="number" min="0" step="1" value="0" placeholder="Coût (€)" aria-label="Coût en euros">
     </div>
     <div class="row"><input class="field" id="custom-note" type="text" placeholder="Note libre (optionnel)" aria-label="Note libre"></div>
@@ -406,6 +547,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   <div class="deck-head">
     <button class="icon-btn" id="btn-plan-back" aria-label="Modifier ma sélection">←</button>
     <div class="deck-place"><b>Mon planning</b><span id="plan-subtitle">Choisissez la durée et le rythme</span></div>
+    <button class="icon-btn" id="btn-plan-map" aria-label="Voir la carte des activités">🗺</button>
   </div>
 
   <div id="plan-config">
@@ -416,6 +558,10 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
         <div class="val"><span id="days-val">2</span><small>jour(s)</small></div>
         <button id="days-plus" aria-label="Un jour de plus">+</button>
       </div>
+    </div>
+    <div class="panel">
+      <h2>Date de début</h2>
+      <input class="field" type="date" id="start-date" aria-label="Date de début du séjour">
     </div>
     <div class="panel">
       <h2>Rythme</h2>
@@ -436,16 +582,44 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   </div>
 
   <div id="plan-result" hidden>
+    <div class="budget-line" id="plan-budget" hidden></div>
     <div id="plan-days"></div>
     <div class="panel tips-panel" id="tips-panel" hidden>
       <h2>💡 Conseils</h2>
       <ul id="tips-list"></ul>
     </div>
     <div class="plan-btns">
-      <button class="btn btn-primary" id="btn-copy-plan" aria-label="Copier le programme">📋 Copier le programme</button>
+      <button class="btn btn-primary" id="btn-ics" aria-label="Ajouter au calendrier">📅 Ajouter au calendrier</button>
+      <button class="btn btn-sand" id="btn-share-plan" aria-label="Partager le programme">📤 Partager</button>
+      <button class="btn btn-ghost" id="btn-copy-plan" aria-label="Copier le programme">📋 Copier le programme</button>
       <button class="btn btn-ghost" id="btn-replan" aria-label="Régénérer le planning">♻️ Régénérer</button>
       <button class="btn btn-ghost" id="btn-edit-selection" aria-label="Modifier ma sélection">← Modifier ma sélection</button>
     </div>
+  </div>
+</section>
+
+<!-- ======================= ÉCRAN E : CARTE ======================= -->
+<section class="screen" id="screen-map">
+  <div class="deck-head">
+    <button class="icon-btn" id="btn-map-back" aria-label="Revenir à l'écran précédent">←</button>
+    <div class="deck-place"><b>Carte panoramique</b><span id="map-subtitle">Vos activités sur la carte</span></div>
+    <button class="chip" id="map-toggle-maybe" aria-pressed="false" aria-label="Inclure les activités en balance">🤔 inclure</button>
+  </div>
+
+  <div class="map-wrap" id="map-wrap">
+    <div class="map-world" id="map-world"></div>
+    <div class="map-ctrls">
+      <button id="map-zoom-in" aria-label="Zoomer">+</button>
+      <button id="map-zoom-out" aria-label="Dézoomer">−</button>
+      <button id="map-recenter" aria-label="Recentrer la carte">⌖</button>
+    </div>
+    <div class="map-popup" id="map-popup" hidden></div>
+    <a class="map-attrib" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
+  </div>
+
+  <div class="panel travel-banner">
+    <h2>🧭 Trajets</h2>
+    <ol id="map-travels"><li class="map-empty">—</li></ol>
   </div>
 </section>
 
@@ -471,16 +645,30 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 
 <div class="toast" id="toast" role="status"></div>
 
+<!-- ======================= BOTTOM-SHEET DÉTAILS ======================= -->
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Fiche détaillée">
+  <div class="sheet-grip" id="sheet-grip"><span></span></div>
+  <div class="sheet-head">
+    <b id="sheet-title">…</b>
+    <button class="icon-btn" id="sheet-close" aria-label="Fermer la fiche">✕</button>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+</div>
+
 <script>
 "use strict";
 /* ===========================================================================
- * Escapade — logique applicative (vanilla JS, ES2020).
+ * Escapade v2 — logique applicative (vanilla JS, ES2020). Aucune dépendance.
  * =========================================================================== */
 
 const API_URL = "/api/escapade";
-const STORAGE_KEY = "escapade_v1";
+const STORAGE_KEY = "escapade_v2";
+const LEGACY_KEY = "escapade_v1";
+const IMG_CACHE_KEY = "escapade_img_v1";
+const DETAIL_CACHE_KEY = "escapade_detail_v1";
 
-/* Métadonnées des 10 catégories : emoji, libellé, classe de dégradé */
+/* Métadonnées des 10 catégories : emoji, libellé */
 const CATS = {
   "culture":      { emoji: "🏛️", label: "Culture" },
   "nature":       { emoji: "🌿", label: "Nature" },
@@ -493,27 +681,46 @@ const CATS = {
   "detente":      { emoji: "🧘", label: "Détente" },
   "panorama":     { emoji: "🌅", label: "Panorama" },
 };
+const OUTDOOR_CATS = new Set(["nature", "panorama", "sport"]);
 
 /* ---------------------------------------------------------------------------
- * État global (persisté en localStorage)
+ * État global (persisté en localStorage) — clé v2, migration douce depuis v1.
  * --------------------------------------------------------------------------- */
 let state = defaultState();
-let dragging = null;          // suivi du drag en cours sur la carte du dessus
-let fetchingMore = false;     // évite les doubles requêtes de rechargement
-let retryAction = null;       // action à rejouer depuis l'écran d'erreur
+let fetchingMore = false;
+let retryAction = null;
 let lastScreen = "screen-home";
+let swiping = false;             // anti double-swipe pendant l'animation
+
+function todayISO(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + (offsetDays || 0));
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+function addDaysISO(iso, n) {
+  const parts = String(iso || "").split("-").map(Number);
+  const d = parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : new Date();
+  d.setDate(d.getDate() + n);
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
 
 function defaultState() {
   return {
+    version: 2,
     lat: 0, lng: 0,
-    place: "",                 // saisie utilisateur (ville / lieu)
-    placeName: "",             // nom renvoyé par l'API
+    place: "",
+    placeName: "",
     filters: { categories: [], budget: 200, note: "" },
-    deck: [],                  // cartes restantes à swiper
-    seen: [],                  // titres déjà présentés (pour exclude)
-    liked: [], maybe: [],      // activités retenues / en balance
-    history: [],               // pile pour le bouton annuler
+    deck: [],
+    seen: [],
+    liked: [], maybe: [],
+    history: [],
     days: 2, pace: "equilibre",
+    startDate: todayISO(1),      // défaut : demain
     plan: null,
   };
 }
@@ -523,11 +730,46 @@ function saveState() {
 }
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      /* Migration douce depuis escapade_v1 (mêmes champs + nouveaux défauts) */
+      raw = localStorage.getItem(LEGACY_KEY);
+      if (!raw) return null;
+      const old = JSON.parse(raw);
+      if (!old || typeof old !== "object") return null;
+      const merged = Object.assign(defaultState(), old, { version: 2 });
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        localStorage.removeItem(LEGACY_KEY);
+      } catch { /* ignore */ }
+      return merged;
+    }
     const parsed = JSON.parse(raw);
     return (parsed && typeof parsed === "object") ? Object.assign(defaultState(), parsed) : null;
   } catch { return null; }
+}
+
+/* Caches localStorage (images + fiches détails), clé = titre */
+function loadJSON(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const v = raw ? JSON.parse(raw) : null;
+    return (v && typeof v === "object") ? v : {};
+  } catch { return {}; }
+}
+function trimCache(obj, max) {
+  const ks = Object.keys(obj);
+  if (ks.length > max) for (const k of ks.slice(0, ks.length - max)) delete obj[k];
+}
+const imgCache = loadJSON(IMG_CACHE_KEY);
+const detailCache = loadJSON(DETAIL_CACHE_KEY);
+function saveImgCache() {
+  trimCache(imgCache, 220);
+  try { localStorage.setItem(IMG_CACHE_KEY, JSON.stringify(imgCache)); } catch { /* ignore */ }
+}
+function saveDetailCache() {
+  trimCache(detailCache, 120);
+  try { localStorage.setItem(DETAIL_CACHE_KEY, JSON.stringify(detailCache)); } catch { /* ignore */ }
 }
 
 /* ---------------------------------------------------------------------------
@@ -552,12 +794,37 @@ function fmtCost(eur) {
   return n <= 0 ? "Gratuit" : `${Math.round(n)} €`;
 }
 
+function clampDur(v) {
+  const raw = Number(v);
+  const base = Number.isFinite(raw) && raw > 0 ? raw : 60; // défaut : 1 h
+  return Math.min(480, Math.max(15, Math.round(base / 15) * 15));
+}
+/* Pas de stepper : ±15 min, borné 15–480 (0 n'est jamais retraité en défaut) */
+function stepDur(cur, dir) {
+  return Math.min(480, Math.max(15, clampDur(cur) + dir));
+}
+
 function showToast(msg) {
   const t = $("toast");
   t.textContent = msg;
   t.classList.add("on");
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+/* Retour haptique discret sur décision de swipe */
+function haptic() {
+  try { if (navigator.vibrate) navigator.vibrate(12); } catch { /* non supporté */ }
+}
+
+/* AbortSignal.timeout avec repli */
+function timeoutSignal(ms) {
+  try { return AbortSignal.timeout(ms); }
+  catch {
+    const c = new AbortController();
+    setTimeout(() => c.abort(), ms);
+    return c.signal;
+  }
 }
 
 /* Bascule d'écran avec ré-animation douce */
@@ -592,11 +859,80 @@ function showError(msg, retry) {
   showScreen("screen-error");
 }
 
+/* ---------------------------------------------------------------------------
+ * Distances & temps de trajet (haversine ×1.3, raffinés via OSRM si possible)
+ * --------------------------------------------------------------------------- */
+function validCoord(lat, lng) {
+  const a = Number(lat), b = Number(lng);
+  return Number.isFinite(a) && Number.isFinite(b) && Math.abs(a) <= 90 && Math.abs(b) <= 180 && !(a === 0 && b === 0);
+}
+
+function haversineKm(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+  const s = Math.sin(dLat / 2) ** 2 +
+    Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}
+
+/* ≤ 2,5 km → marche 4,5 km/h ; sinon transport ~20 km/h. Facteur voirie 1,3. */
+function estimateTravel(a, b) {
+  if (!a || !b || !validCoord(a.lat, a.lng) || !validCoord(b.lat, b.lng)) return null;
+  const km = haversineKm(a, b) * 1.3;
+  if (!Number.isFinite(km) || km <= 0.02) return null;
+  if (km <= 2.5) return { mode: "🚶", walk: true, min: Math.max(1, Math.round((km / 4.5) * 60)), km };
+  return { mode: "🚗/🚇", walk: false, min: Math.max(1, Math.round((km / 20) * 60)), km };
+}
+function travelLabel(t) { return t ? `${t.mode} ${t.min} min` : ""; }
+
+/* Raffinage OSRM (profil piéton) — timeout 4 s, repli silencieux */
+const osrmCache = new Map();
+async function osrmDurations(points) {
+  const coords = points.map((p) => `${Number(p.lng).toFixed(5)},${Number(p.lat).toFixed(5)}`).join(";");
+  if (osrmCache.has(coords)) return osrmCache.get(coords);
+  try {
+    const r = await fetch(
+      `https://router.project-osrm.org/table/v1/foot/${coords}?annotations=duration`,
+      { signal: timeoutSignal(4000) }
+    );
+    if (!r.ok) throw new Error("osrm");
+    const j = await r.json();
+    const m = (j && j.code === "Ok" && Array.isArray(j.durations)) ? j.durations : null;
+    osrmCache.set(coords, m);
+    return m;
+  } catch {
+    osrmCache.set(coords, null);
+    return null;
+  }
+}
+
+/**
+ * Raffine les chips de trajet déjà rendues. `items` est la liste ordonnée
+ * d'activités ; la chip de la paire (i, i+1) porte l'id `${idPrefix}${i}`.
+ * Seuls les segments "marche" sont raffinés (profil OSRM foot).
+ */
+function refineTravelChips(items, idPrefix) {
+  const pts = items.map((a, i) => ({ a, i })).filter((x) => validCoord(x.a.lat, x.a.lng));
+  if (pts.length < 2) return;
+  osrmDurations(pts.map((x) => x.a)).then((m) => {
+    if (!m) return;
+    for (let j = 0; j < pts.length - 1; j++) {
+      if (pts[j + 1].i !== pts[j].i + 1) continue;
+      const el = $(idPrefix + pts[j].i);
+      if (!el) continue;
+      const est = estimateTravel(pts[j].a, pts[j + 1].a);
+      if (!est || !est.walk) continue;
+      const sec = m[j] && m[j][j + 1];
+      if (typeof sec !== "number" || !Number.isFinite(sec) || sec <= 0) continue;
+      el.textContent = `🚶 ${Math.max(1, Math.round(sec / 60))} min`;
+    }
+  });
+}
+
 /* ===========================================================================
  * ÉCRAN A — ACCUEIL
  * =========================================================================== */
 function initHome() {
-  // Chips des catégories
   const chips = $("cat-chips");
   chips.innerHTML = Object.entries(CATS).map(([key, c]) =>
     `<button class="chip" data-cat="${key}" aria-pressed="false">${c.emoji} ${c.label}</button>`
@@ -608,17 +944,24 @@ function initHome() {
     btn.setAttribute("aria-pressed", String(!on));
   });
 
-  // Slider budget
   $("budget-slider").addEventListener("input", () => {
     const v = Number($("budget-slider").value);
     $("budget-val").textContent = v >= 200 ? "Sans limite" : `${v} €`;
-  });
+  }, { passive: true });
 
-  // Géolocalisation
   $("btn-locate").addEventListener("click", locateMe);
-
-  // Lancer la découverte
   $("btn-discover").addEventListener("click", startDiscovery);
+
+  $("btn-reset-all").addEventListener("click", () => {
+    if (!window.confirm("Tout effacer et recommencer une nouvelle escapade ?")) return;
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(LEGACY_KEY);
+      localStorage.removeItem(IMG_CACHE_KEY);
+      localStorage.removeItem(DETAIL_CACHE_KEY);
+    } catch { /* ignore */ }
+    window.location.reload();
+  });
 }
 
 function locateMe() {
@@ -647,7 +990,6 @@ function locateMe() {
   );
 }
 
-/* Lit les filtres du formulaire d'accueil dans l'état */
 function readHomeForm() {
   const cats = [...document.querySelectorAll('#cat-chips .chip[aria-pressed="true"]')]
     .map((b) => b.dataset.cat);
@@ -684,7 +1026,6 @@ async function startDiscovery() {
   }
 }
 
-/* Construit le corps "generate" et retourne les activités (ou null si no_key) */
 async function fetchActivities(count) {
   const filters = {};
   if (state.filters.categories.length) filters.categories = state.filters.categories;
@@ -713,24 +1054,116 @@ function allSeenTitles() {
 }
 
 /* ===========================================================================
- * ÉCRAN B — DECK DE SWIPE
+ * IMAGES — chaîne de résolution à 4 niveaux, cache localStorage (clé = titre)
+ *   a) REST summary fr.wikipedia.org   b) idem en.wikipedia.org
+ *   c) géosearch MediaWiki (lat/lng)   d) dégradé catégorie + emoji (CSS)
+ * =========================================================================== */
+async function wikiSummaryThumb(lang, title) {
+  try {
+    const r = await fetch(
+      `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+      { signal: timeoutSignal(6000) }
+    );
+    if (!r.ok) return null;
+    const j = await r.json();
+    return (j && j.thumbnail && j.thumbnail.source) || null;
+  } catch { return null; }
+}
+
+async function geoSearchThumb(lat, lng) {
+  try {
+    const u = "https://fr.wikipedia.org/w/api.php?action=query&generator=geosearch" +
+      `&ggscoord=${encodeURIComponent(lat)}%7C${encodeURIComponent(lng)}` +
+      "&ggsradius=300&ggslimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=640&format=json&origin=*";
+    const r = await fetch(u, { signal: timeoutSignal(6000) });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const pages = j && j.query && j.query.pages;
+    if (!pages) return null;
+    for (const p of Object.values(pages)) {
+      if (p && p.thumbnail && p.thumbnail.source) return p.thumbnail.source;
+    }
+    return null;
+  } catch { return null; }
+}
+
+const imgResolving = new Map();   // title → Promise en cours (dédoublonnage)
+function resolveImageUrl(a) {
+  const key = String(a.title || "");
+  if (!key) return Promise.resolve(null);
+  if (key in imgCache) return Promise.resolve(imgCache[key] || null);
+  if (imgResolving.has(key)) return imgResolving.get(key);
+  const p = (async () => {
+    let url = null;
+    if (a.wikipedia_title) {
+      url = await wikiSummaryThumb("fr", a.wikipedia_title);
+      if (!url) url = await wikiSummaryThumb("en", a.wikipedia_title);
+    }
+    if (!url && validCoord(a.lat, a.lng)) url = await geoSearchThumb(a.lat, a.lng);
+    imgCache[key] = url || "";
+    saveImgCache();
+    imgResolving.delete(key);
+    return url;
+  })();
+  imgResolving.set(key, p);
+  return p;
+}
+
+/* Applique l'image sur une carte : skeleton shimmer → fondu à l'apparition */
+function loadCardImage(card, a) {
+  const box = card.querySelector(".card-img");
+  const photo = card.querySelector(".card-photo");
+  if (!box || !photo) return;
+  box.classList.add("loading");
+  resolveImageUrl(a).then((url) => {
+    if (!url) { box.classList.remove("loading"); return; }
+    photo.onload = () => {
+      photo.classList.add("loaded");
+      box.classList.remove("loading");
+      const emoji = box.querySelector(".fallback-emoji");
+      if (emoji) emoji.style.visibility = "hidden";
+    };
+    photo.onerror = () => { box.classList.remove("loading"); };
+    photo.src = url;
+  });
+}
+
+/* Préchargement des images des 2 cartes suivantes */
+function preloadNextImages() {
+  for (const a of state.deck.slice(1, 3)) {
+    resolveImageUrl(a).then((url) => {
+      if (!url) return;
+      const im = new Image();
+      im.decoding = "async";
+      im.src = url;
+    });
+  }
+}
+
+/* ===========================================================================
+ * ÉCRAN B — DECK DE SWIPE (max 3 cartes montées dans le DOM)
  * =========================================================================== */
 function renderDeck() {
   $("deck-place-name").textContent = state.placeName || state.place || "Autour de vous";
   const stack = $("stack");
   stack.innerHTML = "";
+  swiping = false;
 
   if (state.deck.length === 0) {
+    const hasCatFilter = state.filters.categories.length > 0;
     stack.innerHTML = `
       <div class="empty-deck">
         <div class="big">🧭</div>
         <p>Plus de cartes pour le moment.</p>
         <button class="btn btn-ghost" id="btn-more-cards" style="max-width:260px" aria-label="Chercher d'autres idées">Chercher d'autres idées</button>
+        ${hasCatFilter ? '<button class="btn btn-sand" id="btn-widen" style="max-width:260px" aria-label="Élargir la recherche à toutes les catégories">✨ Élargir la recherche</button>' : ""}
       </div>`;
     const more = $("btn-more-cards");
     if (more) more.addEventListener("click", () => fetchMore(true));
+    const widen = $("btn-widen");
+    if (widen) widen.addEventListener("click", widenSearch);
   } else {
-    // Les 3 premières cartes : dessus + 2 aperçus décalés derrière
+    /* Recyclage : seules les 3 premières cartes sont montées */
     const visible = state.deck.slice(0, 3);
     for (let i = visible.length - 1; i >= 0; i--) {
       const card = buildCard(visible[i]);
@@ -738,9 +1171,19 @@ function renderDeck() {
       else card.classList.add(`behind-${i}`);
       stack.appendChild(card);
     }
+    preloadNextImages();
   }
   updateCounter();
   saveState();
+}
+
+/* Relance la découverte sans filtre de catégories */
+async function widenSearch() {
+  state.filters.categories = [];
+  document.querySelectorAll("#cat-chips .chip").forEach((b) => b.setAttribute("aria-pressed", "false"));
+  saveState();
+  showToast("Recherche élargie à toutes les envies ✨");
+  fetchMore(true);
 }
 
 function buildCard(a) {
@@ -752,7 +1195,12 @@ function buildCard(a) {
     <div class="verdict like">GARDER ♥</div>
     <div class="verdict nope">PASSER ✕</div>
     <div class="verdict maybe">À VOIR 🤔</div>
-    <div class="card-img ${gradClass}"><span>${esc(a.emoji || cat.emoji)}</span><span class="badge">${cat.emoji} ${esc(cat.label)}</span></div>
+    <div class="card-img ${gradClass}">
+      <img class="card-photo" alt="" decoding="async" draggable="false">
+      <span class="fallback-emoji">${esc(a.emoji || cat.emoji)}</span>
+      <span class="badge">${cat.emoji} ${esc(cat.label)}</span>
+      <button class="card-info" aria-label="Voir la fiche détaillée">ℹ️</button>
+    </div>
     <div class="card-body">
       <h3 class="card-title">${esc(a.title)}</h3>
       <p class="card-desc">${esc(a.description || "")}</p>
@@ -765,54 +1213,53 @@ function buildCard(a) {
         ${a.best_time ? `<span class="kpi">🕐 ${esc(a.best_time)}</span>` : ""}
       </div>
     </div>`;
-  loadWikiImage(card, a);
+  card.querySelector(".card-info").addEventListener("click", (e) => {
+    e.stopPropagation();
+    openDetail(a);
+  });
+  loadCardImage(card, a);
   return card;
 }
 
-/* Image Wikipédia FR (thumbnail) ; en cas d'échec on garde le dégradé + emoji */
-function loadWikiImage(card, a) {
-  if (!a.wikipedia_title) return;
-  const url = `https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(a.wikipedia_title)}`;
-  fetch(url)
-    .then((r) => (r.ok ? r.json() : null))
-    .then((json) => {
-      const src = json && json.thumbnail && json.thumbnail.source;
-      if (!src) return;
-      const img = new Image();
-      img.onload = () => {
-        const box = card.querySelector(".card-img");
-        box.style.backgroundImage = `url("${src}")`;
-        const emoji = box.querySelector("span:not(.badge)");
-        if (emoji) emoji.style.display = "none";
-      };
-      img.src = src;
-    })
-    .catch(() => { /* fallback dégradé conservé */ });
-}
-
-/* --- Gestes : drag tactile + souris via Pointer Events --------------------- */
+/* --- Gestes : drag via Pointer Events, transform en requestAnimationFrame --- */
 const SWIPE_THRESHOLD = 90;
+let dragging = null;
+let dragRaf = false;
+
+function applyDragFrame() {
+  dragRaf = false;
+  if (!dragging) return;
+  const { card, dx, dy, vLike, vNope, vMaybe } = dragging;
+  card.style.transform = `translate3d(${dx}px, ${dy}px, 0) rotate(${dx * 0.07}deg)`;
+  const upward = dy < 0 && Math.abs(dy) > Math.abs(dx);
+  vLike.style.opacity = !upward && dx > 30 ? Math.min(1, dx / 120) : 0;
+  vNope.style.opacity = !upward && dx < -30 ? Math.min(1, -dx / 120) : 0;
+  vMaybe.style.opacity = upward && dy < -30 ? Math.min(1, -dy / 120) : 0;
+}
 
 function attachDrag(card) {
   card.addEventListener("pointerdown", (e) => {
     if (e.button !== undefined && e.button !== 0) return;
-    dragging = { card, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0 };
-    card.setPointerCapture(e.pointerId);
+    if (e.target.closest(".card-info")) return;
+    dragging = {
+      card, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0,
+      vLike: card.querySelector(".verdict.like"),
+      vNope: card.querySelector(".verdict.nope"),
+      vMaybe: card.querySelector(".verdict.maybe"),
+    };
+    try { card.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     card.classList.remove("spring");
-  });
+  }, { passive: true });
+
+  /* Non passif volontairement : geste de drag (le seul listener non passif) */
   card.addEventListener("pointermove", (e) => {
     if (!dragging || dragging.card !== card) return;
     dragging.dx = e.clientX - dragging.startX;
     dragging.dy = e.clientY - dragging.startY;
-    const { dx, dy } = dragging;
-    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * 0.07}deg)`;
-    // Overlays selon la direction dominante
-    const upward = dy < 0 && Math.abs(dy) > Math.abs(dx);
-    card.querySelector(".verdict.like").style.opacity = !upward && dx > 30 ? Math.min(1, dx / 120) : 0;
-    card.querySelector(".verdict.nope").style.opacity = !upward && dx < -30 ? Math.min(1, -dx / 120) : 0;
-    card.querySelector(".verdict.maybe").style.opacity = upward && dy < -30 ? Math.min(1, -dy / 120) : 0;
+    if (!dragRaf) { dragRaf = true; requestAnimationFrame(applyDragFrame); }
   });
-  const end = (e) => {
+
+  const end = () => {
     if (!dragging || dragging.card !== card) return;
     const { dx, dy } = dragging;
     dragging = null;
@@ -826,20 +1273,23 @@ function attachDrag(card) {
       card.querySelectorAll(".verdict").forEach((v) => (v.style.opacity = 0));
     }
   };
-  card.addEventListener("pointerup", end);
-  card.addEventListener("pointercancel", end);
+  card.addEventListener("pointerup", end, { passive: true });
+  card.addEventListener("pointercancel", end, { passive: true });
 }
 
 /* Applique un verdict à la carte du dessus, anime sa sortie, ré-empile */
 function swipe(verdict) {
+  if (swiping) return;
   const activity = state.deck[0];
   if (!activity) return;
+  swiping = true;
+  haptic();
   const top = document.querySelector(".card.top");
   if (top) {
     top.classList.add("leaving");
-    const out = verdict === "like" ? "translate(120vw, -30px) rotate(22deg)"
-      : verdict === "nope" ? "translate(-120vw, -30px) rotate(-22deg)"
-      : "translate(0, -120vh) rotate(4deg)";
+    const out = verdict === "like" ? "translate3d(120vw, -30px, 0) rotate(22deg)"
+      : verdict === "nope" ? "translate3d(-120vw, -30px, 0) rotate(-22deg)"
+      : "translate3d(0, -120vh, 0) rotate(4deg)";
     top.style.transform = out;
     top.style.opacity = "0";
   }
@@ -850,8 +1300,7 @@ function swipe(verdict) {
   state.history.push({ activity, verdict });
   if (state.history.length > 30) state.history.shift();
 
-  // Laisse l'animation de sortie se jouer avant de re-rendre la pile
-  setTimeout(renderDeck, 220);
+  setTimeout(renderDeck, 200);
   maybeFetchMore();
 }
 
@@ -866,13 +1315,23 @@ function undoSwipe() {
   renderDeck();
 }
 
+let lastCounts = { liked: -1, maybe: -1 };
 function updateCounter() {
-  $("count-liked").textContent = state.liked.length;
-  $("count-maybe").textContent = state.maybe.length;
+  const bump = (id, val, key) => {
+    const el = $(id);
+    el.textContent = val;
+    if (lastCounts[key] !== -1 && lastCounts[key] !== val) {
+      el.classList.remove("bump");
+      void el.offsetWidth; // reflow pour relancer l'animation
+      el.classList.add("bump");
+    }
+    lastCounts[key] = val;
+  };
+  bump("count-liked", state.liked.length, "liked");
+  bump("count-maybe", state.maybe.length, "maybe");
   $("btn-to-selection").hidden = state.liked.length < 1;
 }
 
-/* Recharge automatique quand il reste ≤ 2 cartes */
 function maybeFetchMore() {
   if (state.deck.length <= 2) fetchMore(false);
 }
@@ -906,10 +1365,21 @@ function initDeck() {
   $("btn-undo").addEventListener("click", undoSwipe);
   $("btn-deck-home").addEventListener("click", () => showScreen("screen-home"));
   $("btn-to-selection").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
+
+  /* Flèches clavier ←/→/↑ + U (undo) sur desktop */
+  document.addEventListener("keydown", (e) => {
+    if (!$("screen-deck").classList.contains("active")) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
+    if (e.key === "ArrowLeft") { e.preventDefault(); swipe("nope"); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); swipe("like"); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); swipe("maybe"); }
+    else if (e.key === "u" || e.key === "U") { undoSwipe(); }
+  });
 }
 
 /* ===========================================================================
- * ÉCRAN C — SÉLECTION
+ * ÉCRAN C — SÉLECTION (durées modifiables, fiches, trajets)
  * =========================================================================== */
 function renderSelection() {
   renderSelList("list-liked", state.liked, "liked");
@@ -917,6 +1387,7 @@ function renderSelection() {
   $("sel-liked-count").textContent = `(${state.liked.length})`;
   $("sel-maybe-count").textContent = `(${state.maybe.length})`;
   $("btn-to-plan").disabled = state.liked.length === 0;
+  refineTravelChips(state.liked, "sel-travel-");
   saveState();
 }
 
@@ -929,35 +1400,58 @@ function renderSelList(elId, items, kind) {
   el.innerHTML = items.map((a, i) => {
     const cat = CATS[a.category] || { emoji: "✍️", label: a.category || "Perso" };
     const moveBtn = kind === "liked"
-      ? `<button class="mini-btn" data-act="demote" data-i="${i}" aria-label="Rétrograder en balance" title="Mettre en balance">🤔</button>`
-      : `<button class="mini-btn" data-act="promote" data-i="${i}" aria-label="Promouvoir dans la sélection" title="Ajouter à la sélection">♥</button>`;
+      ? `<button class="mini-btn" data-act="demote" aria-label="Rétrograder en balance" title="Mettre en balance">🤔</button>`
+      : `<button class="mini-btn" data-act="promote" aria-label="Promouvoir dans la sélection" title="Ajouter à la sélection">♥</button>`;
+    /* Chip de trajet vers l'item suivant (liste ♥ uniquement) */
+    let travel = "";
+    if (kind === "liked" && i < items.length - 1) {
+      const t = estimateTravel(a, items[i + 1]);
+      if (t) travel = `<div class="travel-chip"><span id="sel-travel-${i}">${travelLabel(t)}</span></div>`;
+    }
     return `
-      <div class="sel-item">
+      <div class="sel-item" data-kind="${kind}" data-i="${i}">
         <span class="sel-emoji">${esc(a.emoji || cat.emoji)}</span>
         <div class="sel-info">
           <b>${esc(a.title)}</b>
-          <span>${cat.emoji} ${esc(cat.label)} · ⏱ ${fmtDuration(a.est_duration_min)} · 💶 ${fmtCost(a.est_cost_eur)}</span>
+          <span>${cat.emoji} ${esc(cat.label)} · 💶 ${fmtCost(a.est_cost_eur)}</span>
+          <div class="dur-step">
+            <button class="mini-btn" data-act="dur-minus" aria-label="15 minutes de moins">−</button>
+            <span class="dur-val">⏱ ${fmtDuration(a.est_duration_min)}</span>
+            <button class="mini-btn" data-act="dur-plus" aria-label="15 minutes de plus">+</button>
+          </div>
         </div>
-        <div class="sel-acts" data-kind="${kind}">
+        <div class="sel-acts">
+          <button class="mini-btn" data-act="detail" aria-label="Voir la fiche détaillée" title="Détails">ℹ️</button>
           ${moveBtn}
-          <button class="mini-btn" data-act="remove" data-i="${i}" aria-label="Supprimer cette activité" title="Supprimer">🗑</button>
+          <button class="mini-btn" data-act="remove" aria-label="Supprimer cette activité" title="Supprimer">🗑</button>
         </div>
-      </div>`;
+      </div>${travel}`;
   }).join("");
 }
 
 function handleSelAction(e) {
   const btn = e.target.closest(".mini-btn");
   if (!btn) return;
-  const kind = btn.closest(".sel-acts").dataset.kind;
-  const i = Number(btn.dataset.i);
+  const wrap = btn.closest(".sel-item");
+  if (!wrap) return;
+  const kind = wrap.dataset.kind;
+  const i = Number(wrap.dataset.i);
   const src = kind === "liked" ? state.liked : state.maybe;
-  const [item] = src.splice(i, 1);
+  const item = src[i];
   if (!item) return;
   const act = btn.dataset.act;
+
+  if (act === "dur-minus" || act === "dur-plus") {
+    item.est_duration_min = stepDur(item.est_duration_min, act === "dur-plus" ? 15 : -15);
+    renderSelection();
+    return;
+  }
+  if (act === "detail") { openDetail(item); return; }
+
+  src.splice(i, 1);
   if (act === "demote") state.maybe.push(item);
   if (act === "promote") state.liked.push(item);
-  // "remove" : rien à faire, l'item est déjà retiré
+  /* "remove" : rien à faire, l'item est déjà retiré */
   renderSelection();
   updateCounter();
 }
@@ -966,8 +1460,8 @@ function initSelection() {
   $("list-liked").addEventListener("click", handleSelAction);
   $("list-maybe").addEventListener("click", handleSelAction);
   $("btn-sel-back").addEventListener("click", () => { renderDeck(); showScreen("screen-deck"); });
+  $("btn-sel-map").addEventListener("click", () => openMap("screen-selection"));
 
-  // Formulaire d'activité personnalisée
   const catSelect = $("custom-cat");
   catSelect.innerHTML = Object.entries(CATS).map(([k, c]) =>
     `<option value="${k}">${c.emoji} ${c.label}</option>`).join("");
@@ -983,7 +1477,7 @@ function initSelection() {
       title,
       category: catSelect.value,
       description: $("custom-note").value.trim(),
-      est_duration_min: Math.max(10, Number($("custom-duration").value) || 60),
+      est_duration_min: clampDur($("custom-duration").value),
       est_cost_eur: Math.max(0, Number($("custom-cost").value) || 0),
       distance_km: 0, rating: null, popularity: null,
       best_time: "après-midi", lat: state.lat, lng: state.lng,
@@ -1003,13 +1497,204 @@ function initSelection() {
 }
 
 /* ===========================================================================
- * ÉCRAN D — PLANNING
+ * FICHE DÉTAILS — bottom-sheet, action API "detail", cache par titre
  * =========================================================================== */
+let sheetActivity = null;
+
+function openSheet() {
+  $("sheet-backdrop").classList.add("on");
+  const sh = $("sheet");
+  sh.classList.remove("dragging");
+  sh.style.transform = "";
+  sh.classList.add("on");
+}
+function closeSheet() {
+  $("sheet-backdrop").classList.remove("on");
+  const sh = $("sheet");
+  sh.classList.remove("dragging");
+  sh.style.transform = "";
+  sh.classList.remove("on");
+  sheetActivity = null;
+}
+
+async function openDetail(a) {
+  sheetActivity = a;
+  $("sheet-title").textContent = `${a.emoji || "📍"} ${a.title}`;
+  const body = $("sheet-body");
+  const key = String(a.title || "");
+
+  if (detailCache[key]) {
+    body.innerHTML = detailHTML(detailCache[key]);
+    openSheet();
+    return;
+  }
+  body.innerHTML = `<div class="sheet-loading"><span class="spinner"></span> L'expert local rédige la fiche...</div>`;
+  openSheet();
+  try {
+    const json = await apiCall({
+      action: "detail",
+      title: a.title,
+      place: state.placeName || state.place || "",
+      category: a.category || "",
+    });
+    if (!json) { closeSheet(); return; } // no_key
+    detailCache[key] = json;
+    saveDetailCache();
+    if (sheetActivity && sheetActivity.title === a.title) {
+      body.innerHTML = detailHTML(json);
+    }
+  } catch {
+    if (sheetActivity && sheetActivity.title === a.title) {
+      body.innerHTML = `<p class="detail-row"><span class="d-ico">📡</span><span class="d-txt">Fiche indisponible pour le moment. Réessayez plus tard.</span></p>`;
+    }
+  }
+}
+
+function detailHTML(d) {
+  const row = (ico, txt) => txt ? `<div class="detail-row"><span class="d-ico">${ico}</span><span class="d-txt">${esc(txt)}</span></div>` : "";
+  const tips = Array.isArray(d.tips) && d.tips.length
+    ? `<ul class="detail-tips">${d.tips.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>`
+    : "";
+  const durBtn = Number(d.ideal_duration_min) > 0
+    ? `<button class="btn btn-sand" id="btn-apply-duration" style="margin-top:12px" aria-label="Appliquer la durée conseillée">⏱ Appliquer la durée conseillée (${fmtDuration(d.ideal_duration_min)})</button>`
+    : "";
+  return `
+    ${d.why_go ? `<p class="detail-why">${esc(d.why_go)}</p>` : ""}
+    ${row("📍", d.address_hint)}
+    ${row("🕐", d.hours_hint)}
+    ${row("💶", d.price_hint)}
+    ${row("🎫", d.booking_hint)}
+    ${tips}
+    ${durBtn}`;
+}
+
+function applyIdealDuration() {
+  if (!sheetActivity) return;
+  const d = detailCache[String(sheetActivity.title || "")];
+  if (!d || !(Number(d.ideal_duration_min) > 0)) return;
+  const min = clampDur(d.ideal_duration_min);
+  const title = sheetActivity.title;
+  for (const list of [state.liked, state.maybe, state.deck]) {
+    for (const a of list) {
+      if (a.title === title) a.est_duration_min = min;
+    }
+  }
+  saveState();
+  if ($("screen-selection").classList.contains("active")) renderSelection();
+  showToast(`Durée appliquée : ${fmtDuration(min)} ⏱`);
+}
+
+function initSheet() {
+  $("sheet-close").addEventListener("click", closeSheet);
+  $("sheet-backdrop").addEventListener("click", closeSheet);
+  $("sheet-body").addEventListener("click", (e) => {
+    if (e.target.closest("#btn-apply-duration")) applyIdealDuration();
+  });
+
+  /* Fermeture par glisser vers le bas (poignée + entête) */
+  let sheetDrag = null;
+  const sh = $("sheet");
+  const startDrag = (e) => {
+    sheetDrag = { startY: e.clientY, dy: 0 };
+    sh.classList.add("dragging");
+    try { sh.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+  };
+  $("sheet-grip").addEventListener("pointerdown", startDrag, { passive: true });
+  sh.addEventListener("pointermove", (e) => {
+    if (!sheetDrag) return;
+    sheetDrag.dy = Math.max(0, e.clientY - sheetDrag.startY);
+    sh.style.transform = `translate3d(0, ${sheetDrag.dy}px, 0)`;
+  }, { passive: true });
+  const endDrag = () => {
+    if (!sheetDrag) return;
+    const dy = sheetDrag.dy;
+    sheetDrag = null;
+    sh.classList.remove("dragging");
+    if (dy > 90) closeSheet();
+    else sh.style.transform = "";
+  };
+  sh.addEventListener("pointerup", endDrag, { passive: true });
+  sh.addEventListener("pointercancel", endDrag, { passive: true });
+}
+
+/* ===========================================================================
+ * MÉTÉO — Open-Meteo, gratuit sans clé, timeout 5 s, repli silencieux
+ * =========================================================================== */
+let weatherData = null;   // { "YYYY-MM-DD": {code,tmax,tmin} }
+let weatherKey = "";
+
+function refCoords() {
+  if (validCoord(state.lat, state.lng)) return { lat: state.lat, lng: state.lng };
+  for (const a of [...state.liked, ...state.maybe]) {
+    if (validCoord(a.lat, a.lng)) return { lat: Number(a.lat), lng: Number(a.lng) };
+  }
+  return null;
+}
+
+async function ensureWeather() {
+  const c = refCoords();
+  if (!c) return false;
+  const key = `${c.lat.toFixed(2)},${c.lng.toFixed(2)}`;
+  if (weatherKey === key && weatherData) return false;
+  try {
+    const r = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}` +
+      "&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=16",
+      { signal: timeoutSignal(5000) }
+    );
+    if (!r.ok) return false;
+    const j = await r.json();
+    if (j && j.daily && Array.isArray(j.daily.time)) {
+      const data = {};
+      j.daily.time.forEach((d, i) => {
+        data[d] = {
+          code: Number(j.daily.weathercode[i]),
+          tmax: Number(j.daily.temperature_2m_max[i]),
+          tmin: Number(j.daily.temperature_2m_min[i]),
+        };
+      });
+      weatherData = data;
+      weatherKey = key;
+      return true;
+    }
+  } catch { /* repli silencieux */ }
+  return false;
+}
+
+function weatherEmoji(code) {
+  const c = Number(code);
+  if (c === 0) return "☀️";
+  if (c === 1 || c === 2) return "🌤";
+  if (c === 3) return "☁️";
+  if (c === 45 || c === 48) return "🌫";
+  if (c >= 51 && c <= 67) return "🌧";
+  if (c >= 71 && c <= 77) return "🌨";
+  if (c >= 80 && c <= 82) return "🌦";
+  if (c >= 95) return "⛈";
+  return "🌤";
+}
+function isRainy(code) {
+  const c = Number(code);
+  return (c >= 51 && c <= 67) || (c >= 80 && c <= 82) || c >= 95;
+}
+
+/* ===========================================================================
+ * ÉCRAN D — PLANNING (durées éditables, météo, budget, exports)
+ * =========================================================================== */
+function findActivityByTitle(title) {
+  for (const list of [state.liked, state.maybe, state.deck]) {
+    for (const a of list) if (a.title === title) return a;
+  }
+  return null;
+}
+
 function renderPlanConfig() {
   $("days-val").textContent = state.days;
+  const sd = $("start-date");
+  sd.min = todayISO(0);
+  sd.value = state.startDate || todayISO(1);
   document.querySelectorAll(".pace-btn").forEach((b) =>
     b.setAttribute("aria-pressed", String(b.dataset.pace === state.pace)));
-  // Si un plan existe déjà, on le ré-affiche
   if (state.plan) renderPlanResult();
   else { $("plan-result").hidden = true; $("plan-subtitle").textContent = "Choisissez la durée et le rythme"; }
 }
@@ -1017,7 +1702,7 @@ function renderPlanConfig() {
 async function generatePlan() {
   const activities = state.liked.map((a) => ({
     title: a.title, category: a.category,
-    est_duration_min: Number(a.est_duration_min) || 60,
+    est_duration_min: clampDur(a.est_duration_min),
     est_cost_eur: Number(a.est_cost_eur) || 0,
     distance_km: Number(a.distance_km) || 0,
     best_time: a.best_time || "après-midi",
@@ -1029,6 +1714,7 @@ async function generatePlan() {
   $("plan-config").hidden = true;
   $("plan-result").hidden = true;
   $("plan-loading").classList.add("on");
+  const weatherP = ensureWeather();   // en parallèle du LLM, best-effort
   try {
     const json = await apiCall({
       action: "plan",
@@ -1041,6 +1727,7 @@ async function generatePlan() {
     if (!json) return; // no_key
     state.plan = { days: json.days || [], tips: json.tips || [] };
     saveState();
+    try { await weatherP; } catch { /* ignore */ }
     renderPlanResult();
   } catch (err) {
     showError("La génération du planning a échoué : " + err.message, () => { showScreen("screen-plan"); generatePlan(); });
@@ -1050,58 +1737,155 @@ async function generatePlan() {
   }
 }
 
+function dayDateISO(i) { return addDaysISO(state.startDate || todayISO(1), i); }
+
+function fmtDayDate(iso) {
+  const parts = String(iso).split("-").map(Number);
+  if (parts.length !== 3) return "";
+  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+  try {
+    return d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+  } catch { return iso; }
+}
+
+let weatherRefreshPending = false;
 function renderPlanResult() {
   const plan = state.plan;
   if (!plan) return;
   $("plan-subtitle").textContent = `${state.placeName || state.place} · ${state.days} jour(s)`;
   const wrap = $("plan-days");
-  wrap.innerHTML = (plan.days || []).map((day) => {
+  let totalCost = 0;
+  const dayCosts = [];
+
+  wrap.innerHTML = (plan.days || []).map((day, d) => {
+    const dateISO = dayDateISO(d);
+    const wx = weatherData ? weatherData[dateISO] : null;
+    let dayCost = 0, dayMin = 0;
+    let hasOutdoor = false;
+
     const items = (day.items || []).map((it, i, arr) => {
-      const travel = Number(it.travel_after_min) > 0 && i < arr.length - 1
-        ? `<div class="tl-travel">🚶 ${Math.round(it.travel_after_min)} min de trajet${it.travel_mode ? ` (${esc(it.travel_mode)})` : ""}</div>`
-        : "";
+      const act = findActivityByTitle(it.title);
+      if (act) {
+        dayCost += Number(act.est_cost_eur) || 0;
+        if (OUTDOOR_CATS.has(act.category)) hasOutdoor = true;
+      }
+      dayMin += Number(it.duration_min) || 0;
+
+      /* Trajet : fourni par le LLM, sinon estimation locale (fallback) */
+      let travel = "";
+      if (i < arr.length - 1) {
+        if (Number(it.travel_after_min) > 0) {
+          travel = `<div class="tl-travel">🚶 ${Math.round(it.travel_after_min)} min de trajet${it.travel_mode ? ` (${esc(it.travel_mode)})` : ""}</div>`;
+        } else {
+          const next = findActivityByTitle(arr[i + 1].title);
+          const t = act && next ? estimateTravel(act, next) : null;
+          if (t) travel = `<div class="tl-travel">≈ <span id="plan-travel-${d}-${i}">${travelLabel(t)}</span> de trajet</div>`;
+        }
+      }
       return `
         <div class="tl-item">
           <div class="tl-time">${esc(it.time || "")}</div>
           <div class="tl-body">
-            <b>${esc(it.emoji || "📍")} ${esc(it.title || "")}</b><span class="dur">⏱ ${fmtDuration(it.duration_min)}</span>
+            <b>${esc(it.emoji || "📍")} ${esc(it.title || "")}</b>
+            <div class="dur-step">
+              <button class="mini-btn" data-plan-dur="minus" data-d="${d}" data-i="${i}" aria-label="15 minutes de moins">−</button>
+              <span class="dur-val">${fmtDuration(it.duration_min)}</span>
+              <button class="mini-btn" data-plan-dur="plus" data-d="${d}" data-i="${i}" aria-label="15 minutes de plus">+</button>
+            </div>
             ${it.note ? `<p>${esc(it.note)}</p>` : ""}
           </div>
         </div>${travel}`;
     }).join("");
-    return `<div class="plan-day"><h3>${esc(day.label || "Jour")}</h3>${items}</div>`;
+
+    totalCost += dayCost;
+    dayCosts.push(dayCost);
+    const wxTxt = wx ? ` · ${weatherEmoji(wx.code)} ${Math.round(wx.tmax)}° / ${Math.round(wx.tmin)}°` : "";
+    const rainTip = (wx && isRainy(wx.code) && hasOutdoor)
+      ? `<p class="rain-tip">🌧 Pluie annoncée ce jour-là : prévoyez un plan B pour les activités en plein air (nature, panorama, sport).</p>`
+      : "";
+    return `<div class="plan-day">
+      <h3>${esc(day.label || "Jour")} <span class="day-meta">${esc(fmtDayDate(dateISO))}${wxTxt} · ⏱ ${fmtDuration(dayMin)} · 💶 ${fmtCost(dayCost)}</span></h3>
+      ${rainTip}
+      <div class="day-items">${items}</div>
+    </div>`;
   }).join("");
+
+  /* Budget total du séjour + détail par jour */
+  const bl = $("plan-budget");
+  if (totalCost > 0) {
+    bl.hidden = false;
+    bl.innerHTML = `💶 Budget estimé du séjour : ${Math.round(totalCost)} €` +
+      `<small>${dayCosts.map((c, i) => `Jour ${i + 1} : ${fmtCost(c)}`).join(" · ")}</small>`;
+  } else {
+    bl.hidden = true;
+  }
 
   const tips = plan.tips || [];
   $("tips-panel").hidden = tips.length === 0;
   $("tips-list").innerHTML = tips.map((t) => `<li>${esc(t)}</li>`).join("");
   $("plan-result").hidden = false;
+
+  /* Raffinage OSRM des trajets fallback, jour par jour */
+  (plan.days || []).forEach((day, d) => {
+    const acts = (day.items || []).map((it) => findActivityByTitle(it.title) || { lat: NaN, lng: NaN });
+    refineTravelChips(acts, `plan-travel-${d}-`);
+  });
+
+  /* Météo absente (ex : plan restauré) → fetch puis re-render une fois */
+  if (!weatherData && !weatherRefreshPending) {
+    weatherRefreshPending = true;
+    ensureWeather().then((ok) => {
+      weatherRefreshPending = false;
+      if (ok && state.plan && $("screen-plan").classList.contains("active")) renderPlanResult();
+    });
+  }
 }
 
-/* Copie du programme en texte formaté */
-async function copyPlan() {
+/* Steppers de durée dans le planning (délégation) */
+function handlePlanDurClick(e) {
+  const btn = e.target.closest("[data-plan-dur]");
+  if (!btn || !state.plan) return;
+  const d = Number(btn.dataset.d), i = Number(btn.dataset.i);
+  const day = state.plan.days[d];
+  const it = day && day.items && day.items[i];
+  if (!it) return;
+  const dir = btn.dataset.planDur === "plus" ? 15 : -15;
+  it.duration_min = stepDur(it.duration_min, dir);
+  /* Propage vers l'activité source pour que la régénération envoie la durée éditée */
+  const act = findActivityByTitle(it.title);
+  if (act) act.est_duration_min = it.duration_min;
+  saveState();
+  renderPlanResult();
+}
+
+/* --- Texte du programme (copie + partage) ---------------------------------- */
+function planText() {
   const plan = state.plan;
-  if (!plan) return;
+  if (!plan) return "";
   const lines = [`✈ ESCAPADE — ${state.placeName || state.place}`, ""];
-  for (const day of plan.days || []) {
-    lines.push(`━━ ${day.label || "Jour"} ━━`);
+  (plan.days || []).forEach((day, d) => {
+    lines.push(`━━ ${day.label || "Jour"} (${fmtDayDate(dayDateISO(d))}) ━━`);
     for (const it of day.items || []) {
       lines.push(`${it.time || "--:--"}  ${it.emoji || ""} ${it.title} (${fmtDuration(it.duration_min)})`);
       if (it.note) lines.push(`        ${it.note}`);
       if (Number(it.travel_after_min) > 0) lines.push(`        🚶 ${Math.round(it.travel_after_min)} min de trajet`);
     }
     lines.push("");
-  }
+  });
   if ((plan.tips || []).length) {
     lines.push("💡 Conseils :");
     for (const t of plan.tips) lines.push(`• ${t}`);
   }
-  const text = lines.join("\n");
+  return lines.join("\n");
+}
+
+async function copyPlan() {
+  const text = planText();
+  if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
     showToast("Programme copié 📋");
   } catch {
-    // Fallback : textarea temporaire
     const ta = document.createElement("textarea");
     ta.value = text;
     document.body.appendChild(ta);
@@ -1110,6 +1894,88 @@ async function copyPlan() {
     catch { showToast("Copie impossible"); }
     ta.remove();
   }
+}
+
+async function sharePlan() {
+  const text = planText();
+  if (!text) return;
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: `Escapade — ${state.placeName || state.place}`, text });
+      return;
+    } catch (err) {
+      if (err && err.name === "AbortError") return; // annulé par l'utilisateur
+    }
+  }
+  copyPlan(); // repli : presse-papiers
+}
+
+/* --- Export .ics (un VEVENT par activité du planning) ---------------------- */
+function icsEscape(s) {
+  return String(s ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/\r?\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
+}
+function icsStamp(iso, minutes) {
+  const [y, m, d] = String(iso).split("-");
+  const hh = String(Math.floor(minutes / 60) % 24).padStart(2, "0");
+  const mm = String(Math.round(minutes) % 60).padStart(2, "0");
+  return `${y}${m}${d}T${hh}${mm}00`;
+}
+function parseTimeMin(t) {
+  const m = /^(\d{1,2})[h:](\d{2})?$/.exec(String(t || "").trim());
+  if (!m) return null;
+  const h = Number(m[1]), mn = Number(m[2] || 0);
+  if (h > 23 || mn > 59) return null;
+  return h * 60 + mn;
+}
+
+function downloadICS() {
+  const plan = state.plan;
+  if (!plan || !(plan.days || []).length) return;
+  const now = new Date();
+  const dtstamp = now.toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Escapade v2//FR",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+  ];
+  (plan.days || []).forEach((day, d) => {
+    const dateISO = dayDateISO(d);
+    let cursor = 9 * 60; // 09:00 par défaut si heure manquante
+    (day.items || []).forEach((it, i) => {
+      const t = parseTimeMin(it.time);
+      const start = t != null ? t : cursor;
+      const dur = clampDur(it.duration_min);
+      cursor = start + dur + (Number(it.travel_after_min) > 0 ? Math.round(it.travel_after_min) : 15);
+      lines.push(
+        "BEGIN:VEVENT",
+        `UID:escapade-${dateISO}-${d}-${i}-${Math.random().toString(36).slice(2, 9)}@escapade`,
+        `DTSTAMP:${dtstamp}`,
+        `DTSTART:${icsStamp(dateISO, start)}`,
+        `DTEND:${icsStamp(dateISO, Math.min(start + dur, 23 * 60 + 59))}`,
+        `SUMMARY:${icsEscape(`${it.emoji || "📍"} ${it.title || "Activité"}`)}`,
+        `DESCRIPTION:${icsEscape(it.note || "")}`,
+        `LOCATION:${icsEscape(it.title || "")}`,
+        "END:VEVENT"
+      );
+    });
+  });
+  lines.push("END:VCALENDAR");
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const aEl = document.createElement("a");
+  aEl.href = url;
+  aEl.download = "escapade.ics";
+  document.body.appendChild(aEl);
+  aEl.click();
+  aEl.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  showToast("Fichier calendrier téléchargé 📅");
 }
 
 function initPlan() {
@@ -1123,6 +1989,12 @@ function initPlan() {
     $("days-val").textContent = state.days;
     saveState();
   });
+  $("start-date").addEventListener("change", () => {
+    const v = $("start-date").value;
+    state.startDate = v || todayISO(1);
+    saveState();
+    if (state.plan && !$("plan-result").hidden) renderPlanResult();
+  });
   document.querySelectorAll(".pace-btn").forEach((b) =>
     b.addEventListener("click", () => {
       state.pace = b.dataset.pace;
@@ -1133,8 +2005,248 @@ function initPlan() {
   $("btn-generate-plan").addEventListener("click", generatePlan);
   $("btn-replan").addEventListener("click", generatePlan);
   $("btn-copy-plan").addEventListener("click", copyPlan);
+  $("btn-share-plan").addEventListener("click", sharePlan);
+  $("btn-ics").addEventListener("click", downloadICS);
+  $("btn-plan-map").addEventListener("click", () => openMap("screen-plan"));
+  $("plan-days").addEventListener("click", handlePlanDurClick);
   $("btn-plan-back").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
   $("btn-edit-selection").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
+}
+
+/* ===========================================================================
+ * ÉCRAN E — CARTE PANORAMIQUE (tuiles OSM en pur JS, Web Mercator)
+ * =========================================================================== */
+const TILE = 256;
+const mapView = {
+  z: 13, cx: 0, cy: 0,          // centre en pixels-monde au zoom z
+  points: [],                    // activités affichées (ordonnées)
+  from: "screen-selection",      // écran d'origine (retour)
+  includeMaybe: false,
+};
+
+function lngToWorldX(lng, z) { return ((Number(lng) + 180) / 360) * TILE * Math.pow(2, z); }
+function latToWorldY(lat, z) {
+  const s = Math.min(Math.max(Math.sin((Number(lat) * Math.PI) / 180), -0.9999), 0.9999);
+  return (0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)) * TILE * Math.pow(2, z);
+}
+
+function orderedPlanActivities() {
+  const seen = new Set();
+  const out = [];
+  for (const day of (state.plan && state.plan.days) || []) {
+    for (const it of day.items || []) {
+      const a = findActivityByTitle(it.title);
+      if (a && !seen.has(a.title)) { seen.add(a.title); out.push(a); }
+    }
+  }
+  return out;
+}
+
+function collectMapPoints() {
+  let acts;
+  if (mapView.from === "screen-plan" && state.plan) {
+    acts = orderedPlanActivities();
+  } else {
+    acts = [...state.liked];
+    if (mapView.includeMaybe) acts = acts.concat(state.maybe);
+  }
+  return acts.filter((a) => validCoord(a.lat, a.lng));
+}
+
+function fitMapToPoints() {
+  const wrap = $("map-wrap");
+  const w = wrap.clientWidth || 320, h = wrap.clientHeight || 400;
+  const pts = mapView.points;
+  let z = 15;
+  if (pts.length > 1) {
+    for (z = 18; z > 3; z--) {
+      const xs = pts.map((p) => lngToWorldX(p.lng, z));
+      const ys = pts.map((p) => latToWorldY(p.lat, z));
+      if (Math.max(...xs) - Math.min(...xs) <= w - 70 &&
+          Math.max(...ys) - Math.min(...ys) <= h - 70) break;
+    }
+  }
+  mapView.z = Math.min(18, Math.max(3, z));
+  const xs = pts.map((p) => lngToWorldX(p.lng, mapView.z));
+  const ys = pts.map((p) => latToWorldY(p.lat, mapView.z));
+  mapView.cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+  mapView.cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+}
+
+function renderMap() {
+  const wrap = $("map-wrap"), world = $("map-world");
+  const w = wrap.clientWidth || 320, h = wrap.clientHeight || 400;
+  const z = mapView.z, n = Math.pow(2, z);
+  const left = mapView.cx - w / 2, top = mapView.cy - h / 2;
+  world.style.transform = "translate3d(0,0,0)";
+
+  let html = "";
+  /* Tuiles visibles + 1 de marge */
+  const x0 = Math.floor(left / TILE) - 1, x1 = Math.floor((left + w) / TILE) + 1;
+  const y0 = Math.max(0, Math.floor(top / TILE) - 1);
+  const y1 = Math.min(n - 1, Math.floor((top + h) / TILE) + 1);
+  for (let ty = y0; ty <= y1; ty++) {
+    for (let tx = x0; tx <= x1; tx++) {
+      const wx = ((tx % n) + n) % n; // wrap horizontal
+      html += `<img class="tile" alt="" decoding="async" loading="lazy" draggable="false" ` +
+        `src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png" ` +
+        `style="left:${tx * TILE - left}px;top:${ty * TILE - top}px">`;
+    }
+  }
+
+  /* Polyline reliant les activités dans l'ordre */
+  const pts = mapView.points.map((p) => ({
+    x: lngToWorldX(p.lng, z) - left,
+    y: latToWorldY(p.lat, z) - top,
+    p,
+  }));
+  if (pts.length > 1) {
+    const path = pts.map((pt) => `${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(" ");
+    html += `<svg class="map-svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">` +
+      `<polyline points="${path}" fill="none" stroke="#ff6b57" stroke-width="3" ` +
+      `stroke-dasharray="7 6" stroke-linecap="round" opacity=".9"/></svg>`;
+  }
+
+  /* Marqueurs : pastille corail numérotée + emoji */
+  pts.forEach((pt, i) => {
+    html += `<button class="map-marker" data-mi="${i}" style="left:${pt.x.toFixed(1)}px;top:${pt.y.toFixed(1)}px" ` +
+      `aria-label="${esc(pt.p.title)}">` +
+      `<span class="m-emoji">${esc(pt.p.emoji || "📍")}</span>` +
+      `<span class="m-num"><i>${i + 1}</i></span></button>`;
+  });
+
+  world.innerHTML = html;
+}
+
+function openMapPopup(i) {
+  const p = mapView.points[i];
+  if (!p) return;
+  const pop = $("map-popup");
+  pop.innerHTML = `
+    <b>${i + 1}. ${esc(p.emoji || "📍")} ${esc(p.title)}</b>
+    <span class="mp-meta">⏱ ${fmtDuration(p.est_duration_min)} · 💶 ${fmtCost(p.est_cost_eur)}</span>
+    <div class="mp-btns">
+      <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${Number(p.lat)},${Number(p.lng)}`)}" target="_blank" rel="noopener">🧭 Itinéraire</a>
+      <button class="mp-close" aria-label="Fermer">✕</button>
+    </div>`;
+  pop.hidden = false;
+}
+
+function renderMapTravels() {
+  const ol = $("map-travels");
+  const pts = mapView.points;
+  if (pts.length < 2) {
+    ol.innerHTML = `<li class="map-empty">Ajoutez au moins deux activités géolocalisées pour voir les trajets.</li>`;
+    return;
+  }
+  ol.innerHTML = pts.slice(0, -1).map((a, i) => {
+    const b = pts[i + 1];
+    const t = estimateTravel(a, b);
+    return `<li><span class="t-num">${i + 1} → ${i + 2}</span>` +
+      `<span>${esc(a.title)} → ${esc(b.title)}</span>` +
+      `<span class="t-time" id="map-travel-${i}">${t ? travelLabel(t) : "—"}</span></li>`;
+  }).join("");
+  refineTravelChips(pts, "map-travel-");
+}
+
+function openMap(from) {
+  mapView.from = from;
+  mapView.points = collectMapPoints();
+  $("map-toggle-maybe").hidden = from === "screen-plan";
+  $("map-toggle-maybe").setAttribute("aria-pressed", String(mapView.includeMaybe));
+  $("map-subtitle").textContent = mapView.points.length
+    ? `${mapView.points.length} activité(s) · ${state.placeName || state.place || ""}`
+    : "Aucune activité géolocalisée";
+  $("map-popup").hidden = true;
+  showScreen("screen-map");
+  if (mapView.points.length === 0) {
+    $("map-world").innerHTML = `<div class="map-empty" style="padding-top:130px">🗺 Aucune coordonnée disponible pour vos activités.</div>`;
+    renderMapTravels();
+    return;
+  }
+  /* Le layout doit être posé pour mesurer le conteneur */
+  requestAnimationFrame(() => {
+    fitMapToPoints();
+    renderMap();
+    renderMapTravels();
+  });
+}
+
+function initMap() {
+  const wrap = $("map-wrap"), world = $("map-world");
+
+  $("btn-map-back").addEventListener("click", () => {
+    if (mapView.from === "screen-plan") { renderPlanConfig(); showScreen("screen-plan"); }
+    else { renderSelection(); showScreen("screen-selection"); }
+  });
+
+  $("map-toggle-maybe").addEventListener("click", () => {
+    mapView.includeMaybe = !mapView.includeMaybe;
+    openMap(mapView.from);
+  });
+
+  const zoomBy = (dz) => {
+    const nz = Math.min(18, Math.max(3, mapView.z + dz));
+    if (nz === mapView.z) return;
+    const f = Math.pow(2, nz - mapView.z);
+    mapView.cx *= f;
+    mapView.cy *= f;
+    mapView.z = nz;
+    $("map-popup").hidden = true;
+    renderMap();
+  };
+  $("map-zoom-in").addEventListener("click", () => zoomBy(1));
+  $("map-zoom-out").addEventListener("click", () => zoomBy(-1));
+  $("map-recenter").addEventListener("click", () => {
+    if (!mapView.points.length) return;
+    fitMapToPoints();
+    $("map-popup").hidden = true;
+    renderMap();
+  });
+
+  /* Tap sur un marqueur → mini-popup ; fermeture via ✕ ou tap sur la carte */
+  world.addEventListener("click", (e) => {
+    const mk = e.target.closest(".map-marker");
+    if (mk) { openMapPopup(Number(mk.dataset.mi)); }
+  });
+  $("map-popup").addEventListener("click", (e) => {
+    if (e.target.closest(".mp-close")) $("map-popup").hidden = true;
+  });
+
+  /* Pan : transform du monde pendant le drag, re-render des tuiles au relâché */
+  let panDrag = null;
+  let panRaf = false;
+  const applyPan = () => {
+    panRaf = false;
+    if (!panDrag) return;
+    world.style.transform = `translate3d(${panDrag.dx}px, ${panDrag.dy}px, 0)`;
+  };
+  wrap.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".map-ctrls, .map-marker, .map-popup, .map-attrib")) return;
+    if (!mapView.points.length) return;
+    panDrag = { id: e.pointerId, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0 };
+    try { wrap.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+  }, { passive: true });
+  wrap.addEventListener("pointermove", (e) => {
+    if (!panDrag || e.pointerId !== panDrag.id) return;
+    panDrag.dx = e.clientX - panDrag.startX;
+    panDrag.dy = e.clientY - panDrag.startY;
+    if (!panRaf) { panRaf = true; requestAnimationFrame(applyPan); }
+  });
+  const endPan = () => {
+    if (!panDrag) return;
+    const { dx, dy } = panDrag;
+    panDrag = null;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      mapView.cx -= dx;
+      mapView.cy -= dy;
+      renderMap();
+    } else {
+      $("map-popup").hidden = true; // simple tap : ferme la popup
+    }
+  };
+  wrap.addEventListener("pointerup", endPan, { passive: true });
+  wrap.addEventListener("pointercancel", endPan, { passive: true });
 }
 
 /* ===========================================================================
@@ -1148,7 +2260,6 @@ function initMisc() {
     if (retryAction) { const fn = retryAction; retryAction = null; fn(); }
   });
 
-  // Proposition de reprise si une session existe
   const saved = loadState();
   const hasProgress = saved && (saved.deck.length || saved.liked.length || saved.maybe.length || saved.plan);
   if (hasProgress) {
@@ -1162,7 +2273,7 @@ function initMisc() {
       updateCounter();
     });
     $("btn-restart").addEventListener("click", () => {
-      localStorage.removeItem(STORAGE_KEY);
+      try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LEGACY_KEY); } catch { /* ignore */ }
       state = defaultState();
       $("resume-banner").hidden = true;
       showToast("Nouvelle escapade ✈");
@@ -1174,7 +2285,9 @@ function initMisc() {
 initHome();
 initDeck();
 initSelection();
+initSheet();
 initPlan();
+initMap();
 initMisc();
 </script>
 </body>

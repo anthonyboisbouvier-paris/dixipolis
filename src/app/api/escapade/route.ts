@@ -3,11 +3,13 @@
  *
  * Route handler POST de l'application Escapade (compagnon de voyage).
  *
- * Deux actions dans le corps JSON :
+ * Trois actions dans le corps JSON :
  *   - "generate" : génère des cartes d'activités réelles autour d'une position
  *     (lat/lng) ou d'un lieu nommé (place), en respectant filtres et exclusions.
  *   - "plan"     : construit un planning jour par jour à partir des activités
  *     retenues (regroupement géographique, best_time, temps de trajet, rythme).
+ *   - "detail"   : fiche pratique détaillée d'une activité (pourquoi y aller,
+ *     adresse, horaires, prix, réservation, conseils, durée idéale).
  *
  * La clé OPENAI_API_KEY reste strictement côté serveur. Si elle est absente,
  * la route répond 200 { error: "no_key" } pour que le client affiche un écran
@@ -75,6 +77,13 @@ interface PlanBody {
   pace?: unknown;
   activities?: unknown;
   custom_notes?: unknown;
+}
+
+interface DetailBody {
+  action: "detail";
+  title?: unknown;
+  place?: unknown;
+  category?: unknown;
 }
 
 /* --------------------------------------------------------------------------
@@ -278,12 +287,90 @@ async function handlePlan(body: PlanBody) {
 }
 
 /* --------------------------------------------------------------------------
+ * Action "detail" — fiche pratique détaillée d'une activité
+ * -------------------------------------------------------------------------- */
+
+/** Coupe proprement une chaîne renvoyée par le LLM (ou null si invalide). */
+function cleanStr(v: unknown, max = 120): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  if (!s) return null;
+  return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+}
+
+async function handleDetail(body: DetailBody) {
+  const title = cleanStr(body.title, 120);
+  const place = cleanStr(body.place, 120) ?? "";
+  const category = cleanStr(body.category, 40) ?? "";
+
+  if (!title) {
+    return NextResponse.json(
+      { error: "Titre d'activité requis." },
+      { status: 400 }
+    );
+  }
+
+  const systemPrompt =
+    "Tu es un expert local qui connaît parfaitement les lieux touristiques et " +
+    "leurs aspects pratiques. Donne une fiche pratique CONCRÈTE et RÉALISTE " +
+    "pour l'activité demandée. Réponds UNIQUEMENT en JSON : " +
+    '{"why_go":"2-3 phrases donnant envie et expliquant l\'intérêt réel du lieu",' +
+    '"address_hint":"adresse ou repère de localisation court",' +
+    '"hours_hint":"horaires habituels courts (ex: tlj 9h-18h, fermé lundi)",' +
+    '"price_hint":"fourchette de prix courte (ex: 12 €, gratuit -18 ans)",' +
+    '"booking_hint":"faut-il réserver, et comment, en une phrase courte",' +
+    '"tips":["3 conseils pratiques courts d\'initié"],' +
+    '"ideal_duration_min":90}. ' +
+    "Chaque champ hormis why_go fait moins de 120 caractères. tips contient " +
+    "exactement 3 chaînes. ideal_duration_min est un nombre de minutes " +
+    "réaliste entre 15 et 480. Tout est en français. Si tu n'es pas sûr d'une " +
+    "information, donne une indication prudente plutôt qu'une invention précise.";
+
+  const userLines = [
+    `Activité : ${title}`,
+    place ? `Destination / ville : ${place}` : "",
+    category ? `Catégorie : ${category}` : "",
+  ].filter(Boolean);
+
+  const result = await callOpenAI(systemPrompt, userLines.join("\n"));
+  if (!result) {
+    return NextResponse.json(
+      { error: "Fiche indisponible pour le moment. Réessayez." },
+      { status: 502 }
+    );
+  }
+
+  const tips = Array.isArray(result.tips)
+    ? result.tips
+        .map((t) => cleanStr(t, 120))
+        .filter((t): t is string => t !== null)
+        .slice(0, 3)
+    : [];
+  const rawDur = result.ideal_duration_min;
+  const idealDuration =
+    typeof rawDur === "number" && Number.isFinite(rawDur)
+      ? Math.min(Math.max(Math.round(rawDur), 15), 480)
+      : null;
+
+  return NextResponse.json({
+    title,
+    why_go: cleanStr(result.why_go, 360),
+    address_hint: cleanStr(result.address_hint, 120),
+    hours_hint: cleanStr(result.hours_hint, 120),
+    price_hint: cleanStr(result.price_hint, 120),
+    booking_hint: cleanStr(result.booking_hint, 120),
+    tips,
+    ideal_duration_min: idealDuration,
+  });
+}
+
+/* --------------------------------------------------------------------------
  * POST /api/escapade
  * -------------------------------------------------------------------------- */
 export async function POST(request: Request) {
-  let body: GenerateBody | PlanBody;
+  let body: GenerateBody | PlanBody | DetailBody;
   try {
-    body = (await request.json()) as GenerateBody | PlanBody;
+    body = (await request.json()) as GenerateBody | PlanBody | DetailBody;
   } catch {
     return NextResponse.json({ error: "Corps JSON invalide." }, { status: 400 });
   }
@@ -301,8 +388,11 @@ export async function POST(request: Request) {
     if (body.action === "plan") {
       return await handlePlan(body);
     }
+    if (body.action === "detail") {
+      return await handleDetail(body);
+    }
     return NextResponse.json(
-      { error: 'Action inconnue (attendu : "generate" ou "plan").' },
+      { error: 'Action inconnue (attendu : "generate", "plan" ou "detail").' },
       { status: 400 }
     );
   } catch (err) {
