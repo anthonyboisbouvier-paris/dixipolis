@@ -11,7 +11,7 @@
  *      app_list_persons(person, 1) ; `from`/`to` bornent la période.
  *   1. Recherche lexicale plein-texte via app_search_transcripts (toujours),
  *      avec p_person_id / p_from / p_to.
- *   2. Si OPENAI_API_KEY est configurée :
+ *   2. Si un chemin LLM est disponible (clé directe OU relais Supabase llm-proxy) :
  *      a. Embedding de la question (text-embedding-3-small)
  *      b. Recherche sémantique via app_search_semantic
  *      c. Fusion des résultats (déduplication par segment_id, lexical d'abord)
@@ -23,6 +23,7 @@
 
 import { NextResponse } from "next/server";
 import { rpc } from "@/lib/supabase-server";
+import { llmAvailable, openaiCall } from "@/lib/openai-server";
 
 export const dynamic = "force-dynamic";
 
@@ -105,17 +106,13 @@ function toSearchResult(r: LexicalResult | SemanticResult): SearchResult {
  * Appels OpenAI (embedding + synthèse) — timeouts raisonnables, jamais
  * bloquants : toute erreur fait retomber la recherche en mode lexical.
  * -------------------------------------------------------------------------- */
-async function fetchEmbedding(query: string, apiKey: string): Promise<number[] | null> {
+async function fetchEmbedding(query: string): Promise<number[] | null> {
   try {
-    const res = await fetch("https://api.openai.com/v1/embeddings", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ model: "text-embedding-3-small", input: query }),
-      signal: AbortSignal.timeout(10_000),
-    });
+    const res = await openaiCall(
+      "embeddings",
+      { model: "text-embedding-3-small", input: query },
+      10_000
+    );
     if (!res.ok) {
       console.error(`[recherche] OpenAI embeddings → HTTP ${res.status}`);
       return null;
@@ -130,8 +127,7 @@ async function fetchEmbedding(query: string, apiKey: string): Promise<number[] |
 
 async function fetchAnswer(
   query: string,
-  excerpts: SearchResult[],
-  apiKey: string
+  excerpts: SearchResult[]
 ): Promise<string | null> {
   const context = excerpts
     .map((r) => {
@@ -142,13 +138,7 @@ async function fetchAnswer(
     .join("\n\n");
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const res = await openaiCall("chat", {
         model: "gpt-4o-mini",
         temperature: 0.2,
         messages: [
@@ -164,9 +154,7 @@ async function fetchAnswer(
             content: `Question : ${query}\n\nExtraits du corpus :\n\n${context}`,
           },
         ],
-      }),
-      signal: AbortSignal.timeout(30_000),
-    });
+      });
     if (!res.ok) {
       console.error(`[recherche] OpenAI chat → HTTP ${res.status}`);
       return null;
@@ -250,9 +238,8 @@ export async function POST(request: Request) {
        période — quand un filtre est actif, on saute la fusion sémantique pour
        ne pas réintroduire des extraits hors filtre. La synthèse reste active. */
     const hasFilters = personId !== null || from !== null || to !== null;
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (openaiKey) {
-      const embedding = await fetchEmbedding(q, openaiKey);
+    if (llmAvailable()) {
+      const embedding = await fetchEmbedding(q);
       if (embedding) {
         const semantic = hasFilters
           ? null
@@ -276,7 +263,7 @@ export async function POST(request: Request) {
         /* Synthèse IA sur les 12 meilleurs extraits */
         const top = merged.slice(0, 12);
         if (top.length > 0) {
-          answer = await fetchAnswer(q, top, openaiKey);
+          answer = await fetchAnswer(q, top);
           if (answer) mode = "agent";
         }
       }

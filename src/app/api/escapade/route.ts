@@ -16,13 +16,13 @@
  * ============================================================================= */
 
 import { NextResponse } from "next/server";
+import { llmAvailable, openaiCall } from "@/lib/openai-server";
 
 export const dynamic = "force-dynamic";
 
 /* --------------------------------------------------------------------------
  * Constantes
  * -------------------------------------------------------------------------- */
-const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "gpt-4o-mini";
 const TIMEOUT_MS = 30_000;
 
@@ -82,18 +82,13 @@ interface PlanBody {
  * Retourne l'objet JSON parsé ou null en cas d'échec.
  * -------------------------------------------------------------------------- */
 async function callOpenAI(
-  apiKey: string,
   systemPrompt: string,
   userPrompt: string
 ): Promise<Record<string, unknown> | null> {
   try {
-    const res = await fetch(OPENAI_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const res = await openaiCall(
+      "chat",
+      {
         model: MODEL,
         temperature: 0.8,
         response_format: { type: "json_object" },
@@ -101,9 +96,9 @@ async function callOpenAI(
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
+      },
+      TIMEOUT_MS
+    );
     if (!res.ok) {
       console.error(`[escapade] OpenAI → HTTP ${res.status}`);
       return null;
@@ -123,7 +118,7 @@ async function callOpenAI(
 /* --------------------------------------------------------------------------
  * Action "generate" — cartes d'activités autour d'une position
  * -------------------------------------------------------------------------- */
-async function handleGenerate(body: GenerateBody, apiKey: string) {
+async function handleGenerate(body: GenerateBody) {
   const lat = typeof body.lat === "number" && Number.isFinite(body.lat) ? body.lat : 0;
   const lng = typeof body.lng === "number" && Number.isFinite(body.lng) ? body.lng : 0;
   const place =
@@ -198,7 +193,7 @@ async function handleGenerate(body: GenerateBody, apiKey: string) {
     );
   }
 
-  const result = await callOpenAI(apiKey, systemPrompt, userLines.join("\n"));
+  const result = await callOpenAI(systemPrompt, userLines.join("\n"));
   if (!result || !Array.isArray(result.activities)) {
     return NextResponse.json(
       { error: "Génération impossible pour le moment. Réessayez." },
@@ -216,7 +211,7 @@ async function handleGenerate(body: GenerateBody, apiKey: string) {
 /* --------------------------------------------------------------------------
  * Action "plan" — planning jour par jour à partir des activités retenues
  * -------------------------------------------------------------------------- */
-async function handlePlan(body: PlanBody, apiKey: string) {
+async function handlePlan(body: PlanBody) {
   const place =
     typeof body.place === "string" ? body.place.trim().slice(0, 120) : "";
   const rawDays = typeof body.days === "number" ? body.days : 1;
@@ -268,7 +263,7 @@ async function handlePlan(body: PlanBody, apiKey: string) {
     JSON.stringify(activities),
   ].filter(Boolean);
 
-  const result = await callOpenAI(apiKey, systemPrompt, userLines.join("\n"));
+  const result = await callOpenAI(systemPrompt, userLines.join("\n"));
   if (!result || !Array.isArray(result.days)) {
     return NextResponse.json(
       { error: "Planning impossible pour le moment. Réessayez." },
@@ -294,17 +289,17 @@ export async function POST(request: Request) {
   }
 
   /* Clé absente → 200 { error: "no_key" } : le client affiche l'écran d'info */
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const hasLlm = llmAvailable();
+  if (!hasLlm) {
     return NextResponse.json({ error: "no_key" });
   }
 
   try {
     if (body.action === "generate") {
-      return await handleGenerate(body, apiKey);
+      return await handleGenerate(body);
     }
     if (body.action === "plan") {
-      return await handlePlan(body, apiKey);
+      return await handlePlan(body);
     }
     return NextResponse.json(
       { error: 'Action inconnue (attendu : "generate" ou "plan").' },
