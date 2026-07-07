@@ -8,7 +8,8 @@
 <meta name="theme-color" content="#ff6b57">
 <link rel="manifest" href="/escapade/manifest.webmanifest">
 <link rel="icon" href="/escapade/icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+<link rel="preconnect" href="https://maps.google.com">
 <link rel="preconnect" href="https://fr.wikipedia.org" crossorigin>
 <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin>
 <link rel="preconnect" href="https://api.open-meteo.com" crossorigin>
@@ -362,16 +363,28 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .sheet-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;padding:18px 0 26px}
 
 /* ----- Carte panoramique ---------------------------------------------------- */
+.map-tabs{display:flex;gap:8px;margin-bottom:10px}
+.map-tab{
+  flex:1;padding:10px 8px;border-radius:14px;background:var(--surface);
+  border:1px solid var(--border);color:var(--muted);font-weight:600;font-size:14px;
+  transition:all .15s;
+}
+.map-tab[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
 .map-wrap{
   position:relative;overflow:hidden;border-radius:var(--radius);
   border:1px solid var(--border);background:#1a1e2a;
   height:min(58dvh,520px);min-height:320px;touch-action:none;
 }
+.gmap-wrap{display:flex;touch-action:auto}
+.gmap-wrap[hidden]{display:none}
+.gmap-wrap iframe{width:100%;height:100%;border:0;border-radius:var(--radius);background:#1a1e2a}
 .map-world{position:absolute;inset:0;will-change:transform}
 .map-world .tile{
   position:absolute;width:256px;height:256px;max-width:none;pointer-events:none;
   filter:brightness(.82) saturate(.9);user-select:none;-webkit-user-drag:none;
+  opacity:0;transition:opacity .25s ease;
 }
+.map-world .tile.on{opacity:1}
 .map-svg{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
 .map-marker{
   position:absolute;z-index:3;transform:translate(-50%,-100%);
@@ -420,6 +433,36 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .travel-banner .t-num{color:var(--coral);font-weight:700;flex:none}
 .travel-banner .t-time{margin-left:auto;color:var(--sand);font-weight:600;white-space:nowrap}
 .map-empty{padding:22px;text-align:center;color:var(--muted);font-size:14px}
+
+/* ----- Pauses repas → suggestions de restos --------------------------------- */
+.meal-sug-btn{
+  display:inline-flex;align-items:center;gap:6px;margin:8px 8px 0 0;
+  padding:7px 12px;border-radius:11px;background:var(--sand-soft);
+  border:1px solid rgba(245,201,123,.3);color:var(--sand);
+  font-size:12.5px;font-weight:600;text-decoration:none;
+}
+.resto-opt{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:14px;
+  padding:12px 13px;margin:10px 0;display:flex;flex-direction:column;gap:7px;
+}
+.resto-opt b{font-size:14.5px}
+.resto-opt p{font-size:12.5px;color:var(--muted);line-height:1.4}
+.resto-kpis{display:flex;flex-wrap:wrap;gap:6px}
+.resto-btns{display:flex;gap:8px}
+.resto-btns .choose{
+  flex:1;background:var(--coral);color:#fff;border-radius:11px;
+  padding:9px;font-weight:600;font-size:13.5px;
+}
+.resto-btns a{
+  flex:none;display:flex;align-items:center;justify-content:center;width:42px;
+  border-radius:11px;background:var(--surface);border:1px solid var(--border);
+  text-decoration:none;font-size:16px;
+}
+.sheet-more{
+  width:100%;margin:6px 0 4px;padding:11px;border-radius:12px;
+  background:var(--surface-2);border:1px solid var(--border);
+  font-weight:600;font-size:13.5px;
+}
 
 /* ----- Écrans d'erreur / no_key -------------------------------------------- */
 .center-box{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:20px}
@@ -477,7 +520,7 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
     <button class="btn btn-primary" id="btn-discover" aria-label="Découvrir les activités">Découvrir les activités</button>
   </div>
   <button class="btn btn-ghost" id="btn-reset-all" style="margin-top:10px" aria-label="Tout effacer et recommencer">🗑 Tout recommencer</button>
-  <footer class="app-footer">Escapade v2 · cartes © OpenStreetMap</footer>
+  <footer class="app-footer">Escapade v2 · cartes © OpenStreetMap © CARTO</footer>
 </section>
 
 <!-- ======================= ÉCRAN B : DECK DE SWIPE ======================= -->
@@ -606,6 +649,11 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
     <button class="chip" id="map-toggle-maybe" aria-pressed="false" aria-label="Inclure les activités en balance">🤔 inclure</button>
   </div>
 
+  <div class="map-tabs" role="tablist" aria-label="Mode d'affichage de la carte">
+    <button class="map-tab" id="map-tab-canvas" role="tab" aria-pressed="true">🗺 Carte</button>
+    <button class="map-tab" id="map-tab-gmaps" role="tab" aria-pressed="false">📍 Google Maps</button>
+  </div>
+
   <div class="map-wrap" id="map-wrap">
     <div class="map-world" id="map-world"></div>
     <div class="map-ctrls">
@@ -614,8 +662,12 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
       <button id="map-recenter" aria-label="Recentrer la carte">⌖</button>
     </div>
     <div class="map-popup" id="map-popup" hidden></div>
-    <a class="map-attrib" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>
+    <a class="map-attrib" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap © CARTO</a>
   </div>
+
+  <div class="map-wrap gmap-wrap" id="gmap-wrap" hidden></div>
+
+  <button class="btn btn-ghost" id="btn-gmaps-route" style="margin-top:12px" hidden aria-label="Ouvrir l'itinéraire complet dans Google Maps">🧭 Ouvrir l'itinéraire complet dans Google Maps</button>
 
   <div class="panel travel-banner">
     <h2>🧭 Trajets</h2>
@@ -885,48 +937,76 @@ function estimateTravel(a, b) {
 }
 function travelLabel(t) { return t ? `${t.mode} ${t.min} min` : ""; }
 
-/* Raffinage OSRM (profil piéton) — timeout 4 s, repli silencieux */
-const osrmCache = new Map();
-async function osrmDurations(points) {
-  const coords = points.map((p) => `${Number(p.lng).toFixed(5)},${Number(p.lat).toFixed(5)}`).join(";");
-  if (osrmCache.has(coords)) return osrmCache.get(coords);
-  try {
-    const r = await fetch(
-      `https://router.project-osrm.org/table/v1/foot/${coords}?annotations=duration`,
-      { signal: timeoutSignal(4000) }
-    );
-    if (!r.ok) throw new Error("osrm");
-    const j = await r.json();
-    const m = (j && j.code === "Ok" && Array.isArray(j.durations)) ? j.durations : null;
-    osrmCache.set(coords, m);
-    return m;
-  } catch {
-    osrmCache.set(coords, null);
-    return null;
-  }
+/* Raffinage OSRM route (foot si marche, driving sinon) — timeout 4 s,
+   repli silencieux, cache localStorage par paire de coordonnées arrondies
+   (4 décimales) et dédoublonnage des requêtes en vol. */
+const OSRM_CACHE_KEY = "escapade_osrm_v1";
+const osrmStore = loadJSON(OSRM_CACHE_KEY);
+const osrmInflight = new Map();   // clé paire → Promise en cours
+function saveOsrmStore() {
+  trimCache(osrmStore, 400);
+  try { localStorage.setItem(OSRM_CACHE_KEY, JSON.stringify(osrmStore)); } catch { /* ignore */ }
+}
+
+/** Durée réelle (minutes) d'un trajet a→b via OSRM, ou null (repli silencieux). */
+function osrmRouteMin(a, b, walk) {
+  const profile = walk ? "foot" : "driving";
+  const key = `${profile}:${Number(a.lat).toFixed(4)},${Number(a.lng).toFixed(4)}>` +
+    `${Number(b.lat).toFixed(4)},${Number(b.lng).toFixed(4)}`;
+  const cached = osrmStore[key];
+  if (typeof cached === "number" && cached > 0) return Promise.resolve(cached);
+  if (osrmInflight.has(key)) return osrmInflight.get(key);
+  const p = (async () => {
+    try {
+      const url = `https://router.project-osrm.org/route/v1/${profile}/` +
+        `${Number(a.lng).toFixed(5)},${Number(a.lat).toFixed(5)};` +
+        `${Number(b.lng).toFixed(5)},${Number(b.lat).toFixed(5)}` +
+        "?overview=false&alternatives=false&steps=false";
+      const r = await fetch(url, { signal: timeoutSignal(4000) });
+      if (!r.ok) return null;
+      const j = await r.json();
+      const sec = j && j.code === "Ok" && Array.isArray(j.routes) && j.routes[0]
+        ? j.routes[0].duration : null;
+      if (typeof sec !== "number" || !Number.isFinite(sec) || sec <= 0) return null;
+      const min = Math.max(1, Math.round(sec / 60));
+      osrmStore[key] = min;
+      saveOsrmStore();
+      return min;
+    } catch {
+      return null;
+    } finally {
+      osrmInflight.delete(key);
+    }
+  })();
+  osrmInflight.set(key, p);
+  return p;
+}
+
+/** Raffine une chip déjà rendue (estimation → durée OSRM), mode conservé. */
+function refinePairChip(a, b, elId) {
+  const est = estimateTravel(a, b);
+  if (!est) return;
+  osrmRouteMin(a, b, est.walk).then((min) => {
+    if (!min) return;
+    const el = $(elId);
+    if (el) el.textContent = `${est.mode} ${min} min`;
+  });
 }
 
 /**
  * Raffine les chips de trajet déjà rendues. `items` est la liste ordonnée
  * d'activités ; la chip de la paire (i, i+1) porte l'id `${idPrefix}${i}`.
- * Seuls les segments "marche" sont raffinés (profil OSRM foot).
  */
 function refineTravelChips(items, idPrefix) {
-  const pts = items.map((a, i) => ({ a, i })).filter((x) => validCoord(x.a.lat, x.a.lng));
-  if (pts.length < 2) return;
-  osrmDurations(pts.map((x) => x.a)).then((m) => {
-    if (!m) return;
-    for (let j = 0; j < pts.length - 1; j++) {
-      if (pts[j + 1].i !== pts[j].i + 1) continue;
-      const el = $(idPrefix + pts[j].i);
-      if (!el) continue;
-      const est = estimateTravel(pts[j].a, pts[j + 1].a);
-      if (!est || !est.walk) continue;
-      const sec = m[j] && m[j][j + 1];
-      if (typeof sec !== "number" || !Number.isFinite(sec) || sec <= 0) continue;
-      el.textContent = `🚶 ${Math.max(1, Math.round(sec / 60))} min`;
-    }
-  });
+  for (let i = 0; i < items.length - 1; i++) {
+    const a = items[i], b = items[i + 1];
+    if (!validCoord(a.lat, a.lng) || !validCoord(b.lat, b.lng)) continue;
+    refinePairChip(
+      { lat: Number(a.lat), lng: Number(a.lng) },
+      { lat: Number(b.lat), lng: Number(b.lng) },
+      idPrefix + i
+    );
+  }
 }
 
 /* ===========================================================================
@@ -959,6 +1039,7 @@ function initHome() {
       localStorage.removeItem(LEGACY_KEY);
       localStorage.removeItem(IMG_CACHE_KEY);
       localStorage.removeItem(DETAIL_CACHE_KEY);
+      localStorage.removeItem(OSRM_CACHE_KEY);
     } catch { /* ignore */ }
     window.location.reload();
   });
@@ -1515,6 +1596,7 @@ function closeSheet() {
   sh.style.transform = "";
   sh.classList.remove("on");
   sheetActivity = null;
+  mealCtx = null;
 }
 
 async function openDetail(a) {
@@ -1584,11 +1666,128 @@ function applyIdealDuration() {
   showToast(`Durée appliquée : ${fmtDuration(min)} ⏱`);
 }
 
+/* ---------------------------------------------------------------------------
+ * Pauses repas → suggestions de restos (réutilise le bottom-sheet)
+ * --------------------------------------------------------------------------- */
+let mealCtx = null;   // { d, i, meal, near, exclude:[] , options:[] }
+
+function mealLabelFor(it) {
+  const t = String((it && it.title) || "");
+  if (/petit[- ]déjeuner/i.test(t)) return "petit-déjeuner";
+  if (/d[iî]ner/i.test(t)) return "dîner";
+  if (/déjeuner/i.test(t)) return "déjeuner";
+  const m = parseTimeMin(it && it.time);
+  return m != null && m >= 17 * 60 ? "dîner" : "déjeuner";
+}
+
+/* Activité précédant la pause dans la journée (repli : la suivante) */
+function nearActivityOf(dayItems, i) {
+  for (let k = i - 1; k >= 0; k--) {
+    if (itemKind(dayItems[k]) === "activity") {
+      const a = findActivityByTitle(dayItems[k].title);
+      if (a) return a;
+    }
+  }
+  for (let k = i + 1; k < dayItems.length; k++) {
+    if (itemKind(dayItems[k]) === "activity") {
+      const a = findActivityByTitle(dayItems[k].title);
+      if (a) return a;
+    }
+  }
+  return null;
+}
+
+function openMealSuggestions(d, i) {
+  const day = state.plan && state.plan.days && state.plan.days[d];
+  const it = day && day.items && day.items[i];
+  if (!it) return;
+  const near = nearActivityOf(day.items || [], i);
+  mealCtx = { d, i, meal: mealLabelFor(it), near, exclude: allSeenTitles(), options: [] };
+  $("sheet-title").textContent = `🍽 Suggestions — ${mealCtx.meal}`;
+  openSheet();
+  fetchMealOptions();
+}
+
+async function fetchMealOptions() {
+  const ctx = mealCtx;
+  if (!ctx) return;
+  const body = $("sheet-body");
+  body.innerHTML = `<div class="sheet-loading"><span class="spinner"></span> Recherche de bonnes tables...</div>`;
+  const nearTitle = ctx.near ? ctx.near.title : (state.placeName || state.place || "votre position");
+  const payload = {
+    action: "generate",
+    count: 4,
+    filters: {
+      categories: ["gastronomie"],
+      note: `restaurant recommandé pour le ${ctx.meal} près de ${nearTitle}`,
+    },
+    exclude: ctx.exclude.slice(-100),
+  };
+  const c = ctx.near && validCoord(ctx.near.lat, ctx.near.lng)
+    ? { lat: Number(ctx.near.lat), lng: Number(ctx.near.lng) }
+    : refCoords();
+  if (c) { payload.lat = c.lat; payload.lng = c.lng; }
+  if (state.place) payload.place = state.place;
+  else if (state.placeName) payload.place = state.placeName;
+  try {
+    const json = await apiCall(payload);
+    if (!json || mealCtx !== ctx) return;   // no_key ou sheet fermée entre-temps
+    const opts = (json.activities || []).filter((a) => a && a.title).slice(0, 4);
+    ctx.options = opts;
+    for (const o of opts) ctx.exclude.push(o.title);
+    body.innerHTML = opts.length
+      ? restoOptionsHTML(opts)
+      : `<div class="detail-row"><span class="d-ico">🍽</span><span class="d-txt">Aucune suggestion trouvée pour le moment.</span></div><button class="sheet-more" id="btn-meal-more">♻️ Réessayer</button>`;
+  } catch {
+    if (mealCtx !== ctx) return;
+    body.innerHTML = `<div class="detail-row"><span class="d-ico">📡</span><span class="d-txt">Suggestions indisponibles pour le moment.</span></div><button class="sheet-more" id="btn-meal-more">♻️ Réessayer</button>`;
+  }
+}
+
+function restoOptionsHTML(opts) {
+  return opts.map((o, k) => `
+    <div class="resto-opt">
+      <b>${esc(o.emoji || "🍽")} ${esc(o.title)}</b>
+      ${o.description ? `<p>${esc(o.description)}</p>` : ""}
+      <div class="resto-kpis">
+        <span class="kpi">💶 ${fmtCost(o.est_cost_eur)}</span>
+        ${o.distance_km != null ? `<span class="kpi">📍 ${esc(Number(o.distance_km).toFixed(1))} km</span>` : ""}
+        ${o.rating != null ? `<span class="kpi">★ ${esc(Number(o.rating).toFixed(1))}</span>` : ""}
+      </div>
+      <div class="resto-btns">
+        <button class="choose" data-meal-choose="${k}" aria-label="Choisir ce restaurant">✓ Choisir</button>
+        ${validCoord(o.lat, o.lng) ? `<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${Number(o.lat)},${Number(o.lng)}`)}&travelmode=walking" target="_blank" rel="noopener" aria-label="Itinéraire Google Maps">🧭</a>` : ""}
+      </div>
+    </div>`).join("") +
+    `<button class="sheet-more" id="btn-meal-more" aria-label="Relancer avec d'autres idées">♻️ D'autres idées</button>`;
+}
+
+function chooseMealOption(k) {
+  const ctx = mealCtx;
+  if (!ctx || !state.plan) return;
+  const o = ctx.options[k];
+  const day = state.plan.days && state.plan.days[ctx.d];
+  const it = day && day.items && day.items[ctx.i];
+  if (!o || !it) return;
+  it.kind = "meal";
+  it.title = o.title;
+  it.emoji = o.emoji || "🍽";
+  it.note = o.description || it.note || "";
+  if (validCoord(o.lat, o.lng)) { it.lat = Number(o.lat); it.lng = Number(o.lng); }
+  saveState();
+  closeSheet();
+  renderPlanResult();
+  showToast(`Restaurant choisi 🍽 ${o.title}`);
+}
+
 function initSheet() {
   $("sheet-close").addEventListener("click", closeSheet);
   $("sheet-backdrop").addEventListener("click", closeSheet);
   $("sheet-body").addEventListener("click", (e) => {
-    if (e.target.closest("#btn-apply-duration")) applyIdealDuration();
+    if (e.target.closest("#btn-apply-duration")) { applyIdealDuration(); return; }
+    const choose = e.target.closest("[data-meal-choose]");
+    if (choose) { chooseMealOption(Number(choose.dataset.mealChoose)); return; }
+    if (e.target.closest("#btn-meal-more")) fetchMealOptions();
   });
 
   /* Fermeture par glisser vers le bas (poignée + entête) */
@@ -1688,6 +1887,42 @@ function findActivityByTitle(title) {
   return null;
 }
 
+/* Type d'un item de planning. Compat plannings v2 déjà stockés (sans kind,
+   avec travel_after_min/travel_mode : champs ignorés, trajets recalculés). */
+const MEAL_RE = /déjeuner|d[iî]ner|pause repas|petit[- ]déjeuner/i;
+function itemKind(it) {
+  if (it && (it.kind === "activity" || it.kind === "meal" || it.kind === "pause")) return it.kind;
+  const title = String((it && it.title) || "");
+  if (MEAL_RE.test(title)) return "meal";
+  return findActivityByTitle(title) ? "activity" : "pause";
+}
+
+/* Coordonnées d'un item de planning (activité retrouvée par titre, ou resto choisi) */
+function itemCoords(it) {
+  const act = findActivityByTitle(it && it.title);
+  if (act && validCoord(act.lat, act.lng)) return { lat: Number(act.lat), lng: Number(act.lng) };
+  if (it && validCoord(it.lat, it.lng)) return { lat: Number(it.lat), lng: Number(it.lng) };
+  return null;
+}
+
+/**
+ * Paires de trajet d'une journée : entre items consécutifs de type "activity"
+ * (les meal/pause n'interrompent pas la paire). La chip s'affiche juste après
+ * l'item d'index `at` (l'activité de départ), donc autour d'une éventuelle pause.
+ */
+function dayTravelPairs(items) {
+  const pairs = [];
+  let prev = null;                 // { idx, pt } de la dernière activité géolocalisée
+  (items || []).forEach((it, i) => {
+    if (itemKind(it) !== "activity") return;
+    const pt = itemCoords(it);
+    if (!pt) { prev = null; return; }
+    if (prev) pairs.push({ at: prev.idx, a: prev.pt, b: pt });
+    prev = { idx: i, pt };
+  });
+  return pairs;
+}
+
 function renderPlanConfig() {
   $("days-val").textContent = state.days;
   const sd = $("start-date");
@@ -1763,25 +1998,38 @@ function renderPlanResult() {
     let dayCost = 0, dayMin = 0;
     let hasOutdoor = false;
 
-    const items = (day.items || []).map((it, i, arr) => {
+    /* Trajets réels entre activités consécutives (recalculés à chaque rendu :
+       les anciens champs travel_after_min/travel_mode sont ignorés) */
+    const travelAt = {};
+    dayTravelPairs(day.items || []).forEach((p) => { travelAt[p.at] = p; });
+
+    const items = (day.items || []).map((it, i) => {
       const act = findActivityByTitle(it.title);
       if (act) {
         dayCost += Number(act.est_cost_eur) || 0;
         if (OUTDOOR_CATS.has(act.category)) hasOutdoor = true;
       }
       dayMin += Number(it.duration_min) || 0;
+      const kind = itemKind(it);
 
-      /* Trajet : fourni par le LLM, sinon estimation locale (fallback) */
+      /* Estimation immédiate (haversine ×1,3), raffinée ensuite via OSRM */
       let travel = "";
-      if (i < arr.length - 1) {
-        if (Number(it.travel_after_min) > 0) {
-          travel = `<div class="tl-travel">🚶 ${Math.round(it.travel_after_min)} min de trajet${it.travel_mode ? ` (${esc(it.travel_mode)})` : ""}</div>`;
-        } else {
-          const next = findActivityByTitle(arr[i + 1].title);
-          const t = act && next ? estimateTravel(act, next) : null;
-          if (t) travel = `<div class="tl-travel">≈ <span id="plan-travel-${d}-${i}">${travelLabel(t)}</span> de trajet</div>`;
-        }
+      const pair = travelAt[i];
+      if (pair) {
+        const t = estimateTravel(pair.a, pair.b);
+        if (t) travel = `<div class="tl-travel">≈ <span id="plan-travel-${d}-${i}">${travelLabel(t)}</span> de trajet</div>`;
       }
+
+      /* Pause repas cliquable → suggestions de restos ; itinéraire si resto choisi */
+      let mealBtns = "";
+      if (kind === "meal") {
+        mealBtns = `<div><button class="meal-sug-btn" data-meal-d="${d}" data-meal-i="${i}" aria-label="Voir des suggestions de restaurants">🍽 Voir des suggestions</button>` +
+          (validCoord(it.lat, it.lng)
+            ? `<a class="meal-sug-btn" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${Number(it.lat)},${Number(it.lng)}`)}&travelmode=walking" target="_blank" rel="noopener" aria-label="Itinéraire Google Maps vers le restaurant">🧭 Itinéraire</a>`
+            : "") +
+          `</div>`;
+      }
+
       return `
         <div class="tl-item">
           <div class="tl-time">${esc(it.time || "")}</div>
@@ -1793,6 +2041,7 @@ function renderPlanResult() {
               <button class="mini-btn" data-plan-dur="plus" data-d="${d}" data-i="${i}" aria-label="15 minutes de plus">+</button>
             </div>
             ${it.note ? `<p>${esc(it.note)}</p>` : ""}
+            ${mealBtns}
           </div>
         </div>${travel}`;
     }).join("");
@@ -1825,10 +2074,11 @@ function renderPlanResult() {
   $("tips-list").innerHTML = tips.map((t) => `<li>${esc(t)}</li>`).join("");
   $("plan-result").hidden = false;
 
-  /* Raffinage OSRM des trajets fallback, jour par jour */
+  /* Raffinage asynchrone OSRM des estimations, jour par jour */
   (plan.days || []).forEach((day, d) => {
-    const acts = (day.items || []).map((it) => findActivityByTitle(it.title) || { lat: NaN, lng: NaN });
-    refineTravelChips(acts, `plan-travel-${d}-`);
+    dayTravelPairs(day.items || []).forEach((p) => {
+      refinePairChip(p.a, p.b, `plan-travel-${d}-${p.at}`);
+    });
   });
 
   /* Météo absente (ex : plan restauré) → fetch puis re-render une fois */
@@ -1841,8 +2091,13 @@ function renderPlanResult() {
   }
 }
 
-/* Steppers de durée dans le planning (délégation) */
+/* Steppers de durée + pauses repas dans le planning (délégation) */
 function handlePlanDurClick(e) {
+  const meal = e.target.closest("[data-meal-d]");
+  if (meal && state.plan) {
+    openMealSuggestions(Number(meal.dataset.mealD), Number(meal.dataset.mealI));
+    return;
+  }
   const btn = e.target.closest("[data-plan-dur]");
   if (!btn || !state.plan) return;
   const d = Number(btn.dataset.d), i = Number(btn.dataset.i);
@@ -1865,11 +2120,15 @@ function planText() {
   const lines = [`✈ ESCAPADE — ${state.placeName || state.place}`, ""];
   (plan.days || []).forEach((day, d) => {
     lines.push(`━━ ${day.label || "Jour"} (${fmtDayDate(dayDateISO(d))}) ━━`);
-    for (const it of day.items || []) {
+    const travelAt = {};
+    dayTravelPairs(day.items || []).forEach((p) => { travelAt[p.at] = p; });
+    (day.items || []).forEach((it, i) => {
       lines.push(`${it.time || "--:--"}  ${it.emoji || ""} ${it.title} (${fmtDuration(it.duration_min)})`);
       if (it.note) lines.push(`        ${it.note}`);
-      if (Number(it.travel_after_min) > 0) lines.push(`        🚶 ${Math.round(it.travel_after_min)} min de trajet`);
-    }
+      const pair = travelAt[i];
+      const t = pair ? estimateTravel(pair.a, pair.b) : null;
+      if (t) lines.push(`        ${t.mode} ≈ ${t.min} min de trajet`);
+    });
     lines.push("");
   });
   if ((plan.tips || []).length) {
@@ -1946,12 +2205,15 @@ function downloadICS() {
   ];
   (plan.days || []).forEach((day, d) => {
     const dateISO = dayDateISO(d);
+    const travelAt = {};
+    dayTravelPairs(day.items || []).forEach((p) => { travelAt[p.at] = p; });
     let cursor = 9 * 60; // 09:00 par défaut si heure manquante
     (day.items || []).forEach((it, i) => {
       const t = parseTimeMin(it.time);
       const start = t != null ? t : cursor;
       const dur = clampDur(it.duration_min);
-      cursor = start + dur + (Number(it.travel_after_min) > 0 ? Math.round(it.travel_after_min) : 15);
+      const est = travelAt[i] ? estimateTravel(travelAt[i].a, travelAt[i].b) : null;
+      cursor = start + dur + (est ? est.min : 15);
       lines.push(
         "BEGIN:VEVENT",
         `UID:escapade-${dateISO}-${d}-${i}-${Math.random().toString(36).slice(2, 9)}@escapade`,
@@ -2022,6 +2284,8 @@ const mapView = {
   points: [],                    // activités affichées (ordonnées)
   from: "screen-selection",      // écran d'origine (retour)
   includeMaybe: false,
+  tab: "canvas",                 // onglet actif : "canvas" | "gmaps"
+  canvasDirty: false,            // canvas à (re)rendre à l'activation de l'onglet
 };
 
 function lngToWorldX(lng, z) { return ((Number(lng) + 180) / 360) * TILE * Math.pow(2, z); }
@@ -2088,8 +2352,9 @@ function renderMap() {
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) {
       const wx = ((tx % n) + n) % n; // wrap horizontal
+      /* Tuiles CARTO Voyager rétina (512px natif affiché 256px CSS) */
       html += `<img class="tile" alt="" decoding="async" loading="lazy" draggable="false" ` +
-        `src="https://tile.openstreetmap.org/${z}/${wx}/${ty}.png" ` +
+        `src="https://basemaps.cartocdn.com/rastertiles/voyager/${z}/${wx}/${ty}@2x.png" ` +
         `style="left:${tx * TILE - left}px;top:${ty * TILE - top}px">`;
     }
   }
@@ -2116,6 +2381,85 @@ function renderMap() {
   });
 
   world.innerHTML = html;
+
+  /* Fondu d'apparition des tuiles (immédiat si déjà en cache navigateur) */
+  world.querySelectorAll(".tile").forEach((im) => {
+    if (im.complete && im.naturalWidth > 0) im.classList.add("on");
+    else im.addEventListener("load", () => im.classList.add("on"), { once: true });
+  });
+}
+
+/* --- Onglet Google Maps : aperçu embarqué + itinéraire complet -------------- */
+
+/* Points pour Google Maps : ordre du planning s'il existe, sinon sélection */
+function gmapsPoints() {
+  let acts = state.plan ? orderedPlanActivities() : [];
+  if (!acts.length) acts = collectMapPoints();
+  return acts.filter((a) => validCoord(a.lat, a.lng));
+}
+
+function gmapsCoordStrs(pts) {
+  return pts.map((p) => `${Number(p.lat).toFixed(5)},${Number(p.lng).toFixed(5)}`);
+}
+
+/* URL de l'iframe d'aperçu (max 8 points) */
+function gmapsEmbedSrc(pts) {
+  const cs = gmapsCoordStrs(pts.slice(0, 8));
+  if (cs.length === 0) return null;
+  if (cs.length === 1) return `https://maps.google.com/maps?q=${encodeURIComponent(cs[0])}&z=15&output=embed`;
+  const daddr = cs.slice(1).map(encodeURIComponent).join("+to:");
+  return `https://maps.google.com/maps?saddr=${encodeURIComponent(cs[0])}&daddr=${daddr}&dirflg=w&output=embed`;
+}
+
+/* URL "app native" (max 9 waypoints intermédiaires) */
+function gmapsDirUrl(pts) {
+  const cs = gmapsCoordStrs(pts);
+  if (cs.length === 0) return null;
+  if (cs.length === 1) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cs[0])}&travelmode=walking`;
+  }
+  let url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(cs[0])}` +
+    `&destination=${encodeURIComponent(cs[cs.length - 1])}&travelmode=walking`;
+  const mid = cs.slice(1, -1).slice(0, 9);
+  if (mid.length) url += `&waypoints=${encodeURIComponent(mid.join("|"))}`;
+  return url;
+}
+
+/* Bascule Carte / Google Maps ; l'iframe n'est créée qu'à l'activation */
+function setMapTab(tab) {
+  mapView.tab = tab;
+  $("map-tab-canvas").setAttribute("aria-pressed", String(tab === "canvas"));
+  $("map-tab-gmaps").setAttribute("aria-pressed", String(tab === "gmaps"));
+  $("map-wrap").hidden = tab !== "canvas";
+  const g = $("gmap-wrap");
+  g.hidden = tab !== "gmaps";
+  if (tab !== "gmaps") {
+    /* Canvas jamais rendu (ouvert sur l'onglet Google Maps) → rendu différé */
+    if (mapView.canvasDirty && mapView.points.length) {
+      requestAnimationFrame(() => {
+        fitMapToPoints();
+        renderMap();
+        mapView.canvasDirty = false;
+      });
+    }
+    return;
+  }
+  const src = gmapsEmbedSrc(gmapsPoints());
+  if (!src) {
+    g.innerHTML = `<div class="map-empty" style="margin:auto">🗺 Aucune activité géolocalisée.</div>`;
+    return;
+  }
+  let frame = g.querySelector("iframe");
+  if (!frame) {
+    g.innerHTML = "";
+    frame = document.createElement("iframe");
+    frame.loading = "lazy";
+    frame.title = "Aperçu Google Maps de l'itinéraire";
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = "no-referrer-when-downgrade";
+    g.appendChild(frame);
+  }
+  if (frame.getAttribute("src") !== src) frame.setAttribute("src", src);
 }
 
 function openMapPopup(i) {
@@ -2158,6 +2502,8 @@ function openMap(from) {
     ? `${mapView.points.length} activité(s) · ${state.placeName || state.place || ""}`
     : "Aucune activité géolocalisée";
   $("map-popup").hidden = true;
+  setMapTab(mapView.tab === "gmaps" ? "gmaps" : "canvas");
+  $("btn-gmaps-route").hidden = gmapsPoints().length === 0;
   showScreen("screen-map");
   if (mapView.points.length === 0) {
     $("map-world").innerHTML = `<div class="map-empty" style="padding-top:130px">🗺 Aucune coordonnée disponible pour vos activités.</div>`;
@@ -2165,9 +2511,13 @@ function openMap(from) {
     return;
   }
   /* Le layout doit être posé pour mesurer le conteneur */
+  mapView.canvasDirty = true;
   requestAnimationFrame(() => {
-    fitMapToPoints();
-    renderMap();
+    if (mapView.tab === "canvas") {
+      fitMapToPoints();
+      renderMap();
+      mapView.canvasDirty = false;
+    }
     renderMapTravels();
   });
 }
@@ -2183,6 +2533,13 @@ function initMap() {
   $("map-toggle-maybe").addEventListener("click", () => {
     mapView.includeMaybe = !mapView.includeMaybe;
     openMap(mapView.from);
+  });
+
+  $("map-tab-canvas").addEventListener("click", () => setMapTab("canvas"));
+  $("map-tab-gmaps").addEventListener("click", () => setMapTab("gmaps"));
+  $("btn-gmaps-route").addEventListener("click", () => {
+    const url = gmapsDirUrl(gmapsPoints());
+    if (url) window.open(url, "_blank", "noopener");
   });
 
   const zoomBy = (dz) => {

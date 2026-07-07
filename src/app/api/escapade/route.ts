@@ -7,7 +7,8 @@
  *   - "generate" : génère des cartes d'activités réelles autour d'une position
  *     (lat/lng) ou d'un lieu nommé (place), en respectant filtres et exclusions.
  *   - "plan"     : construit un planning jour par jour à partir des activités
- *     retenues (regroupement géographique, best_time, temps de trajet, rythme).
+ *     retenues (regroupement géographique, best_time, pauses repas, rythme) ;
+ *     les temps de trajet réels sont calculés côté client (haversine + OSRM).
  *   - "detail"   : fiche pratique détaillée d'une activité (pourquoi y aller,
  *     adresse, horaires, prix, réservation, conseils, durée idéale).
  *
@@ -255,15 +256,19 @@ async function handlePlan(body: PlanBody) {
     "Tu es un organisateur de voyage expert. Construis un planning de séjour " +
     "jour par jour RÉALISTE à partir des activités fournies : regroupe les lieux " +
     "géographiquement proches sur une même journée, respecte le moment idéal " +
-    "(best_time : matin/après-midi/soir), insère des temps de trajet estimés " +
-    "entre les lieux (à pied si moins de 2 km, sinon transport en commun ou taxi), " +
-    "prévois des pauses déjeuner (vers 12h30) et dîner (vers 19h30), et respecte " +
-    "le rythme demandé. Si trop d'activités pour le nombre de jours, priorise les " +
-    "mieux notées et signale-le dans tips. Réponds UNIQUEMENT en JSON : " +
-    '{"days":[{"label":"Jour 1","items":[{"time":"09:30","title":"...","emoji":"...",' +
-    '"duration_min":60,"note":"une phrase","travel_after_min":15,"travel_mode":"à pied"}]}],' +
-    '"tips":["..."]}. Le dernier item de chaque journée a travel_after_min:0. ' +
-    "Tout le texte est en français.";
+    "(best_time : matin/après-midi/soir), prévois des pauses déjeuner (vers 12h30) " +
+    "et dîner (vers 19h30), et respecte le rythme demandé. Si trop d'activités " +
+    "pour le nombre de jours, priorise les mieux notées et signale-le dans tips. " +
+    "Réponds UNIQUEMENT en JSON : " +
+    '{"days":[{"label":"Jour 1","items":[{"time":"09:30","kind":"activity",' +
+    '"title":"...","emoji":"...","duration_min":60,"note":"une phrase"}]}],' +
+    '"tips":["..."]}. ' +
+    'kind est EXACTEMENT "activity", "meal" ou "pause" : "activity" pour une ' +
+    'activité fournie, "meal" pour une pause déjeuner/dîner, "pause" pour tout ' +
+    'autre temps libre. Pour kind:"activity", title est STRICTEMENT IDENTIQUE ' +
+    "(caractère pour caractère) au champ title d'une des activités fournies. " +
+    "NE fournis JAMAIS de champs travel_after_min ni travel_mode : les temps de " +
+    "trajet réels sont calculés par l'application. Tout le texte est en français.";
 
   const userLines = [
     `Destination : ${place || "non précisée"}`,
