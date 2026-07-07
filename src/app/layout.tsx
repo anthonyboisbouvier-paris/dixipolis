@@ -49,6 +49,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Dixipolis" }],
   creator: "Dixipolis",
+  /* Manifest PWA global — la page du-jour déclare le même fichier, Next
+   * fusionne les métadonnées sans conflit. */
+  manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
     locale: "fr_FR",

@@ -1,79 +1,78 @@
 /* =============================================================================
  * app/connexion/page.tsx
  *
- * Page de connexion (login) premium de l'application Dixipolis.
+ * Page de connexion de Dixipolis — version liste d'attente.
  *
- * Fonctionnalites :
- *   - Formulaire de connexion avec email et mot de passe
- *   - Validation basique (champs non vides) pour activer le bouton
- *   - Toggle visibilite du mot de passe (Eye/EyeOff)
- *   - Liens vers la page d'inscription et la reinitialisation du mot de passe
- *   - Separateur visuel "ou" entre le formulaire et le lien d'inscription
- *   - Pret pour une future integration Supabase Auth (submit = log console)
+ * L'authentification n'est pas encore ouverte : plutôt qu'un faux formulaire
+ * de connexion, cette page l'annonce honnêtement et propose de rejoindre la
+ * liste d'attente (WaitlistForm → POST /api/waitlist, source "connexion").
+ *
+ * Contenu :
+ *   - Message : « Dixipolis ouvre bientôt ses comptes utilisateurs »
+ *   - Bénéfices à venir : recherches sauvegardées, alertes personnalisées,
+ *     suivi de politiciens
+ *   - Formulaire de liste d'attente
  *
  * Design :
- *   - Carte blanche centree sur fond page (palette Dixipolis)
- *   - Logo Dixipolis en en-tete de la carte
- *   - Icones Lucide dans chaque champ pour une UX claire et accessible
- *   - Bouton primaire avec etat desactive visuellement distinct
+ *   - Carte blanche centrée sur fond page (palette Dixipolis)
+ *   - Logo Dixipolis en en-tête de la carte
  *   - Toutes les couleurs via CSS variables (pas de Tailwind raw colors)
  *
  * Note :
- *   - "use client" car utilise useState pour le formulaire
- *   - Les metadata SEO sont exportees dans layout.tsx (Server Component)
- *   - Pas de pt-offset — le root layout gere le padding pour le header
+ *   - Composant serveur : l'interactivité est déléguée à WaitlistForm
+ *   - Les metadata SEO restent exportées dans layout.tsx
+ *   - Pas de pt-offset — le root layout gère le padding pour le header
  * ============================================================================= */
 
-"use client";
-
-import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Bookmark, Bell, Users } from "lucide-react";
+import WaitlistForm from "@/components/shared/WaitlistForm";
+
+/* --------------------------------------------------------------------------
+ * Bénéfices annoncés de l'espace membre à venir
+ * -------------------------------------------------------------------------- */
+const BENEFITS = [
+  {
+    icon: Bookmark,
+    label: "Recherches sauvegardées",
+    description: "Retrouvez vos requêtes sur le corpus en un clic.",
+  },
+  {
+    icon: Bell,
+    label: "Alertes personnalisées",
+    description: "Soyez prévenu quand un sujet qui vous intéresse est évoqué.",
+  },
+  {
+    icon: Users,
+    label: "Suivi de politiciens",
+    description: "Suivez les prises de parole des personnalités de votre choix.",
+  },
+] as const;
 
 /* --------------------------------------------------------------------------
  * ConnexionPage — Composant principal de la page de connexion
  * -------------------------------------------------------------------------- */
 export default function ConnexionPage() {
-  /* ---- Etat du formulaire ---- */
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
-  /* ---- Validation : le bouton est actif seulement si les deux champs sont remplis ---- */
-  const isFormValid = email.trim().length > 0 && password.trim().length > 0;
-
-  /* ---- Soumission du formulaire (placeholder pour Supabase Auth) ---- */
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isFormValid) return;
-
-    // TODO : Remplacer par un appel Supabase Auth (signInWithPassword)
-    console.log("[Dixipolis] Tentative de connexion :", { email });
-  };
-
-  /* ---- Rendu ---- */
   return (
     <main
       className="flex min-h-[calc(100vh-72px)] items-center justify-center px-4 py-12"
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
       {/* ================================================================
-       * Carte de connexion
+       * Carte centrale
        * max-w-md pour une largeur confortable sur desktop.
-       * Carte blanche avec ombre legere via la classe .card du design system.
        * ================================================================ */}
       <div
         className="card w-full max-w-md p-8 sm:p-10"
         role="region"
-        aria-label="Formulaire de connexion"
+        aria-label="Liste d'attente Dixipolis"
       >
-        {/* ---- En-tete : logo Dixipolis ---- */}
-        <div className="mb-8 text-center">
+        {/* ---- En-tête : logo Dixipolis ---- */}
+        <div className="mb-6 text-center">
           <Link
             href="/"
             className="inline-block"
-            aria-label="Retour a l'accueil Dixipolis"
+            aria-label="Retour à l'accueil Dixipolis"
           >
             <span
               className="text-3xl font-bold tracking-tight"
@@ -82,199 +81,78 @@ export default function ConnexionPage() {
               Dixipolis
             </span>
           </Link>
+          <h1
+            className="mt-4 text-xl font-bold tracking-tight"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            Dixipolis ouvre bient&ocirc;t ses comptes utilisateurs
+          </h1>
           <p
-            className="mt-2 text-sm"
+            className="mt-2 text-sm leading-relaxed"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Connectez-vous pour acc&eacute;der &agrave; votre espace
+            La connexion n&apos;est pas encore disponible. Laissez votre email
+            pour &ecirc;tre pr&eacute;venu d&egrave;s l&apos;ouverture.
           </p>
         </div>
 
         {/* ================================================================
-         * Formulaire de connexion
-         * noValidate desactive la validation native du navigateur
-         * (la validation est geree manuellement via isFormValid).
+         * Bénéfices de l'espace membre à venir
          * ================================================================ */}
-        <form onSubmit={handleSubmit} noValidate className="space-y-5">
-          {/* ---- Champ email ---- */}
-          <div>
-            <label
-              htmlFor="login-email"
-              className="mb-1.5 block text-sm font-medium"
-              style={{ color: "var(--color-text-primary)" }}
-            >
-              Adresse email
-            </label>
-            <div className="relative">
-              {/* Icone Mail positionnee a gauche du champ */}
-              <Mail
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-                size={18}
-                style={{ color: "var(--color-text-muted)" }}
-                aria-hidden="true"
-              />
-              <input
-                id="login-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="nom@exemple.fr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                aria-required="true"
-                className={cn(
-                  "w-full rounded-lg border py-2.5 pl-10 pr-4 text-sm transition-colors",
-                  "placeholder:opacity-50",
-                  "focus:outline-none focus:ring-2"
-                )}
-                style={{
-                  borderColor: "var(--color-border)",
-                  backgroundColor: "var(--color-bg-card)",
-                  color: "var(--color-text-primary)",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* ---- Champ mot de passe avec toggle visibilite ---- */}
-          <div>
-            <label
-              htmlFor="login-password"
-              className="mb-1.5 block text-sm font-medium"
-              style={{ color: "var(--color-text-primary)" }}
-            >
-              Mot de passe
-            </label>
-            <div className="relative">
-              {/* Icone Lock positionnee a gauche du champ */}
-              <Lock
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-                size={18}
-                style={{ color: "var(--color-text-muted)" }}
-                aria-hidden="true"
-              />
-              <input
-                id="login-password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                placeholder="Votre mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                aria-required="true"
-                className={cn(
-                  "w-full rounded-lg border py-2.5 pl-10 pr-12 text-sm transition-colors",
-                  "placeholder:opacity-50",
-                  "focus:outline-none focus:ring-2"
-                )}
-                style={{
-                  borderColor: "var(--color-border)",
-                  backgroundColor: "var(--color-bg-card)",
-                  color: "var(--color-text-primary)",
-                }}
-              />
-              {/* Bouton toggle visibilite mot de passe */}
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 transition-opacity hover:opacity-70"
-                aria-label={
-                  showPassword
-                    ? "Masquer le mot de passe"
-                    : "Afficher le mot de passe"
-                }
-              >
-                {showPassword ? (
-                  <EyeOff
-                    size={18}
+        <ul className="mb-8 space-y-4" aria-label="Fonctionnalités à venir">
+          {BENEFITS.map((benefit) => {
+            const Icon = benefit.icon;
+            return (
+              <li key={benefit.label} className="flex items-start gap-3">
+                <span
+                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    backgroundColor: "var(--color-primary-light)",
+                    color: "var(--color-primary)",
+                  }}
+                  aria-hidden="true"
+                >
+                  <Icon size={16} />
+                </span>
+                <div>
+                  <p
+                    className="text-sm font-semibold"
+                    style={{ color: "var(--color-text-primary)" }}
+                  >
+                    {benefit.label}
+                  </p>
+                  <p
+                    className="text-xs leading-relaxed"
                     style={{ color: "var(--color-text-muted)" }}
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <Eye
-                    size={18}
-                    style={{ color: "var(--color-text-muted)" }}
-                    aria-hidden="true"
-                  />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* ---- Bouton mot de passe oublie (fonctionnalite a venir) ---- */}
-          <div className="text-right">
-            <button
-              type="button"
-              onClick={() => alert("Cette fonctionnalit\u00e9 sera bient\u00f4t disponible")}
-              className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline cursor-pointer bg-transparent border-none p-0"
-              style={{ color: "var(--color-primary)" }}
-            >
-              Mot de passe oubli&eacute; ?
-            </button>
-          </div>
-
-          {/* ---- Bouton de soumission ---- */}
-          <button
-            type="submit"
-            disabled={!isFormValid}
-            className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition-all duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-offset-2",
-              isFormValid
-                ? "cursor-pointer hover:opacity-90"
-                : "cursor-not-allowed opacity-50"
-            )}
-            style={{
-              backgroundColor: "var(--color-primary)",
-              color: "var(--color-text-on-primary)",
-            }}
-            aria-disabled={!isFormValid}
-          >
-            <LogIn size={18} aria-hidden="true" />
-            Se connecter
-          </button>
-        </form>
+                  >
+                    {benefit.description}
+                  </p>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
 
         {/* ================================================================
-         * Separateur "ou"
-         * Divise visuellement le formulaire de connexion et le lien
-         * d'inscription. Utilise un role="separator" pour l'accessibilite.
+         * Formulaire de liste d'attente
          * ================================================================ */}
-        <div className="my-6 flex items-center gap-3" role="separator">
-          <div
-            className="h-px flex-1"
-            style={{ backgroundColor: "var(--color-border)" }}
-          />
-          <span
-            className="text-xs font-medium uppercase tracking-wider"
-            style={{ color: "var(--color-text-muted)" }}
-          >
-            ou
-          </span>
-          <div
-            className="h-px flex-1"
-            style={{ backgroundColor: "var(--color-border)" }}
-          />
-        </div>
+        <WaitlistForm source="connexion" />
 
-        {/* ================================================================
-         * Lien vers la page d'inscription
-         * ================================================================ */}
-        <div className="text-center">
+        {/* ---- Lien retour vers l'accueil ---- */}
+        <div className="mt-6 text-center">
           <p
             className="text-sm"
             style={{ color: "var(--color-text-secondary)" }}
           >
-            Pas encore de compte ?{" "}
+            En attendant, la{" "}
             <Link
-              href="/inscription"
+              href="/"
               className="font-semibold transition-opacity hover:opacity-80 hover:underline"
               style={{ color: "var(--color-primary)" }}
             >
-              Cr&eacute;er un compte
-            </Link>
+              recherche dans le corpus
+            </Link>{" "}
+            est d&eacute;j&agrave; ouverte &agrave; tous.
           </p>
         </div>
       </div>

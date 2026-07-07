@@ -1,8 +1,8 @@
 {
-  "name": "Dixipolis — Du jour",
+  "name": "Dixipolis",
   "short_name": "Dixipolis",
-  "description": "Les vidéos politiques transcrites de la journée : intervenants, thèmes et textes de loi évoqués.",
-  "start_url": "/du-jour",
+  "description": "La plateforme d'analyse du discours politique par l'IA : recherchez tout ce qui a été dit par les politiciens et partis.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f8fafc",

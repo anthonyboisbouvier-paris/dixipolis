@@ -11,8 +11,8 @@
  *   - Resume du contenu, tronque a 3 lignes pour garder les cartes compactes
  *   - Badge thematique indiquant le sujet principal du contenu
  *   - Pied de carte avec : temps de lecture, date relative, politiciens concernes
- *   - Effet de survol interactif (card-interactive) avec elevation et ombre
- *   - Lien vers une future page de detail (href="#" pour l'instant)
+ *   - Badge « A venir » : ces formats ne sont pas encore publies, la carte
+ *     n'est donc pas cliquable (pas de lien mort vers une page inexistante)
  *
  * Ce composant ne contient aucune logique cote client (pas de "use client").
  * Il recoit un objet GeneratedContent en props et rend un affichage statique.
@@ -21,7 +21,6 @@
  *   <ContentCard content={monContenu} />
  * ============================================================================= */
 
-import Link from "next/link";
 import {
   FileText,
   Mail,
@@ -98,12 +97,12 @@ const TYPE_CONFIG: Record<
  * ContentCard — Composant principal
  *
  * Structure de la carte :
- *   1. En-tete  : badge de type avec icone et libelle
+ *   1. En-tete  : badge de type avec icone et libelle + badge « A venir »
  *   2. Corps    : titre (2 lignes max) + resume (3 lignes max) + badge theme
  *   3. Pied     : temps de lecture, date relative, politiciens associes
  *
- * L'ensemble est enveloppe dans un <Link> pour rendre toute la carte
- * cliquable et navigable au clavier.
+ * La carte est un <article> statique : ces formats editoriaux ne sont pas
+ * encore publies, il n'y a donc aucune page de detail vers laquelle pointer.
  * -------------------------------------------------------------------------- */
 export default function ContentCard({ content }: ContentCardProps) {
   /* Recuperation de la configuration du type de contenu */
@@ -111,11 +110,10 @@ export default function ContentCard({ content }: ContentCardProps) {
   const TypeIcon = typeConfig.icon;
 
   return (
-    <Link
-      href="#"
+    <article
       className={cn(
         /* Base de la carte : fond blanc, bordure, coins arrondis */
-        "card card-interactive",
+        "card",
 
         /* Disposition en colonne pour empiler les elements verticalement */
         "flex flex-col",
@@ -123,22 +121,17 @@ export default function ContentCard({ content }: ContentCardProps) {
         /* Padding interne genereux pour aerer le contenu */
         "p-5",
 
-        /* Suppression de la couleur de lien par defaut (sinon tout le texte serait bleu) */
-        "text-[var(--color-text-primary)] no-underline",
-
-        /* Curseur pointeur pour indiquer l'interactivite */
-        "cursor-pointer",
-
-        /* Transition fluide pour l'effet de survol */
-        "transition-all duration-[var(--transition-normal)]"
+        /* Couleur de texte du design system */
+        "text-[var(--color-text-primary)]"
       )}
-      aria-label={`Lire : ${content.title}`}
+      aria-label={content.title}
     >
       {/* ================================================================
-       * EN-TETE : Badge de type de contenu
-       * Le badge affiche une icone et un libelle colore selon le type.
+       * EN-TETE : Badge de type de contenu + badge « A venir »
+       * Le badge de type affiche une icone et un libelle colore.
+       * Le badge « A venir » signale que ce format n'est pas encore publie.
        * ================================================================ */}
-      <div className="mb-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         <span
           className={cn(
             /* Style de base du badge : inline-flex, arrondi en pilule */
@@ -153,6 +146,19 @@ export default function ContentCard({ content }: ContentCardProps) {
           {/* Icone du type de contenu (decorative) */}
           <TypeIcon className="h-3.5 w-3.5" aria-hidden="true" />
           {typeConfig.label}
+        </span>
+
+        {/* Badge « A venir » — format editorial non encore publie */}
+        <span
+          className={cn(
+            "inline-flex items-center",
+            "rounded-[var(--radius-full)]",
+            "border border-[var(--color-border)]",
+            "bg-[var(--color-bg-section)] text-[var(--color-text-muted)]",
+            "px-2.5 py-1 text-xs font-medium"
+          )}
+        >
+          &Agrave; venir
         </span>
       </div>
 
@@ -251,6 +257,6 @@ export default function ContentCard({ content }: ContentCardProps) {
           </div>
         )}
       </div>
-    </Link>
+    </article>
   );
 }
