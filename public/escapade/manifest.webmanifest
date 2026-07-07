@@ -1,0 +1,12 @@
+{
+  "name": "Escapade",
+  "short_name": "Escapade",
+  "start_url": "/escapade/index.html",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#ff6b57",
+  "lang": "fr",
+  "icons": [
+    { "src": "/escapade/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

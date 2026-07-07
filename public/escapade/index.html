@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Escapade — votre compagnon de voyage</title>
+<meta name="description" content="Escapade génère des activités autour de vous, vous swipez, elle construit votre planning de séjour.">
+<meta name="theme-color" content="#ff6b57">
+<link rel="manifest" href="/escapade/manifest.webmanifest">
+<link rel="icon" href="/escapade/icon.svg" type="image/svg+xml">
+<style>
+/* ==========================================================================
+   Escapade — thème sombre voyage. Aucune dépendance externe.
+   ========================================================================== */
+:root{
+  --bg:#0f1117;
+  --surface:#171a23;
+  --surface-2:#1e2230;
+  --border:#2a2f3f;
+  --text:#f2f3f7;
+  --muted:#9aa1b5;
+  --coral:#ff6b57;
+  --coral-soft:rgba(255,107,87,.14);
+  --sand:#f5c97b;
+  --sand-soft:rgba(245,201,123,.14);
+  --green:#3ddc85;
+  --red:#ff5470;
+  --amber:#ffb454;
+  --radius:20px;
+  --shadow:0 18px 40px rgba(0,0,0,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font:inherit}
+img{max-width:100%}
+
+/* ----- Écrans (sections switchées en JS) --------------------------------- */
+.screen{
+  display:none;
+  min-height:100dvh;
+  max-width:520px;
+  margin:0 auto;
+  padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  flex-direction:column;
+  animation:screen-in .35s ease both;
+}
+.screen.active{display:flex}
+@keyframes screen-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ----- Boutons ------------------------------------------------------------ */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px 18px;border-radius:var(--radius);
+  font-weight:600;font-size:16px;transition:transform .15s,filter .15s,background .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--coral);color:#fff;box-shadow:0 8px 24px rgba(255,107,87,.35)}
+.btn-primary:hover{filter:brightness(1.07)}
+.btn-primary:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}
+.btn-ghost{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-sand{background:var(--sand-soft);color:var(--sand);border:1px solid rgba(245,201,123,.3)}
+
+/* ----- Accueil ------------------------------------------------------------ */
+.hero{text-align:center;padding:34px 0 22px}
+.logo{font-size:34px;font-weight:800;letter-spacing:-.5px}
+.logo .plane{color:var(--coral)}
+.pitch{color:var(--muted);margin-top:8px;font-size:15px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-top:16px}
+.panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--sand);margin-bottom:12px;font-weight:700}
+.or-sep{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:14px 0}
+.or-sep::before,.or-sep::after{content:"";flex:1;height:1px;background:var(--border)}
+.field{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:13px 14px;color:var(--text);outline:none;transition:border-color .15s}
+.field:focus{border-color:var(--coral)}
+.field::placeholder{color:#5d6478}
+textarea.field{resize:vertical;min-height:64px}
+.loc-status{font-size:13px;margin-top:10px;color:var(--muted);min-height:18px}
+.loc-status.err{color:var(--red)}
+.loc-status.ok{color:var(--green)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--border);color:var(--muted);
+  font-size:13.5px;font-weight:500;transition:all .15s;
+}
+.chip[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.slider-row{display:flex;align-items:center;gap:14px}
+input[type=range]{flex:1;accent-color:var(--coral);height:22px}
+.budget-val{min-width:86px;text-align:right;font-weight:700;color:var(--sand);font-variant-numeric:tabular-nums}
+
+.resume-banner{
+  background:linear-gradient(120deg,var(--coral-soft),var(--sand-soft));
+  border:1px solid rgba(255,107,87,.35);border-radius:var(--radius);
+  padding:14px 16px;margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+}
+.resume-banner p{flex:1 1 100%;font-size:14.5px}
+.resume-banner button{padding:9px 16px;border-radius:12px;font-weight:600;font-size:14px}
+.resume-yes{background:var(--coral);color:#fff}
+.resume-no{background:var(--surface);border:1px solid var(--border)}
+
+/* ----- Deck de swipe ------------------------------------------------------ */
+.deck-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.icon-btn{
+  width:40px;height:40px;border-radius:13px;background:var(--surface);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex:none;transition:background .15s;
+}
+.icon-btn:hover{background:var(--surface-2)}
+.deck-place{flex:1;min-width:0}
+.deck-place b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deck-place span{font-size:12.5px;color:var(--muted)}
+.pick-counter{
+  background:var(--surface);border:1px solid var(--border);border-radius:999px;
+  padding:7px 13px;font-size:13.5px;font-weight:600;white-space:nowrap;
+}
+.pick-counter .h{color:var(--green)} .pick-counter .m{color:var(--amber)}
+
+.stack{position:relative;flex:1;min-height:430px;margin-bottom:14px;touch-action:none}
+.card{
+  position:absolute;inset:0;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:var(--shadow);will-change:transform;user-select:none;-webkit-user-select:none;
+}
+.card.behind-1{transform:translateY(12px) scale(.955);filter:brightness(.75);z-index:1}
+.card.behind-2{transform:translateY(24px) scale(.91);filter:brightness(.55);z-index:0}
+.card.top{z-index:2;cursor:grab}
+.card.top:active{cursor:grabbing}
+.card.leaving{transition:transform .4s ease,opacity .4s ease;pointer-events:none}
+.card.spring{transition:transform .35s cubic-bezier(.2,1.4,.4,1)}
+.card-img{
+  position:relative;height:44%;min-height:170px;flex:none;
+  background-size:cover;background-position:center;
+  display:flex;align-items:center;justify-content:center;font-size:74px;
+}
+.card-img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,var(--surface))}
+.badge{
+  position:absolute;top:14px;left:14px;z-index:1;
+  background:rgba(15,17,23,.72);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.14);border-radius:999px;
+  padding:6px 12px;font-size:12.5px;font-weight:600;
+}
+.card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
+.card-title{font-size:21px;font-weight:700;letter-spacing:-.3px;line-height:1.2}
+.card-desc{font-size:14px;color:var(--muted);line-height:1.5}
+.kpis{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.kpi{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  padding:5px 9px;font-size:12.5px;font-weight:500;white-space:nowrap;
+}
+/* Overlays de verdict pendant le drag */
+.verdict{
+  position:absolute;top:22px;z-index:3;padding:8px 18px;border-radius:14px;
+  font-size:24px;font-weight:800;border:3px solid;opacity:0;transform:rotate(-8deg);
+  pointer-events:none;background:rgba(15,17,23,.6);
+}
+.verdict.like{left:18px;color:var(--green);border-color:var(--green)}
+.verdict.nope{right:18px;color:var(--red);border-color:var(--red);transform:rotate(8deg)}
+.verdict.maybe{left:50%;top:36%;transform:translateX(-50%);color:var(--amber);border-color:var(--amber)}
+/* Dégradés de secours par catégorie */
+.grad-culture{background-image:linear-gradient(135deg,#7b4397,#dc2430)}
+.grad-nature{background-image:linear-gradient(135deg,#134e5e,#71b280)}
+.grad-gastronomie{background-image:linear-gradient(135deg,#b02e0c,#f5c97b)}
+.grad-vie-nocturne{background-image:linear-gradient(135deg,#232a5c,#8348c0)}
+.grad-sport{background-image:linear-gradient(135deg,#1a6f9e,#45d0a1)}
+.grad-shopping{background-image:linear-gradient(135deg,#a83279,#f2778d)}
+.grad-famille{background-image:linear-gradient(135deg,#e08e2b,#f7d060)}
+.grad-insolite{background-image:linear-gradient(135deg,#41295a,#d66d75)}
+.grad-detente{background-image:linear-gradient(135deg,#136a8a,#a2c6b7)}
+.grad-panorama{background-image:linear-gradient(135deg,#e96443,#904e95)}
+.grad-custom{background-image:linear-gradient(135deg,#3a3f52,#6b7089)}
+
+.deck-actions{display:flex;justify-content:center;align-items:center;gap:16px;margin-bottom:12px}
+.act-btn{
+  width:60px;height:60px;border-radius:50%;font-size:24px;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s,border-color .15s;box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+.act-btn:active{transform:scale(.9)}
+.act-btn.nope{color:var(--red)} .act-btn.nope:hover{border-color:var(--red)}
+.act-btn.maybe{color:var(--amber);width:50px;height:50px;font-size:20px} .act-btn.maybe:hover{border-color:var(--amber)}
+.act-btn.like{color:var(--green)} .act-btn.like:hover{border-color:var(--green)}
+.act-btn.undo{width:44px;height:44px;font-size:17px;color:var(--muted)}
+.deck-loading{
+  display:none;align-items:center;justify-content:center;gap:9px;
+  color:var(--muted);font-size:13px;margin-bottom:10px;
+}
+.deck-loading.on{display:flex}
+.spinner{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  border:2px solid var(--border);border-top-color:var(--coral);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-deck{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;text-align:center;color:var(--muted);padding:24px;
+}
+.empty-deck .big{font-size:44px}
+
+/* ----- Sélection ----------------------------------------------------------- */
+.list-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin:18px 0 10px}
+.list-title small{color:var(--muted);font-weight:500}
+.sel-item{
+  display:flex;align-items:center;gap:12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:16px;padding:11px 13px;margin-bottom:8px;
+}
+.sel-emoji{font-size:24px;flex:none}
+.sel-info{flex:1;min-width:0}
+.sel-info b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-info span{font-size:12px;color:var(--muted)}
+.sel-acts{display:flex;gap:6px;flex:none}
+.mini-btn{
+  width:32px;height:32px;border-radius:10px;background:var(--surface-2);
+  border:1px solid var(--border);font-size:14px;display:flex;align-items:center;justify-content:center;
+}
+.mini-btn:hover{border-color:var(--muted)}
+.empty-list{color:var(--muted);font-size:13.5px;padding:6px 2px 2px}
+#custom-form{display:none;margin-top:10px}
+#custom-form.on{display:block}
+#custom-form .row{display:flex;gap:8px;margin-top:8px}
+#custom-form .row .field{flex:1;min-width:0}
+.sticky-cta{position:sticky;bottom:12px;margin-top:18px}
+
+/* ----- Planning ------------------------------------------------------------ */
+.stepper{display:flex;align-items:center;justify-content:center;gap:18px}
+.stepper button{
+  width:46px;height:46px;border-radius:14px;background:var(--surface-2);
+  border:1px solid var(--border);font-size:21px;font-weight:700;
+}
+.stepper .val{font-size:26px;font-weight:800;min-width:100px;text-align:center}
+.stepper .val small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.pace-row{display:flex;gap:8px;margin-top:6px}
+.pace-btn{
+  flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:16px;
+  padding:13px 6px;text-align:center;transition:all .15s;
+}
+.pace-btn .p-emoji{font-size:24px;display:block}
+.pace-btn .p-label{font-size:13px;font-weight:600;margin-top:5px;display:block}
+.pace-btn[aria-pressed="true"]{background:var(--coral-soft);border-color:var(--coral);color:var(--coral)}
+.plan-day{margin-top:22px}
+.plan-day h3{
+  font-size:15px;color:var(--sand);font-weight:800;text-transform:uppercase;
+  letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:10px;
+}
+.plan-day h3::after{content:"";flex:1;height:1px;background:var(--border)}
+.tl-item{display:flex;gap:13px;position:relative;padding-bottom:4px}
+.tl-time{
+  flex:none;width:52px;text-align:right;font-size:13.5px;font-weight:700;
+  color:var(--coral);font-variant-numeric:tabular-nums;padding-top:13px;
+}
+.tl-body{
+  flex:1;background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:12px 14px;margin-bottom:4px;
+}
+.tl-body b{font-size:14.5px}
+.tl-body .dur{font-size:12px;color:var(--sand);margin-left:6px;white-space:nowrap}
+.tl-body p{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tl-travel{
+  margin:2px 0 8px 65px;font-size:12.5px;color:var(--muted);
+  display:flex;align-items:center;gap:7px;
+}
+.tl-travel::before{content:"";width:14px;height:14px;border-left:2px dotted var(--border);margin-left:6px}
+.tips-panel{margin-top:20px}
+.tips-panel li{font-size:13.5px;color:var(--muted);margin:8px 0 8px 18px;line-height:1.5}
+.plan-btns{display:flex;flex-direction:column;gap:9px;margin-top:22px}
+.plan-loading{display:none;flex-direction:column;align-items:center;gap:14px;padding:52px 0;color:var(--muted)}
+.plan-loading.on{display:flex}
+.plan-loading .spinner{width:30px;height:30px;border-width:3px}
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(80px);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:14px;
+  padding:11px 18px;font-size:14px;font-weight:600;z-index:60;opacity:0;
+  transition:all .3s;box-shadow:var(--shadow);white-space:nowrap;
+}
+.toast.on{transform:translateX(-50%);opacity:1}
+
+/* ----- Écrans d'erreur / no_key -------------------------------------------- */
+.center-box{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:20px}
+.center-box .big{font-size:52px}
+.center-box h2{font-size:21px}
+.center-box p{color:var(--muted);font-size:14.5px;line-height:1.55;max-width:340px}
+.center-box code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+  padding:3px 8px;color:var(--sand);font-size:13px;
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= ÉCRAN A : ACCUEIL ======================= -->
+<section class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="logo">Escapade <span class="plane">✈</span></div>
+    <p class="pitch">Swipez les activités autour de vous, on planifie le séjour.</p>
+  </div>
+
+  <div class="resume-banner" id="resume-banner" hidden>
+    <p>👋 Une escapade est en cours. Reprendre là où vous étiez&nbsp;?</p>
+    <button class="resume-yes" id="btn-resume" aria-label="Reprendre la session précédente">Reprendre</button>
+    <button class="resume-no" id="btn-restart" aria-label="Recommencer une nouvelle escapade">Recommencer</button>
+  </div>
+
+  <div class="panel">
+    <h2>Où êtes-vous ?</h2>
+    <button class="btn btn-primary" id="btn-locate" aria-label="Me géolocaliser">📍 Me localiser</button>
+    <div class="loc-status" id="loc-status" role="status"></div>
+    <div class="or-sep">ou</div>
+    <input class="field" id="input-place" type="text" placeholder="Ville / lieu (ex : Lisbonne, Montmartre...)" autocomplete="off" aria-label="Ville ou lieu">
+  </div>
+
+  <div class="panel">
+    <h2>Envies</h2>
+    <div class="chips" id="cat-chips" role="group" aria-label="Catégories d'activités"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Budget max par activité</h2>
+    <div class="slider-row">
+      <input type="range" id="budget-slider" min="0" max="200" step="5" value="200" aria-label="Budget maximum en euros">
+      <span class="budget-val" id="budget-val">Sans limite</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Précisions</h2>
+    <textarea class="field" id="input-note" placeholder="Ex : avec enfants, végétarien, accès PMR..." aria-label="Précisions libres"></textarea>
+  </div>
+
+  <div style="margin-top:18px">
+    <button class="btn btn-primary" id="btn-discover" aria-label="Découvrir les activités">Découvrir les activités</button>
+  </div>
+</section>
+
+<!-- ======================= ÉCRAN B : DECK DE SWIPE ======================= -->
+<section class="screen" id="screen-deck">
+  <div class="deck-head">
+    <button class="icon-btn" id="btn-deck-home" aria-label="Retour à l'accueil">←</button>
+    <div class="deck-place">
+      <b id="deck-place-name">…</b>
+      <span>Glissez : droite = garder · gauche = passer · haut = peut-être</span>
+    </div>
+    <div class="pick-counter" aria-live="polite"><span class="h">♥ <span id="count-liked">0</span></span> · <span class="m">🤔 <span id="count-maybe">0</span></span></div>
+  </div>
+
+  <div class="stack" id="stack"></div>
+
+  <div class="deck-loading" id="deck-loading"><span class="spinner"></span> Recherche de nouvelles idées...</div>
+
+  <div class="deck-actions">
+    <button class="act-btn undo" id="btn-undo" aria-label="Annuler le dernier swipe">↩</button>
+    <button class="act-btn nope" id="btn-nope" aria-label="Passer cette activité">✕</button>
+    <button class="act-btn maybe" id="btn-maybe" aria-label="Mettre de côté, à voir">🤔</button>
+    <button class="act-btn like" id="btn-like" aria-label="Garder cette activité">♥</button>
+  </div>
+
+  <button class="btn btn-sand" id="btn-to-selection" hidden aria-label="Passer au planning">Passer au planning →</button>
+</section>
+
+<!-- ======================= ÉCRAN C : SÉLECTION ======================= -->
+<section class="screen" id="screen-selection">
+  <div class="deck-head">
+    <button class="icon-btn" id="btn-sel-back" aria-label="Revenir au deck de cartes">←</button>
+    <div class="deck-place"><b>Ma sélection</b><span>Ajustez avant de générer le planning</span></div>
+  </div>
+
+  <div class="list-title">♥ Sélection <small id="sel-liked-count"></small></div>
+  <div id="list-liked"></div>
+
+  <div class="list-title">🤔 En balance <small id="sel-maybe-count"></small></div>
+  <div id="list-maybe"></div>
+
+  <button class="btn btn-ghost" id="btn-add-custom" style="margin-top:14px" aria-label="Ajouter ma propre activité">+ Ajouter ma propre activité</button>
+
+  <div class="panel" id="custom-form">
+    <h2>Nouvelle activité</h2>
+    <input class="field" id="custom-title" type="text" placeholder="Titre (ex : Déjeuner chez tante Léa)" aria-label="Titre de l'activité">
+    <div class="row">
+      <select class="field" id="custom-cat" aria-label="Catégorie"></select>
+      <input class="field" id="custom-duration" type="number" min="10" step="5" value="60" placeholder="Durée (min)" aria-label="Durée en minutes">
+      <input class="field" id="custom-cost" type="number" min="0" step="1" value="0" placeholder="Coût (€)" aria-label="Coût en euros">
+    </div>
+    <div class="row"><input class="field" id="custom-note" type="text" placeholder="Note libre (optionnel)" aria-label="Note libre"></div>
+    <div class="row">
+      <button class="btn btn-primary" id="btn-custom-save" aria-label="Ajouter l'activité">Ajouter</button>
+      <button class="btn btn-ghost" id="btn-custom-cancel" aria-label="Annuler l'ajout">Annuler</button>
+    </div>
+  </div>
+
+  <div class="sticky-cta">
+    <button class="btn btn-primary" id="btn-to-plan" aria-label="Générer mon planning">Générer mon planning</button>
+  </div>
+</section>
+
+<!-- ======================= ÉCRAN D : PLANNING ======================= -->
+<section class="screen" id="screen-plan">
+  <div class="deck-head">
+    <button class="icon-btn" id="btn-plan-back" aria-label="Modifier ma sélection">←</button>
+    <div class="deck-place"><b>Mon planning</b><span id="plan-subtitle">Choisissez la durée et le rythme</span></div>
+  </div>
+
+  <div id="plan-config">
+    <div class="panel">
+      <h2>Durée du séjour</h2>
+      <div class="stepper">
+        <button id="days-minus" aria-label="Un jour de moins">−</button>
+        <div class="val"><span id="days-val">2</span><small>jour(s)</small></div>
+        <button id="days-plus" aria-label="Un jour de plus">+</button>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Rythme</h2>
+      <div class="pace-row" role="radiogroup" aria-label="Rythme du séjour">
+        <button class="pace-btn" data-pace="calme" role="radio" aria-pressed="false"><span class="p-emoji">🐢</span><span class="p-label">Calme</span></button>
+        <button class="pace-btn" data-pace="equilibre" role="radio" aria-pressed="true"><span class="p-emoji">🚶</span><span class="p-label">Équilibré</span></button>
+        <button class="pace-btn" data-pace="intense" role="radio" aria-pressed="false"><span class="p-emoji">🚀</span><span class="p-label">Intense</span></button>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primary" id="btn-generate-plan" aria-label="Créer le planning">Créer le planning ✨</button>
+    </div>
+  </div>
+
+  <div class="plan-loading" id="plan-loading">
+    <span class="spinner"></span>
+    <p>Construction de votre séjour...</p>
+  </div>
+
+  <div id="plan-result" hidden>
+    <div id="plan-days"></div>
+    <div class="panel tips-panel" id="tips-panel" hidden>
+      <h2>💡 Conseils</h2>
+      <ul id="tips-list"></ul>
+    </div>
+    <div class="plan-btns">
+      <button class="btn btn-primary" id="btn-copy-plan" aria-label="Copier le programme">📋 Copier le programme</button>
+      <button class="btn btn-ghost" id="btn-replan" aria-label="Régénérer le planning">♻️ Régénérer</button>
+      <button class="btn btn-ghost" id="btn-edit-selection" aria-label="Modifier ma sélection">← Modifier ma sélection</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= ÉCRANS INFO / ERREUR ======================= -->
+<section class="screen" id="screen-nokey">
+  <div class="center-box">
+    <div class="big">🔑</div>
+    <h2>Configuration requise</h2>
+    <p>Le serveur ne dispose pas encore de clé OpenAI. Ajoutez la variable d'environnement <code>OPENAI_API_KEY</code> dans Vercel, puis redéployez.</p>
+    <button class="btn btn-ghost" id="btn-nokey-home" style="max-width:240px" aria-label="Retour à l'accueil">← Retour à l'accueil</button>
+  </div>
+</section>
+
+<section class="screen" id="screen-error">
+  <div class="center-box">
+    <div class="big">📡</div>
+    <h2>Oups, petit trou d'air</h2>
+    <p id="error-msg">Impossible de contacter le serveur. Vérifiez votre connexion et réessayez.</p>
+    <button class="btn btn-primary" id="btn-retry" style="max-width:240px" aria-label="Réessayer">Réessayer</button>
+    <button class="btn btn-ghost" id="btn-error-home" style="max-width:240px" aria-label="Retour à l'accueil">← Accueil</button>
+  </div>
+</section>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ===========================================================================
+ * Escapade — logique applicative (vanilla JS, ES2020).
+ * =========================================================================== */
+
+const API_URL = "/api/escapade";
+const STORAGE_KEY = "escapade_v1";
+
+/* Métadonnées des 10 catégories : emoji, libellé, classe de dégradé */
+const CATS = {
+  "culture":      { emoji: "🏛️", label: "Culture" },
+  "nature":       { emoji: "🌿", label: "Nature" },
+  "gastronomie":  { emoji: "🍽️", label: "Gastronomie" },
+  "vie-nocturne": { emoji: "🌙", label: "Vie nocturne" },
+  "sport":        { emoji: "🚴", label: "Sport" },
+  "shopping":     { emoji: "🛍️", label: "Shopping" },
+  "famille":      { emoji: "👨‍👩‍👧", label: "Famille" },
+  "insolite":     { emoji: "🎭", label: "Insolite" },
+  "detente":      { emoji: "🧘", label: "Détente" },
+  "panorama":     { emoji: "🌅", label: "Panorama" },
+};
+
+/* ---------------------------------------------------------------------------
+ * État global (persisté en localStorage)
+ * --------------------------------------------------------------------------- */
+let state = defaultState();
+let dragging = null;          // suivi du drag en cours sur la carte du dessus
+let fetchingMore = false;     // évite les doubles requêtes de rechargement
+let retryAction = null;       // action à rejouer depuis l'écran d'erreur
+let lastScreen = "screen-home";
+
+function defaultState() {
+  return {
+    lat: 0, lng: 0,
+    place: "",                 // saisie utilisateur (ville / lieu)
+    placeName: "",             // nom renvoyé par l'API
+    filters: { categories: [], budget: 200, note: "" },
+    deck: [],                  // cartes restantes à swiper
+    seen: [],                  // titres déjà présentés (pour exclude)
+    liked: [], maybe: [],      // activités retenues / en balance
+    history: [],               // pile pour le bouton annuler
+    days: 2, pace: "equilibre",
+    plan: null,
+  };
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* stockage plein/privé */ }
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return (parsed && typeof parsed === "object") ? Object.assign(defaultState(), parsed) : null;
+  } catch { return null; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Helpers génériques
+ * --------------------------------------------------------------------------- */
+const $ = (id) => document.getElementById(id);
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function fmtDuration(min) {
+  const m = Math.max(0, Math.round(Number(min) || 0));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h} h ${String(r).padStart(2, "0")}` : `${h} h`;
+}
+
+function fmtCost(eur) {
+  const n = Number(eur) || 0;
+  return n <= 0 ? "Gratuit" : `${Math.round(n)} €`;
+}
+
+function showToast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("on");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("on"), 2200);
+}
+
+/* Bascule d'écran avec ré-animation douce */
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  const el = $(id);
+  el.classList.add("active");
+  if (id !== "screen-error" && id !== "screen-nokey") lastScreen = id;
+  window.scrollTo({ top: 0 });
+}
+
+/* ---------------------------------------------------------------------------
+ * Appel API — gère no_key, timeouts et erreurs réseau
+ * --------------------------------------------------------------------------- */
+async function apiCall(payload) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json().catch(() => null);
+  if (json && json.error === "no_key") { showScreen("screen-nokey"); return null; }
+  if (!res.ok || !json || json.error) {
+    throw new Error((json && json.error) || `HTTP ${res.status}`);
+  }
+  return json;
+}
+
+function showError(msg, retry) {
+  $("error-msg").textContent = msg || "Impossible de contacter le serveur. Vérifiez votre connexion et réessayez.";
+  retryAction = retry || null;
+  showScreen("screen-error");
+}
+
+/* ===========================================================================
+ * ÉCRAN A — ACCUEIL
+ * =========================================================================== */
+function initHome() {
+  // Chips des catégories
+  const chips = $("cat-chips");
+  chips.innerHTML = Object.entries(CATS).map(([key, c]) =>
+    `<button class="chip" data-cat="${key}" aria-pressed="false">${c.emoji} ${c.label}</button>`
+  ).join("");
+  chips.addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    const on = btn.getAttribute("aria-pressed") === "true";
+    btn.setAttribute("aria-pressed", String(!on));
+  });
+
+  // Slider budget
+  $("budget-slider").addEventListener("input", () => {
+    const v = Number($("budget-slider").value);
+    $("budget-val").textContent = v >= 200 ? "Sans limite" : `${v} €`;
+  });
+
+  // Géolocalisation
+  $("btn-locate").addEventListener("click", locateMe);
+
+  // Lancer la découverte
+  $("btn-discover").addEventListener("click", startDiscovery);
+}
+
+function locateMe() {
+  const status = $("loc-status");
+  status.className = "loc-status";
+  if (!navigator.geolocation) {
+    status.className = "loc-status err";
+    status.textContent = "Géolocalisation indisponible — indiquez une ville ci-dessous.";
+    return;
+  }
+  status.textContent = "Localisation en cours...";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      state.lat = pos.coords.latitude;
+      state.lng = pos.coords.longitude;
+      state.place = "";
+      $("input-place").value = "";
+      status.className = "loc-status ok";
+      status.textContent = `✓ Position trouvée (${state.lat.toFixed(3)}, ${state.lng.toFixed(3)})`;
+    },
+    () => {
+      status.className = "loc-status err";
+      status.textContent = "Géolocalisation refusée — indiquez une ville ci-dessous.";
+    },
+    { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+  );
+}
+
+/* Lit les filtres du formulaire d'accueil dans l'état */
+function readHomeForm() {
+  const cats = [...document.querySelectorAll('#cat-chips .chip[aria-pressed="true"]')]
+    .map((b) => b.dataset.cat);
+  const budget = Number($("budget-slider").value);
+  state.filters = { categories: cats, budget, note: $("input-note").value.trim() };
+  const typed = $("input-place").value.trim();
+  if (typed) { state.place = typed; state.lat = 0; state.lng = 0; }
+}
+
+async function startDiscovery() {
+  readHomeForm();
+  if (!state.place && state.lat === 0 && state.lng === 0) {
+    const status = $("loc-status");
+    status.className = "loc-status err";
+    status.textContent = "Localisez-vous ou indiquez une ville pour commencer.";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  const btn = $("btn-discover");
+  btn.disabled = true;
+  btn.textContent = "Recherche d'activités...";
+  try {
+    const batch = await fetchActivities(8);
+    if (!batch) return; // no_key → écran déjà affiché
+    state.deck = batch;
+    saveState();
+    renderDeck();
+    showScreen("screen-deck");
+  } catch (err) {
+    showError("La recherche d'activités a échoué : " + err.message, startDiscovery);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Découvrir les activités";
+  }
+}
+
+/* Construit le corps "generate" et retourne les activités (ou null si no_key) */
+async function fetchActivities(count) {
+  const filters = {};
+  if (state.filters.categories.length) filters.categories = state.filters.categories;
+  if (state.filters.budget < 200) filters.budget_max_eur = state.filters.budget;
+  if (state.filters.note) filters.note = state.filters.note;
+
+  const payload = {
+    action: "generate",
+    lat: state.lat, lng: state.lng,
+    count,
+    exclude: allSeenTitles(),
+  };
+  if (state.place) payload.place = state.place;
+  if (Object.keys(filters).length) payload.filters = filters;
+
+  const json = await apiCall(payload);
+  if (!json) return null;
+  if (json.place_name) { state.placeName = json.place_name; }
+  return (json.activities || []).filter((a) => a && a.title);
+}
+
+function allSeenTitles() {
+  const titles = new Set(state.seen);
+  for (const a of [...state.deck, ...state.liked, ...state.maybe]) titles.add(a.title);
+  return [...titles].slice(-100);
+}
+
+/* ===========================================================================
+ * ÉCRAN B — DECK DE SWIPE
+ * =========================================================================== */
+function renderDeck() {
+  $("deck-place-name").textContent = state.placeName || state.place || "Autour de vous";
+  const stack = $("stack");
+  stack.innerHTML = "";
+
+  if (state.deck.length === 0) {
+    stack.innerHTML = `
+      <div class="empty-deck">
+        <div class="big">🧭</div>
+        <p>Plus de cartes pour le moment.</p>
+        <button class="btn btn-ghost" id="btn-more-cards" style="max-width:260px" aria-label="Chercher d'autres idées">Chercher d'autres idées</button>
+      </div>`;
+    const more = $("btn-more-cards");
+    if (more) more.addEventListener("click", () => fetchMore(true));
+  } else {
+    // Les 3 premières cartes : dessus + 2 aperçus décalés derrière
+    const visible = state.deck.slice(0, 3);
+    for (let i = visible.length - 1; i >= 0; i--) {
+      const card = buildCard(visible[i]);
+      if (i === 0) { card.classList.add("top"); attachDrag(card); }
+      else card.classList.add(`behind-${i}`);
+      stack.appendChild(card);
+    }
+  }
+  updateCounter();
+  saveState();
+}
+
+function buildCard(a) {
+  const cat = CATS[a.category] || { emoji: a.emoji || "📍", label: a.category || "Activité" };
+  const gradClass = CATS[a.category] ? `grad-${a.category}` : "grad-custom";
+  const card = document.createElement("article");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="verdict like">GARDER ♥</div>
+    <div class="verdict nope">PASSER ✕</div>
+    <div class="verdict maybe">À VOIR 🤔</div>
+    <div class="card-img ${gradClass}"><span>${esc(a.emoji || cat.emoji)}</span><span class="badge">${cat.emoji} ${esc(cat.label)}</span></div>
+    <div class="card-body">
+      <h3 class="card-title">${esc(a.title)}</h3>
+      <p class="card-desc">${esc(a.description || "")}</p>
+      <div class="kpis">
+        ${a.distance_km != null ? `<span class="kpi">📍 ${esc(Number(a.distance_km).toFixed(1))} km</span>` : ""}
+        <span class="kpi">💶 ${fmtCost(a.est_cost_eur)}</span>
+        <span class="kpi">⏱ ${fmtDuration(a.est_duration_min)}</span>
+        ${a.rating != null ? `<span class="kpi">★ ${esc(Number(a.rating).toFixed(1))}</span>` : ""}
+        ${a.popularity ? `<span class="kpi">🔥 ${esc(a.popularity)}</span>` : ""}
+        ${a.best_time ? `<span class="kpi">🕐 ${esc(a.best_time)}</span>` : ""}
+      </div>
+    </div>`;
+  loadWikiImage(card, a);
+  return card;
+}
+
+/* Image Wikipédia FR (thumbnail) ; en cas d'échec on garde le dégradé + emoji */
+function loadWikiImage(card, a) {
+  if (!a.wikipedia_title) return;
+  const url = `https://fr.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(a.wikipedia_title)}`;
+  fetch(url)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((json) => {
+      const src = json && json.thumbnail && json.thumbnail.source;
+      if (!src) return;
+      const img = new Image();
+      img.onload = () => {
+        const box = card.querySelector(".card-img");
+        box.style.backgroundImage = `url("${src}")`;
+        const emoji = box.querySelector("span:not(.badge)");
+        if (emoji) emoji.style.display = "none";
+      };
+      img.src = src;
+    })
+    .catch(() => { /* fallback dégradé conservé */ });
+}
+
+/* --- Gestes : drag tactile + souris via Pointer Events --------------------- */
+const SWIPE_THRESHOLD = 90;
+
+function attachDrag(card) {
+  card.addEventListener("pointerdown", (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragging = { card, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0 };
+    card.setPointerCapture(e.pointerId);
+    card.classList.remove("spring");
+  });
+  card.addEventListener("pointermove", (e) => {
+    if (!dragging || dragging.card !== card) return;
+    dragging.dx = e.clientX - dragging.startX;
+    dragging.dy = e.clientY - dragging.startY;
+    const { dx, dy } = dragging;
+    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * 0.07}deg)`;
+    // Overlays selon la direction dominante
+    const upward = dy < 0 && Math.abs(dy) > Math.abs(dx);
+    card.querySelector(".verdict.like").style.opacity = !upward && dx > 30 ? Math.min(1, dx / 120) : 0;
+    card.querySelector(".verdict.nope").style.opacity = !upward && dx < -30 ? Math.min(1, -dx / 120) : 0;
+    card.querySelector(".verdict.maybe").style.opacity = upward && dy < -30 ? Math.min(1, -dy / 120) : 0;
+  });
+  const end = (e) => {
+    if (!dragging || dragging.card !== card) return;
+    const { dx, dy } = dragging;
+    dragging = null;
+    const upward = dy < -SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx);
+    if (upward) swipe("maybe");
+    else if (dx > SWIPE_THRESHOLD) swipe("like");
+    else if (dx < -SWIPE_THRESHOLD) swipe("nope");
+    else {
+      card.classList.add("spring");
+      card.style.transform = "";
+      card.querySelectorAll(".verdict").forEach((v) => (v.style.opacity = 0));
+    }
+  };
+  card.addEventListener("pointerup", end);
+  card.addEventListener("pointercancel", end);
+}
+
+/* Applique un verdict à la carte du dessus, anime sa sortie, ré-empile */
+function swipe(verdict) {
+  const activity = state.deck[0];
+  if (!activity) return;
+  const top = document.querySelector(".card.top");
+  if (top) {
+    top.classList.add("leaving");
+    const out = verdict === "like" ? "translate(120vw, -30px) rotate(22deg)"
+      : verdict === "nope" ? "translate(-120vw, -30px) rotate(-22deg)"
+      : "translate(0, -120vh) rotate(4deg)";
+    top.style.transform = out;
+    top.style.opacity = "0";
+  }
+  state.deck.shift();
+  state.seen.push(activity.title);
+  if (verdict === "like") state.liked.push(activity);
+  if (verdict === "maybe") state.maybe.push(activity);
+  state.history.push({ activity, verdict });
+  if (state.history.length > 30) state.history.shift();
+
+  // Laisse l'animation de sortie se jouer avant de re-rendre la pile
+  setTimeout(renderDeck, 220);
+  maybeFetchMore();
+}
+
+function undoSwipe() {
+  const last = state.history.pop();
+  if (!last) { showToast("Rien à annuler"); return; }
+  const idx = state.seen.lastIndexOf(last.activity.title);
+  if (idx !== -1) state.seen.splice(idx, 1);
+  if (last.verdict === "like") state.liked = state.liked.filter((a) => a !== last.activity && a.title !== last.activity.title);
+  if (last.verdict === "maybe") state.maybe = state.maybe.filter((a) => a !== last.activity && a.title !== last.activity.title);
+  state.deck.unshift(last.activity);
+  renderDeck();
+}
+
+function updateCounter() {
+  $("count-liked").textContent = state.liked.length;
+  $("count-maybe").textContent = state.maybe.length;
+  $("btn-to-selection").hidden = state.liked.length < 1;
+}
+
+/* Recharge automatique quand il reste ≤ 2 cartes */
+function maybeFetchMore() {
+  if (state.deck.length <= 2) fetchMore(false);
+}
+
+async function fetchMore(fromEmpty) {
+  if (fetchingMore) return;
+  fetchingMore = true;
+  $("deck-loading").classList.add("on");
+  try {
+    const batch = await fetchActivities(8);
+    if (batch && batch.length) {
+      const known = new Set(allSeenTitles());
+      const fresh = batch.filter((a) => !known.has(a.title));
+      state.deck.push(...fresh);
+      renderDeck();
+    } else if (fromEmpty && batch) {
+      showToast("Aucune nouvelle idée trouvée");
+    }
+  } catch {
+    if (fromEmpty) showToast("Réseau indisponible, réessayez");
+  } finally {
+    fetchingMore = false;
+    $("deck-loading").classList.remove("on");
+  }
+}
+
+function initDeck() {
+  $("btn-nope").addEventListener("click", () => swipe("nope"));
+  $("btn-maybe").addEventListener("click", () => swipe("maybe"));
+  $("btn-like").addEventListener("click", () => swipe("like"));
+  $("btn-undo").addEventListener("click", undoSwipe);
+  $("btn-deck-home").addEventListener("click", () => showScreen("screen-home"));
+  $("btn-to-selection").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
+}
+
+/* ===========================================================================
+ * ÉCRAN C — SÉLECTION
+ * =========================================================================== */
+function renderSelection() {
+  renderSelList("list-liked", state.liked, "liked");
+  renderSelList("list-maybe", state.maybe, "maybe");
+  $("sel-liked-count").textContent = `(${state.liked.length})`;
+  $("sel-maybe-count").textContent = `(${state.maybe.length})`;
+  $("btn-to-plan").disabled = state.liked.length === 0;
+  saveState();
+}
+
+function renderSelList(elId, items, kind) {
+  const el = $(elId);
+  if (items.length === 0) {
+    el.innerHTML = `<p class="empty-list">${kind === "liked" ? "Aucune activité retenue pour l'instant." : "Rien en balance."}</p>`;
+    return;
+  }
+  el.innerHTML = items.map((a, i) => {
+    const cat = CATS[a.category] || { emoji: "✍️", label: a.category || "Perso" };
+    const moveBtn = kind === "liked"
+      ? `<button class="mini-btn" data-act="demote" data-i="${i}" aria-label="Rétrograder en balance" title="Mettre en balance">🤔</button>`
+      : `<button class="mini-btn" data-act="promote" data-i="${i}" aria-label="Promouvoir dans la sélection" title="Ajouter à la sélection">♥</button>`;
+    return `
+      <div class="sel-item">
+        <span class="sel-emoji">${esc(a.emoji || cat.emoji)}</span>
+        <div class="sel-info">
+          <b>${esc(a.title)}</b>
+          <span>${cat.emoji} ${esc(cat.label)} · ⏱ ${fmtDuration(a.est_duration_min)} · 💶 ${fmtCost(a.est_cost_eur)}</span>
+        </div>
+        <div class="sel-acts" data-kind="${kind}">
+          ${moveBtn}
+          <button class="mini-btn" data-act="remove" data-i="${i}" aria-label="Supprimer cette activité" title="Supprimer">🗑</button>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function handleSelAction(e) {
+  const btn = e.target.closest(".mini-btn");
+  if (!btn) return;
+  const kind = btn.closest(".sel-acts").dataset.kind;
+  const i = Number(btn.dataset.i);
+  const src = kind === "liked" ? state.liked : state.maybe;
+  const [item] = src.splice(i, 1);
+  if (!item) return;
+  const act = btn.dataset.act;
+  if (act === "demote") state.maybe.push(item);
+  if (act === "promote") state.liked.push(item);
+  // "remove" : rien à faire, l'item est déjà retiré
+  renderSelection();
+  updateCounter();
+}
+
+function initSelection() {
+  $("list-liked").addEventListener("click", handleSelAction);
+  $("list-maybe").addEventListener("click", handleSelAction);
+  $("btn-sel-back").addEventListener("click", () => { renderDeck(); showScreen("screen-deck"); });
+
+  // Formulaire d'activité personnalisée
+  const catSelect = $("custom-cat");
+  catSelect.innerHTML = Object.entries(CATS).map(([k, c]) =>
+    `<option value="${k}">${c.emoji} ${c.label}</option>`).join("");
+  $("btn-add-custom").addEventListener("click", () => {
+    $("custom-form").classList.toggle("on");
+    $("custom-title").focus();
+  });
+  $("btn-custom-cancel").addEventListener("click", () => $("custom-form").classList.remove("on"));
+  $("btn-custom-save").addEventListener("click", () => {
+    const title = $("custom-title").value.trim();
+    if (!title) { showToast("Indiquez un titre"); return; }
+    state.liked.push({
+      title,
+      category: catSelect.value,
+      description: $("custom-note").value.trim(),
+      est_duration_min: Math.max(10, Number($("custom-duration").value) || 60),
+      est_cost_eur: Math.max(0, Number($("custom-cost").value) || 0),
+      distance_km: 0, rating: null, popularity: null,
+      best_time: "après-midi", lat: state.lat, lng: state.lng,
+      wikipedia_title: null, emoji: "✍️", custom: true,
+    });
+    $("custom-title").value = ""; $("custom-note").value = "";
+    $("custom-form").classList.remove("on");
+    renderSelection();
+    updateCounter();
+    showToast("Activité ajoutée ✍️");
+  });
+
+  $("btn-to-plan").addEventListener("click", () => {
+    renderPlanConfig();
+    showScreen("screen-plan");
+  });
+}
+
+/* ===========================================================================
+ * ÉCRAN D — PLANNING
+ * =========================================================================== */
+function renderPlanConfig() {
+  $("days-val").textContent = state.days;
+  document.querySelectorAll(".pace-btn").forEach((b) =>
+    b.setAttribute("aria-pressed", String(b.dataset.pace === state.pace)));
+  // Si un plan existe déjà, on le ré-affiche
+  if (state.plan) renderPlanResult();
+  else { $("plan-result").hidden = true; $("plan-subtitle").textContent = "Choisissez la durée et le rythme"; }
+}
+
+async function generatePlan() {
+  const activities = state.liked.map((a) => ({
+    title: a.title, category: a.category,
+    est_duration_min: Number(a.est_duration_min) || 60,
+    est_cost_eur: Number(a.est_cost_eur) || 0,
+    distance_km: Number(a.distance_km) || 0,
+    best_time: a.best_time || "après-midi",
+    lat: Number(a.lat) || 0, lng: Number(a.lng) || 0,
+    emoji: a.emoji || "📍",
+  }));
+  if (activities.length === 0) { showToast("Sélectionnez au moins une activité"); return; }
+
+  $("plan-config").hidden = true;
+  $("plan-result").hidden = true;
+  $("plan-loading").classList.add("on");
+  try {
+    const json = await apiCall({
+      action: "plan",
+      place: state.placeName || state.place || "ma destination",
+      days: state.days,
+      pace: state.pace,
+      activities,
+      custom_notes: state.filters.note || undefined,
+    });
+    if (!json) return; // no_key
+    state.plan = { days: json.days || [], tips: json.tips || [] };
+    saveState();
+    renderPlanResult();
+  } catch (err) {
+    showError("La génération du planning a échoué : " + err.message, () => { showScreen("screen-plan"); generatePlan(); });
+  } finally {
+    $("plan-loading").classList.remove("on");
+    $("plan-config").hidden = false;
+  }
+}
+
+function renderPlanResult() {
+  const plan = state.plan;
+  if (!plan) return;
+  $("plan-subtitle").textContent = `${state.placeName || state.place} · ${state.days} jour(s)`;
+  const wrap = $("plan-days");
+  wrap.innerHTML = (plan.days || []).map((day) => {
+    const items = (day.items || []).map((it, i, arr) => {
+      const travel = Number(it.travel_after_min) > 0 && i < arr.length - 1
+        ? `<div class="tl-travel">🚶 ${Math.round(it.travel_after_min)} min de trajet${it.travel_mode ? ` (${esc(it.travel_mode)})` : ""}</div>`
+        : "";
+      return `
+        <div class="tl-item">
+          <div class="tl-time">${esc(it.time || "")}</div>
+          <div class="tl-body">
+            <b>${esc(it.emoji || "📍")} ${esc(it.title || "")}</b><span class="dur">⏱ ${fmtDuration(it.duration_min)}</span>
+            ${it.note ? `<p>${esc(it.note)}</p>` : ""}
+          </div>
+        </div>${travel}`;
+    }).join("");
+    return `<div class="plan-day"><h3>${esc(day.label || "Jour")}</h3>${items}</div>`;
+  }).join("");
+
+  const tips = plan.tips || [];
+  $("tips-panel").hidden = tips.length === 0;
+  $("tips-list").innerHTML = tips.map((t) => `<li>${esc(t)}</li>`).join("");
+  $("plan-result").hidden = false;
+}
+
+/* Copie du programme en texte formaté */
+async function copyPlan() {
+  const plan = state.plan;
+  if (!plan) return;
+  const lines = [`✈ ESCAPADE — ${state.placeName || state.place}`, ""];
+  for (const day of plan.days || []) {
+    lines.push(`━━ ${day.label || "Jour"} ━━`);
+    for (const it of day.items || []) {
+      lines.push(`${it.time || "--:--"}  ${it.emoji || ""} ${it.title} (${fmtDuration(it.duration_min)})`);
+      if (it.note) lines.push(`        ${it.note}`);
+      if (Number(it.travel_after_min) > 0) lines.push(`        🚶 ${Math.round(it.travel_after_min)} min de trajet`);
+    }
+    lines.push("");
+  }
+  if ((plan.tips || []).length) {
+    lines.push("💡 Conseils :");
+    for (const t of plan.tips) lines.push(`• ${t}`);
+  }
+  const text = lines.join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Programme copié 📋");
+  } catch {
+    // Fallback : textarea temporaire
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); showToast("Programme copié 📋"); }
+    catch { showToast("Copie impossible"); }
+    ta.remove();
+  }
+}
+
+function initPlan() {
+  $("days-minus").addEventListener("click", () => {
+    state.days = Math.max(1, state.days - 1);
+    $("days-val").textContent = state.days;
+    saveState();
+  });
+  $("days-plus").addEventListener("click", () => {
+    state.days = Math.min(14, state.days + 1);
+    $("days-val").textContent = state.days;
+    saveState();
+  });
+  document.querySelectorAll(".pace-btn").forEach((b) =>
+    b.addEventListener("click", () => {
+      state.pace = b.dataset.pace;
+      document.querySelectorAll(".pace-btn").forEach((x) =>
+        x.setAttribute("aria-pressed", String(x === b)));
+      saveState();
+    }));
+  $("btn-generate-plan").addEventListener("click", generatePlan);
+  $("btn-replan").addEventListener("click", generatePlan);
+  $("btn-copy-plan").addEventListener("click", copyPlan);
+  $("btn-plan-back").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
+  $("btn-edit-selection").addEventListener("click", () => { renderSelection(); showScreen("screen-selection"); });
+}
+
+/* ===========================================================================
+ * ÉCRANS INFO / ERREUR + REPRISE DE SESSION
+ * =========================================================================== */
+function initMisc() {
+  $("btn-nokey-home").addEventListener("click", () => showScreen("screen-home"));
+  $("btn-error-home").addEventListener("click", () => showScreen("screen-home"));
+  $("btn-retry").addEventListener("click", () => {
+    showScreen(lastScreen);
+    if (retryAction) { const fn = retryAction; retryAction = null; fn(); }
+  });
+
+  // Proposition de reprise si une session existe
+  const saved = loadState();
+  const hasProgress = saved && (saved.deck.length || saved.liked.length || saved.maybe.length || saved.plan);
+  if (hasProgress) {
+    $("resume-banner").hidden = false;
+    $("btn-resume").addEventListener("click", () => {
+      state = saved;
+      $("resume-banner").hidden = true;
+      if (state.plan) { renderPlanConfig(); showScreen("screen-plan"); }
+      else if (state.deck.length) { renderDeck(); showScreen("screen-deck"); }
+      else { renderSelection(); showScreen("screen-selection"); }
+      updateCounter();
+    });
+    $("btn-restart").addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState();
+      $("resume-banner").hidden = true;
+      showToast("Nouvelle escapade ✈");
+    });
+  }
+}
+
+/* --------------------------------------------------------------------------- */
+initHome();
+initDeck();
+initSelection();
+initPlan();
+initMisc();
+</script>
+</body>
+</html>
