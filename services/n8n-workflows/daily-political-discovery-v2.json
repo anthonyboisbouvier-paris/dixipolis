@@ -140,7 +140,7 @@
     },
     {
       "parameters": {
-        "url": "https://www.googleapis.com/youtube/v3/search",
+        "url": "https://www.googleapis.com/youtube/v3/playlistItems",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "youTubeOAuth2Api",
         "sendQuery": true,
@@ -148,31 +148,15 @@
           "parameters": [
             {
               "name": "part",
-              "value": "snippet"
+              "value": "snippet,contentDetails"
             },
             {
-              "name": "channelId",
-              "value": "={{$json.channel_id}}"
-            },
-            {
-              "name": "type",
-              "value": "video"
-            },
-            {
-              "name": "order",
-              "value": "date"
-            },
-            {
-              "name": "publishedAfter",
-              "value": "={{ $('Set Workflow Mode1').all()[0].json.start_date }}"
+              "name": "playlistId",
+              "value": "={{ 'UU' + $json.channel_id.slice(2) }}"
             },
             {
               "name": "maxResults",
-              "value": "={{ $('Set Workflow Mode1').all()[0].json.mode === \"test\" ? 2 : 50 }}"
-            },
-            {
-              "name": "publishedBefore",
-              "value": "={{ $('Set Workflow Mode1').all()[0].json.end_date }}"
+              "value": "50"
             }
           ]
         },
@@ -199,7 +183,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Normalisation des vid�os de channels\ntry {\n  const normalized = [];\n\n  for (const response of items) {\n    const videos = response.json?.items ?? [];\n\n    for (const video of videos) {\n      const videoId = video.id?.videoId;\n\n      if (!videoId) continue;\n\n      normalized.push({\n        json: {\n          video_id: videoId,\n          source: \"youtube_channel\",\n          channel_title: video.snippet?.channelTitle ?? \"Unknown\"\n        }\n      });\n    }\n  }\n\n  return normalized;\n  \n} catch (error) {\n  console.error('Channel videos normalization error:', error.message);\n  return [];\n}\n"
+        "jsCode": "// Normalisation des vidéos de channels (playlistItems.list — uploads)\ntry {\n  const wf = $('Set Workflow Mode1').all()[0].json;\n  const start = new Date(wf.start_date);\n  const end = new Date(wf.end_date);\n  const normalized = [];\n\n  for (const response of items) {\n    const videos = response.json?.items ?? [];\n    for (const video of videos) {\n      // playlistItems: snippet.resourceId.videoId ; compat search: id.videoId\n      const videoId = video.snippet?.resourceId?.videoId ?? video.id?.videoId;\n      if (!videoId) continue;\n      const publishedAt = video.contentDetails?.videoPublishedAt ?? video.snippet?.publishedAt;\n      if (!publishedAt) continue;\n      const ts = new Date(publishedAt);\n      // fenêtre appliquée côté client (playlistItems n'a pas publishedAfter/Before)\n      if (ts < start || ts >= end) continue;\n      normalized.push({ json: {\n        video_id: videoId,\n        source: \"youtube_channel\",\n        channel_title: video.snippet?.videoOwnerChannelTitle ?? video.snippet?.channelTitle ?? \"Unknown\",\n        channel_id: video.snippet?.videoOwnerChannelId ?? video.snippet?.channelId ?? null,\n        published_at: publishedAt\n      }});\n    }\n  }\n  return normalized;\n} catch (error) {\n  console.error('Channel videos normalization error:', error.message);\n  return [];\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
