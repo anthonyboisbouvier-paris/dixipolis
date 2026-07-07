@@ -362,6 +362,26 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 .detail-tips li{font-size:13.5px;color:var(--muted);margin:7px 0 7px 18px;line-height:1.45}
 .sheet-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px;padding:18px 0 26px}
 
+/* ----- Compte & synchronisation cloud --------------------------------------- */
+.hero{position:relative}
+.hero-account{position:absolute;top:4px;right:0;font-size:16px;opacity:.85}
+.cloud-badge{font-size:15px;vertical-align:middle;margin-left:4px}
+.acc-hint{font-size:13.5px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.acc-hint b{color:var(--text);word-break:break-all}
+.acc-msg{font-size:13px;color:var(--red);min-height:18px;margin-top:10px}
+.acc-msg.ok{color:var(--green)}
+.acc-row{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;margin:4px 0 10px;word-break:break-all}
+.acc-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--green);margin-bottom:14px;
+}
+.acc-badge.sync{color:var(--amber)}
+.acc-badge.err{color:var(--muted)}
+#account-body .btn{margin-top:10px}
+#account-body .field{margin-top:4px}
+#account-body input[inputmode=numeric]{letter-spacing:.35em;text-align:center;font-size:20px;font-weight:700}
+
 /* ----- Carte panoramique ---------------------------------------------------- */
 .map-tabs{display:flex;gap:8px;margin-bottom:10px}
 .map-tab{
@@ -480,7 +500,8 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
 <!-- ======================= ÉCRAN A : ACCUEIL ======================= -->
 <section class="screen active" id="screen-home">
   <div class="hero">
-    <div class="logo">Escapade <span class="plane">✈</span></div>
+    <button class="icon-btn hero-account" id="btn-account" aria-label="Mon compte">👤</button>
+    <div class="logo">Escapade <span class="plane">✈</span><span class="cloud-badge" id="cloud-badge" hidden title="Synchronisation cloud active">☁️</span></div>
     <p class="pitch">Swipez les activités autour de vous, on planifie le séjour.</p>
   </div>
 
@@ -708,6 +729,17 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
   <div class="sheet-body" id="sheet-body"></div>
 </div>
 
+<!-- ======================= BOTTOM-SHEET MON COMPTE ======================= -->
+<div class="sheet-backdrop" id="account-backdrop"></div>
+<div class="sheet" id="account-sheet" role="dialog" aria-modal="true" aria-label="Mon compte">
+  <div class="sheet-grip"><span></span></div>
+  <div class="sheet-head">
+    <b>👤 Mon compte</b>
+    <button class="icon-btn" id="account-close" aria-label="Fermer">✕</button>
+  </div>
+  <div class="sheet-body" id="account-body"></div>
+</div>
+
 <script>
 "use strict";
 /* ===========================================================================
@@ -715,7 +747,10 @@ input[type=range]{flex:1;accent-color:var(--coral);height:22px}
  * =========================================================================== */
 
 const API_URL = "/api/escapade";
+const AUTH_API_URL = "/api/escapade-auth";
 const STORAGE_KEY = "escapade_v2";
+const AUTH_KEY = "escapade_auth_v1";
+const UPDATED_KEY = "escapade_updated_v1";
 const LEGACY_KEY = "escapade_v1";
 const IMG_CACHE_KEY = "escapade_img_v1";
 const DETAIL_CACHE_KEY = "escapade_detail_v1";
@@ -778,7 +813,11 @@ function defaultState() {
 }
 
 function saveState() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch { /* stockage plein/privé */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(UPDATED_KEY, new Date().toISOString());
+  } catch { /* stockage plein/privé */ }
+  scheduleSync(); // push cloud debounced (no-op si déconnecté)
 }
 function loadState() {
   try {
@@ -2616,26 +2655,360 @@ function initMisc() {
     showScreen(lastScreen);
     if (retryAction) { const fn = retryAction; retryAction = null; fn(); }
   });
+}
 
-  const saved = loadState();
-  const hasProgress = saved && (saved.deck.length || saved.liked.length || saved.maybe.length || saved.plan);
-  if (hasProgress) {
-    $("resume-banner").hidden = false;
-    $("btn-resume").addEventListener("click", () => {
-      state = saved;
-      $("resume-banner").hidden = true;
-      if (state.plan) { renderPlanConfig(); showScreen("screen-plan"); }
-      else if (state.deck.length) { renderDeck(); showScreen("screen-deck"); }
-      else { renderSelection(); showScreen("screen-selection"); }
-      updateCounter();
+function stateHasProgress(s) {
+  return !!(s && ((s.deck && s.deck.length) || (s.liked && s.liked.length) ||
+    (s.maybe && s.maybe.length) || s.plan));
+}
+
+/* Bannière de reprise — appelée APRÈS le pull cloud de démarrage */
+function initResume() {
+  $("resume-banner").hidden = !stateHasProgress(loadState());
+  $("btn-resume").addEventListener("click", () => {
+    const saved = loadState();
+    $("resume-banner").hidden = true;
+    if (!stateHasProgress(saved)) return;
+    state = saved;
+    if (state.plan) { renderPlanConfig(); showScreen("screen-plan"); }
+    else if (state.deck.length) { renderDeck(); showScreen("screen-deck"); }
+    else { renderSelection(); showScreen("screen-selection"); }
+    updateCounter();
+  });
+  $("btn-restart").addEventListener("click", () => {
+    try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LEGACY_KEY); } catch { /* ignore */ }
+    state = defaultState();
+    $("resume-banner").hidden = true;
+    showToast("Nouvelle escapade ✈");
+  });
+}
+
+/* ===========================================================================
+ * COMPTE & SYNCHRONISATION CLOUD (code par email via /api/escapade-auth)
+ *   - session persistée dans escapade_auth_v1 {access_token, refresh_token, exp, email}
+ *   - refresh automatique (marge 60 s) avant tout appel sync
+ *   - push debounced 3 s après chaque saveState() tant que connecté
+ *   - pull au démarrage : le plus récent updated_at gagne
+ * =========================================================================== */
+let auth = loadAuth();
+let pendingEmail = "";          // email en attente de code (étape 2 du login)
+let pendingCloud = null;        // { state, updated_at } en attente d'arbitrage
+let syncTimer = null;
+let syncBusy = false;
+let syncAgain = false;
+let syncStatus = "ok";          // "ok" | "sync" | "err"
+let refreshInflight = null;
+
+function loadAuth() {
+  try {
+    const raw = localStorage.getItem(AUTH_KEY);
+    const a = raw ? JSON.parse(raw) : null;
+    return (a && typeof a === "object" && a.access_token && a.refresh_token) ? a : null;
+  } catch { return null; }
+}
+function saveAuth() {
+  try {
+    if (auth) localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+    else localStorage.removeItem(AUTH_KEY);
+  } catch { /* ignore */ }
+}
+
+/* Appel au proxy serveur — la clé anon Supabase ne transite jamais ici */
+async function authCall(payload) {
+  try {
+    const res = await fetch(AUTH_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: timeoutSignal(12000),
     });
-    $("btn-restart").addEventListener("click", () => {
-      try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LEGACY_KEY); } catch { /* ignore */ }
-      state = defaultState();
-      $("resume-banner").hidden = true;
-      showToast("Nouvelle escapade ✈");
-    });
+    return await res.json().catch(() => null);
+  } catch { return null; }
+}
+
+/** Access token valide (refresh auto si expiration < 60 s), ou null. */
+function ensureAccessToken() {
+  if (!auth) return Promise.resolve(null);
+  const now = Math.floor(Date.now() / 1000);
+  if (Number(auth.exp) - now > 60) return Promise.resolve(auth.access_token);
+  if (!refreshInflight) {
+    const rt = auth.refresh_token;
+    refreshInflight = (async () => {
+      const res = await authCall({ action: "refresh", refresh_token: rt });
+      if (res && res.ok && auth) {
+        auth = {
+          access_token: res.access_token,
+          refresh_token: res.refresh_token,
+          exp: Math.floor(Date.now() / 1000) + (Number(res.expires_in) || 3600),
+          email: auth.email,
+        };
+        saveAuth();
+        return auth.access_token;
+      }
+      /* Refresh refusé → déconnexion silencieuse ; réseau KO → on réessaiera */
+      if (res && !res.ok) logout(true);
+      return null;
+    })().finally(() => { refreshInflight = null; });
   }
+  return refreshInflight;
+}
+
+function logout(silent) {
+  auth = null;
+  pendingEmail = "";
+  pendingCloud = null;
+  saveAuth();
+  clearTimeout(syncTimer);
+  updateCloudUI();
+  if ($("account-sheet").classList.contains("on")) renderAccount();
+  showToast(silent ? "Session expirée — reconnectez-vous pour synchroniser"
+    : "Déconnecté — vos données restent sur cet appareil");
+}
+
+function updateCloudUI() {
+  $("cloud-badge").hidden = !auth;
+}
+
+function setSyncStatus(s) {
+  syncStatus = s;
+  const b = $("sync-badge");
+  if (!b) return;
+  b.className = "acc-badge" + (s === "sync" ? " sync" : s === "err" ? " err" : "");
+  b.textContent = s === "sync" ? "⟳ Sync..." : s === "err" ? "⚠ Sync en attente" : "✓ Synchronisé";
+}
+
+/* L'état le plus riche connu localement (l'état courant peut être vierge
+   tant que la bannière « Reprendre » n'a pas été utilisée). */
+function bestLocalState() {
+  if (stateHasProgress(state)) return state;
+  const saved = loadState();
+  return stateHasProgress(saved) ? saved : state;
+}
+
+/* --- Push debounced (3 s après chaque saveState) --------------------------- */
+function scheduleSync() {
+  if (!auth) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(doSync, 3000);
+}
+
+async function doSync() {
+  if (!auth) return;
+  if (syncBusy) { syncAgain = true; return; }
+  syncBusy = true;
+  setSyncStatus("sync");
+  try {
+    const token = await ensureAccessToken();
+    if (!token) { setSyncStatus("err"); return; }
+    const res = await authCall({ action: "push", access_token: token, state: bestLocalState() });
+    if (res && res.ok) setSyncStatus("ok");
+    else if (res && res.error === "unauthorized") logout(true);
+    else setSyncStatus("err");
+  } finally {
+    syncBusy = false;
+    if (syncAgain) { syncAgain = false; scheduleSync(); }
+  }
+}
+
+/* Remplace l'état local par l'état cloud et rafraîchit l'écran actif */
+function applyCloudState(cs, updatedAt) {
+  state = Object.assign(defaultState(), cs);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(UPDATED_KEY, updatedAt || new Date().toISOString());
+  } catch { /* ignore */ }
+  updateCounter();
+  const active = document.querySelector(".screen.active");
+  const id = active ? active.id : "screen-home";
+  if (id === "screen-deck") renderDeck();
+  else if (id === "screen-selection") renderSelection();
+  else if (id === "screen-plan") renderPlanConfig();
+  if ($("screen-home")) $("resume-banner").hidden = !stateHasProgress(state);
+}
+
+/* --- Pull de démarrage : le plus récent updated_at gagne -------------------- */
+async function startupSync() {
+  if (!auth) return;
+  updateCloudUI();
+  const token = await ensureAccessToken();
+  if (!token) return;
+  const res = await authCall({ action: "pull", access_token: token });
+  if (!res || !res.ok) return;
+  const cloudAt = res.updated_at ? Date.parse(res.updated_at) || 0 : 0;
+  let localAt = 0;
+  try { localAt = Date.parse(localStorage.getItem(UPDATED_KEY) || "") || 0; } catch { /* ignore */ }
+  if (res.state && typeof res.state === "object" && cloudAt > localAt) {
+    /* Cloud plus récent → il remplace la sauvegarde locale (restore ensuite) */
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.assign(defaultState(), res.state)));
+      localStorage.setItem(UPDATED_KEY, res.updated_at);
+    } catch { /* ignore */ }
+  } else if (localAt > cloudAt && stateHasProgress(loadState())) {
+    scheduleSync(); // local plus récent → on renvoie vers le cloud
+  }
+}
+
+/* --- Pull post-connexion : arbitrage cloud / appareil ----------------------- */
+async function afterLoginSync() {
+  setSyncStatus("sync");
+  const token = await ensureAccessToken();
+  if (!token) { setSyncStatus("err"); return; }
+  const res = await authCall({ action: "pull", access_token: token });
+  if (!res || !res.ok) { setSyncStatus("err"); return; }
+  const cloud = (res.state && typeof res.state === "object") ? res.state : null;
+  const local = bestLocalState();
+  if (cloud && stateHasProgress(local) && JSON.stringify(cloud) !== JSON.stringify(local)) {
+    pendingCloud = { state: cloud, updated_at: res.updated_at || "" };
+    setSyncStatus("ok");
+    renderAccount();
+    return;
+  }
+  if (cloud && stateHasProgress(cloud) && !stateHasProgress(local)) {
+    applyCloudState(cloud, res.updated_at);
+    setSyncStatus("ok");
+    showToast("Données cloud restaurées ☁️");
+    return;
+  }
+  doSync(); // sinon : push direct de l'état de cet appareil
+}
+
+/* --- Bottom-sheet « Mon compte » -------------------------------------------- */
+function openAccountSheet() {
+  renderAccount();
+  $("account-backdrop").classList.add("on");
+  $("account-sheet").classList.add("on");
+}
+function closeAccountSheet() {
+  $("account-backdrop").classList.remove("on");
+  $("account-sheet").classList.remove("on");
+}
+
+function accMsg(txt, ok) {
+  const el = $("acc-msg");
+  if (!el) return;
+  el.className = "acc-msg" + (ok ? " ok" : "");
+  el.textContent = txt || "";
+}
+
+function renderAccount() {
+  const body = $("account-body");
+  if (auth && pendingCloud) {
+    body.innerHTML = `
+      <p class="acc-hint">☁️ Une sauvegarde cloud existe déjà pour <b>${esc(auth.email)}</b> et diffère des données de cet appareil. Que souhaitez-vous faire&nbsp;?</p>
+      <button class="btn btn-primary" id="acc-use-cloud" aria-label="Reprendre mes données cloud">☁️ Reprendre mes données cloud</button>
+      <button class="btn btn-ghost" id="acc-use-local" aria-label="Garder les données de cet appareil">📱 Garder celles de cet appareil</button>
+      <p class="acc-msg" id="acc-msg"></p>`;
+    return;
+  }
+  if (auth) {
+    body.innerHTML = `
+      <div class="acc-row"><span>👤</span><span>${esc(auth.email)}</span></div>
+      <div class="acc-badge" id="sync-badge">✓ Synchronisé</div>
+      <p class="acc-hint">Vos escapades sont sauvegardées dans le cloud et vous suivent sur tous vos appareils.</p>
+      <button class="btn btn-ghost" id="acc-logout" aria-label="Se déconnecter">Se déconnecter</button>
+      <p class="acc-hint" style="margin-top:12px">La déconnexion conserve les données de cet appareil.</p>`;
+    setSyncStatus(syncStatus);
+    return;
+  }
+  if (pendingEmail) {
+    body.innerHTML = `
+      <p class="acc-hint">Un code à 6 chiffres vient d'être envoyé à <b>${esc(pendingEmail)}</b>. Il est valable quelques minutes.</p>
+      <input class="field" id="acc-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" aria-label="Code reçu par email">
+      <button class="btn btn-primary" id="acc-verify" aria-label="Valider le code">Valider</button>
+      <button class="btn btn-ghost" id="acc-back" aria-label="Changer d'adresse email">← Changer d'email</button>
+      <p class="acc-msg" id="acc-msg"></p>`;
+    const code = $("acc-code");
+    code.focus();
+    code.addEventListener("keydown", (e) => { if (e.key === "Enter") $("acc-verify").click(); });
+    return;
+  }
+  body.innerHTML = `
+    <p class="acc-hint">Connectez-vous avec un simple code reçu par email pour sauvegarder vos escapades dans le cloud et les retrouver sur tous vos appareils.</p>
+    <input class="field" id="acc-email" type="email" autocomplete="email" placeholder="votre@email.fr" aria-label="Adresse email">
+    <button class="btn btn-primary" id="acc-send" aria-label="Recevoir mon code">Recevoir mon code</button>
+    <p class="acc-msg" id="acc-msg"></p>`;
+  $("acc-email").addEventListener("keydown", (e) => { if (e.key === "Enter") $("acc-send").click(); });
+}
+
+async function accountSendCode() {
+  const input = $("acc-email");
+  const email = input ? input.value.trim() : "";
+  if (!email || email.length > 200 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    accMsg("Indiquez une adresse email valide.");
+    return;
+  }
+  const btn = $("acc-send");
+  btn.disabled = true;
+  btn.textContent = "Envoi du code...";
+  const res = await authCall({ action: "request_otp", email });
+  btn.disabled = false;
+  btn.textContent = "Recevoir mon code";
+  if (res && res.ok) {
+    pendingEmail = email;
+    renderAccount();
+  } else if (res && res.error === "rate_limit") {
+    accMsg("Trop d'envois — réessayez dans quelques minutes.");
+  } else {
+    accMsg("Envoi impossible pour le moment. Réessayez.");
+  }
+}
+
+async function accountVerifyCode() {
+  const input = $("acc-code");
+  const token = input ? input.value.trim() : "";
+  if (!/^\d{6}$/.test(token)) {
+    accMsg("Le code comporte 6 chiffres.");
+    return;
+  }
+  const btn = $("acc-verify");
+  btn.disabled = true;
+  btn.textContent = "Vérification...";
+  const res = await authCall({ action: "verify", email: pendingEmail, token });
+  btn.disabled = false;
+  btn.textContent = "Valider";
+  if (res && res.ok && res.access_token) {
+    auth = {
+      access_token: res.access_token,
+      refresh_token: res.refresh_token,
+      exp: Math.floor(Date.now() / 1000) + (Number(res.expires_in) || 3600),
+      email: res.user_email || pendingEmail,
+    };
+    pendingEmail = "";
+    saveAuth();
+    updateCloudUI();
+    renderAccount();
+    showToast("Connecté ✓");
+    afterLoginSync();
+  } else {
+    accMsg("Code invalide ou expiré. Vérifiez le dernier email reçu.");
+  }
+}
+
+function initAccount() {
+  $("btn-account").addEventListener("click", openAccountSheet);
+  $("account-close").addEventListener("click", closeAccountSheet);
+  $("account-backdrop").addEventListener("click", closeAccountSheet);
+  $("account-body").addEventListener("click", (e) => {
+    if (e.target.closest("#acc-send")) { accountSendCode(); return; }
+    if (e.target.closest("#acc-verify")) { accountVerifyCode(); return; }
+    if (e.target.closest("#acc-back")) { pendingEmail = ""; renderAccount(); return; }
+    if (e.target.closest("#acc-logout")) { logout(false); return; }
+    if (e.target.closest("#acc-use-cloud")) {
+      const pc = pendingCloud;
+      pendingCloud = null;
+      if (pc) applyCloudState(pc.state, pc.updated_at);
+      renderAccount();
+      showToast("Données cloud restaurées ☁️");
+      return;
+    }
+    if (e.target.closest("#acc-use-local")) {
+      pendingCloud = null;
+      renderAccount();
+      doSync();
+      showToast("Les données de cet appareil seront synchronisées 📱");
+    }
+  });
+  updateCloudUI();
 }
 
 /* --------------------------------------------------------------------------- */
@@ -2646,6 +3019,9 @@ initSheet();
 initPlan();
 initMap();
 initMisc();
+initAccount();
+/* Pull cloud d'abord (si connecté), puis restauration locale */
+startupSync().catch(() => { /* hors-ligne : on reste local */ }).finally(initResume);
 </script>
 </body>
 </html>
