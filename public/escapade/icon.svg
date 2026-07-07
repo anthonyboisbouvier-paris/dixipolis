@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#ff6b57"/>
-  <!-- Avion en papier stylisé -->
-  <path d="M96 268 L428 116 L316 396 L268 296 Z" fill="#ffffff"/>
-  <path d="M268 296 L428 116 L252 336 L252 396 Z" fill="#ffd9d2"/>
-</svg>
