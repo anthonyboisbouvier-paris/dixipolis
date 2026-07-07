@@ -1,0 +1,19 @@
+{
+  "name": "Dixipolis — Du jour",
+  "short_name": "Dixipolis",
+  "description": "Les vidéos politiques transcrites de la journée : intervenants, thèmes et textes de loi évoqués.",
+  "start_url": "/du-jour",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icon-dixipolis.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
