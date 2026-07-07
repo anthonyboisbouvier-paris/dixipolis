@@ -10,7 +10,8 @@
  * n'est exposée au navigateur. Navigation par jour via ?date=YYYY-MM-DD.
  *
  * Variables d'environnement requises (Vercel → Settings → Environment
- * Variables) : SUPABASE_URL, SUPABASE_ANON_KEY.
+ * Variables) : SUPABASE_URL, SUPABASE_ANON_KEY — scopées Production ET Preview,
+ * puis REDÉPLOYER la preview (les env vars sont figées au build).
  * ============================================================================= */
 
 import type { Metadata } from "next";
