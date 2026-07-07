@@ -4,7 +4,8 @@
  * Hero section Dixipolis — messaging centré sur la BASE DE DONNÉES.
  * "Chaque mot prononcé par un politique français, transcrit et cherchable."
  *
- * Branding fort : gradient audacieux, compteur animé, schéma pipeline inline.
+ * Les compteurs affichent les statistiques RÉELLES du corpus (app_global_stats)
+ * passées en prop depuis app/page.tsx. Si les stats sont indisponibles → "—".
  * Composant serveur (Server Component).
  * ============================================================================= */
 
@@ -18,9 +19,22 @@ import {
   Database,
   Play,
 } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
+import type { GlobalStats } from "@/lib/supabase-server";
+
+/* --------------------------------------------------------------------------
+ * Helpers d'affichage
+ * -------------------------------------------------------------------------- */
+function fmtDayFr(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 /* -------------------------------------------------------------------------- */
-export default function HeroSection() {
+export default function HeroSection({ stats }: { stats: GlobalStats | null }) {
   return (
     <section
       className="relative overflow-hidden"
@@ -39,20 +53,15 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      {/* Formes décoratives */}
+      {/* Formes décoratives — dégradés radiaux statiques (sans filter, perf mobile) */}
       <div
-        className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full opacity-20 blur-3xl"
-        style={{ background: "var(--color-primary)" }}
+        className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full opacity-20"
+        style={{ background: "radial-gradient(circle, var(--color-primary) 0%, transparent 70%)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-20 -left-10 h-72 w-72 rounded-full opacity-10 blur-3xl"
-        style={{ background: "var(--color-accent)" }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/4 h-40 w-40 -translate-x-1/2 rounded-full opacity-[0.07] blur-2xl"
-        style={{ background: "#ec4899" }}
+        className="pointer-events-none absolute -bottom-20 -left-10 h-72 w-72 rounded-full opacity-10"
+        style={{ background: "radial-gradient(circle, var(--color-accent) 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
@@ -242,17 +251,17 @@ export default function HeroSection() {
             </Link>
           </div>
 
-          {/* Compteurs chiffrés — crédibilité immédiate */}
+          {/* Compteurs chiffrés — statistiques réelles du corpus */}
           <div
             className="animate-fade-in-up mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
             style={{ animationDelay: "350ms" }}
           >
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                45&nbsp;000<span className="text-[var(--color-primary)]">+</span>
+                {stats ? formatNumber(stats.n_segments) : "—"}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                discours transcrits
+                segments transcrits
               </p>
             </div>
             <div
@@ -262,10 +271,10 @@ export default function HeroSection() {
             />
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                2&nbsp;000<span className="text-[var(--color-primary)]">+</span>
+                {stats ? formatNumber(stats.n_persons) : "—"}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                politiciens suivis
+                politiciens r&eacute;f&eacute;renc&eacute;s
               </p>
             </div>
             <div
@@ -275,7 +284,14 @@ export default function HeroSection() {
             />
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                10&nbsp;500<span className="text-[var(--color-primary)]">h</span>
+                {stats ? (
+                  <>
+                    {formatNumber(stats.total_hours)}
+                    <span className="text-[var(--color-primary)]">h</span>
+                  </>
+                ) : (
+                  "—"
+                )}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
                 de vid&eacute;o analys&eacute;es
@@ -293,11 +309,11 @@ export default function HeroSection() {
                   aria-hidden="true"
                 />
                 <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                  24<span className="text-[var(--color-success)]">h</span>
+                  {stats ? fmtDayFr(stats.last_day) : "—"}
                 </p>
               </div>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                fraîcheur des donn&eacute;es
+                corpus mis &agrave; jour
               </p>
             </div>
           </div>

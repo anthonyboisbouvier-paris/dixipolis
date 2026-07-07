@@ -16,7 +16,7 @@ import {
   Code,
   ArrowRight,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatNumber } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
 interface FeatureCardData {
@@ -34,14 +34,18 @@ interface FeatureCardData {
   gradient: string;
 }
 
-/* -------------------------------------------------------------------------- */
-const features: FeatureCardData[] = [
+/* --------------------------------------------------------------------------
+ * buildFeatures \u2014 le chiffre du module "Interroger" vient des stats r\u00e9elles
+ * (n_segments, prop de app/page.tsx). Sans stats \u2192 formulation sans chiffre.
+ * -------------------------------------------------------------------------- */
+const buildFeatures = (nSegments: number | null): FeatureCardData[] => [
   {
     id: "prompt",
     title: "Interroger la base",
     tagline: "Posez une question, obtenez des preuves",
-    description:
-      "Un agent IA qui fouille 45 000+ discours pour retrouver exactement ce qu\u2019un politique a dit \u2014 avec l\u2019extrait vid\u00e9o horodat\u00e9.",
+    description: nSegments
+      ? `Un agent IA qui fouille ${formatNumber(nSegments)} segments transcrits pour retrouver exactement ce qu\u2019un politique a dit \u2014 avec l\u2019extrait vid\u00e9o horodat\u00e9.`
+      : "Un agent IA qui fouille le corpus transcrit pour retrouver exactement ce qu\u2019un politique a dit \u2014 avec l\u2019extrait vid\u00e9o horodat\u00e9.",
     userActions: [
       "Rechercher par le sens ou par citation exacte",
       "Obtenir l\u2019extrait vid\u00e9o avec timecode",
@@ -115,7 +119,9 @@ const features: FeatureCardData[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-export default function FeatureCards() {
+export default function FeatureCards({ nSegments }: { nSegments: number | null }) {
+  const features = buildFeatures(nSegments);
+
   return (
     <section
       className="py-16 sm:py-20 lg:py-24"

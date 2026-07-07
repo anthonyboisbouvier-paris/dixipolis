@@ -56,15 +56,24 @@ export default function Header() {
   // Chemin actuel pour la detection du lien actif
   const pathname = usePathname();
 
-  /* ---- Detection du scroll ---- */
+  /* ---- Detection du scroll (throttle via requestAnimationFrame) ---- */
   // On ajoute une ombre sous le header des que l'utilisateur scroll
-  // au-dela de 10px pour creer une separation visuelle subtile.
+  // au-dela de 10px. Le listener est throttle avec un flag "ticking" :
+  // au plus une mise a jour d'etat par frame, pour la fluidite mobile.
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 10);
+        ticking = false;
+      });
     };
 
     // Verification initiale au cas ou la page est deja scrollee
+    // (passe par le meme chemin rAF que le listener)
     handleScroll();
 
     window.addEventListener("scroll", handleScroll, { passive: true });

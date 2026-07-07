@@ -2,13 +2,15 @@
  * components/home/StatsSection.tsx
  *
  * Section "La base en chiffres" — fond sombre, chiffres lumineux.
- * Message clé : l'ampleur et la fraîcheur de la base de données.
+ * Affiche les 6 statistiques RÉELLES du corpus (app_global_stats) passées
+ * en prop depuis app/page.tsx. Si les stats sont indisponibles → "—".
  *
  * Composant serveur (Server Component).
  * ============================================================================= */
 
-import { Video, Users, FileText, Clock, RefreshCw, TrendingUp } from "lucide-react";
+import { Video, Users, FileText, Clock, Mic2, Radio } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
+import type { GlobalStats } from "@/lib/supabase-server";
 
 /* -------------------------------------------------------------------------- */
 interface StatItem {
@@ -20,101 +22,121 @@ interface StatItem {
   color: string;
 }
 
-const stats: StatItem[] = [
-  {
-    id: "speeches",
-    value: formatNumber(45230) + "+",
-    label: "Discours transcrits",
-    detail: "Assembl\u00e9e, S\u00e9nat, interviews, meetings",
-    icon: FileText,
-    color: "#60a5fa",
-  },
-  {
-    id: "hours",
-    value: formatNumber(10500) + "h",
-    label: "De vid\u00e9o analys\u00e9es",
-    detail: "Transcription mot \u00e0 mot avec horodatage",
-    icon: Clock,
-    color: "#34d399",
-  },
-  {
-    id: "politicians",
-    value: formatNumber(2048) + "+",
-    label: "Politiciens suivis",
-    detail: "D\u00e9put\u00e9s, s\u00e9nateurs, eurod\u00e9put\u00e9s, maires",
-    icon: Users,
-    color: "#a78bfa",
-  },
-  {
-    id: "videos",
-    value: formatNumber(18700) + "+",
-    label: "Vid\u00e9os index\u00e9es",
-    detail: "YouTube, sites institutionnels, m\u00e9dias",
-    icon: Video,
-    color: "#fb923c",
-  },
-  {
-    id: "daily",
-    value: "150+",
-    label: "Nouvelles entr\u00e9es / jour",
-    detail: "Ingestion automatique quotidienne",
-    icon: RefreshCw,
-    color: "#f472b6",
-  },
-  {
-    id: "growth",
-    value: "+8%",
-    label: "Croissance mensuelle",
-    detail: "La base grandit chaque jour",
-    icon: TrendingUp,
-    color: "#fbbf24",
-  },
-];
+function fmtDayFr(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function buildStats(stats: GlobalStats | null): StatItem[] {
+  const v = (n: number | undefined, suffix = ""): string =>
+    stats && typeof n === "number" ? formatNumber(n) + suffix : "—";
+
+  return [
+    {
+      id: "segments",
+      value: v(stats?.n_segments),
+      label: "Segments transcrits",
+      detail: "Transcription mot à mot avec horodatage",
+      icon: FileText,
+      color: "#60a5fa",
+    },
+    {
+      id: "hours",
+      value: v(stats?.total_hours, "h"),
+      label: "Heures de vidéo",
+      detail: "Interviews, plateaux, assemblées",
+      icon: Clock,
+      color: "#34d399",
+    },
+    {
+      id: "persons",
+      value: v(stats?.n_persons),
+      label: "Personnalités référencées",
+      detail: "Base de personnalités politiques françaises",
+      icon: Users,
+      color: "#a78bfa",
+    },
+    {
+      id: "speakers",
+      value: v(stats?.n_speakers_resolved),
+      label: "Orateurs identifiés",
+      detail: "Prises de parole attribuées à leur auteur",
+      icon: Mic2,
+      color: "#fb923c",
+    },
+    {
+      id: "videos",
+      value: v(stats?.n_videos),
+      label: "Vidéos",
+      detail: "Vidéos transcrites dans le corpus",
+      icon: Video,
+      color: "#f472b6",
+    },
+    {
+      id: "channels",
+      value: v(stats?.n_channels),
+      label: "Chaînes suivies",
+      detail: "Chaînes YouTube politiques et médias",
+      icon: Radio,
+      color: "#fbbf24",
+    },
+  ];
+}
 
 /* -------------------------------------------------------------------------- */
-export default function StatsSection() {
+export default function StatsSection({ stats }: { stats: GlobalStats | null }) {
+  const items = buildStats(stats);
+
   return (
     <section
       className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
       style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)" }}
-      aria-label="La base de donn\u00e9es Dixipolis en chiffres"
+      aria-label="La base de données Dixipolis en chiffres"
     >
-      {/* Formes décoratives */}
+      {/* Formes décoratives — dégradés radiaux statiques (sans filter) */}
       <div
-        className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-[0.06] blur-3xl"
-        style={{ background: "#3b82f6" }}
+        className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-[0.06]"
+        style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full opacity-[0.05] blur-3xl"
-        style={{ background: "#8b5cf6" }}
+        className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full opacity-[0.05]"
+        style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
       <div className="page-container relative">
         {/* En-tête */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70 backdrop-blur-sm">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#34d399]" aria-hidden="true" />
-            Mis &agrave; jour en continu
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70">
+            {stats ? (
+              <>
+                Corpus&nbsp;: {fmtDayFr(stats.first_day)} &rarr; {fmtDayFr(stats.last_day)}
+              </>
+            ) : (
+              <>Corpus&nbsp;: p&eacute;riode indisponible</>
+            )}
           </div>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            La base la plus compl&egrave;te du discours politique fran&ccedil;ais
+            Le discours politique fran&ccedil;ais, transcrit et sourc&eacute;
           </h2>
           <p className="text-lg text-white/60">
-            Chaque jour, notre pipeline d&eacute;couvre et transcrit automatiquement
-            les nouvelles prises de parole. Rien ne nous &eacute;chappe.
+            Notre pipeline d&eacute;couvre et transcrit les prises de parole
+            politiques. Voici l&apos;&eacute;tat r&eacute;el du corpus.
           </p>
         </div>
 
         {/* Grille 3×2 */}
         <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-3">
-          {stats.map((stat) => {
+          {items.map((stat) => {
             const Icon = stat.icon;
             return (
               <div
                 key={stat.id}
-                className="group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 backdrop-blur-sm transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.06] sm:p-6"
+                className="group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 transition-colors duration-300 hover:border-white/[0.12] hover:bg-white/[0.06] sm:p-6"
               >
                 <div className="mb-3 flex items-center gap-3">
                   <div

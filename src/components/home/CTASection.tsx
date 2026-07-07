@@ -9,9 +9,10 @@
 
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
 
 /* -------------------------------------------------------------------------- */
-export default function CTASection() {
+export default function CTASection({ nSegments }: { nSegments: number | null }) {
   return (
     <section
       className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
@@ -21,17 +22,15 @@ export default function CTASection() {
       }}
       aria-label="Essayer Dixipolis gratuitement"
     >
-      {/* Éléments décoratifs */}
+      {/* Éléments décoratifs — dégradés radiaux statiques (sans filter) */}
       <div
-        className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-white opacity-[0.06] blur-3xl"
+        className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full opacity-[0.06]"
+        style={{ background: "radial-gradient(circle, #ffffff 0%, transparent 70%)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-16 -right-16 h-96 w-96 rounded-full bg-white opacity-[0.04] blur-3xl"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/3 top-1/4 h-48 w-48 rounded-full bg-white opacity-[0.05] blur-2xl"
+        className="pointer-events-none absolute -bottom-16 -right-16 h-96 w-96 rounded-full opacity-[0.04]"
+        style={{ background: "radial-gradient(circle, #ffffff 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
@@ -45,7 +44,9 @@ export default function CTASection() {
 
           {/* Titre */}
           <h2 className="mb-5 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-            45&nbsp;000 discours vous attendent.
+            {nSegments
+              ? `${formatNumber(nSegments)} segments de discours vous attendent.`
+              : "Le corpus du discours politique vous attend."}
             <br />
             Qu&apos;allez-vous chercher ?
           </h2>
