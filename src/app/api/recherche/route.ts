@@ -26,6 +26,8 @@ import { rpc } from "@/lib/supabase-server";
 import { llmAvailable, openaiCall } from "@/lib/openai-server";
 
 export const dynamic = "force-dynamic";
+// Les appels LLM peuvent dépasser les 10 s par défaut de Vercel
+export const maxDuration = 60;
 
 /* --------------------------------------------------------------------------
  * Types des contrats RPC

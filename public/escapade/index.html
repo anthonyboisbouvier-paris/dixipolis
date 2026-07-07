@@ -1012,7 +1012,7 @@ async function startDiscovery() {
   btn.disabled = true;
   btn.textContent = "Recherche d'activités...";
   try {
-    const batch = await fetchActivities(8);
+    const batch = await fetchActivities(6);
     if (!batch) return; // no_key → écran déjà affiché
     state.deck = batch;
     saveState();
@@ -1341,7 +1341,7 @@ async function fetchMore(fromEmpty) {
   fetchingMore = true;
   $("deck-loading").classList.add("on");
   try {
-    const batch = await fetchActivities(8);
+    const batch = await fetchActivities(6);
     if (batch && batch.length) {
       const known = new Set(allSeenTitles());
       const fresh = batch.filter((a) => !known.has(a.title));
