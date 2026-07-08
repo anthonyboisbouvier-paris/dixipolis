@@ -51,9 +51,26 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
       transitoire (mojibake UTF-8→GBK) sur UN appel unitaire de l'ancienne méthode — la lane
       batchée était correcte. Promu en prod (nœud `Batch Video IDs`) + repo, run test
       end-to-end vert (format DIX-33 intact).*
-- [ ] **Attribution des sources** : pour chaque vidéo du résultat final, source unique ou multiple
+- [x] **Attribution des sources** : pour chaque vidéo du résultat final, source unique ou multiple
       (chaîne / mots-clés / SerpAPI). Verdict SerpAPI : garder, réduire ou couper.
-- [ ] Relevé quota avant/après.
+      *Run prod du 08/07 (exécution 29, publication_day=07/07, min_score=0.7, 188 vidéos finales) :
+      175 vidéos (93 %) proviennent du flux chaînes seul, 13 (7 %) chaînes+mots-clés, 0 orpheline.
+      MAIS le bug Merge dual-run fait perdre 39 vidéos uniques du flux mots-clés qui passaient
+      le score (51 au Filter By Score du 2e run, 12 en doublon avec le flux chaînes) → à réparer
+      en J2, gain attendu ~+20 % de vidéos finales. SerpAPI : le nœud `Normalize SerpAPI Results`
+      ne s'exécute JAMAIS (câblage) — 15 requêtes/jour (300 résultats bruts, très bruités type
+      sport/people) pour un apport strictement nul, constaté sur les runs des 07 et 08/07.
+      **Verdict SerpAPI : COUPER** (désactiver la branche, économie de 15 crédits SerpAPI/jour) ;
+      réévaluation possible plus tard si un manque de rappel est constaté.*
+- [x] Relevé quota avant/après.
+      *Run du 08/07 avec batch : subscriptions 4 u + playlistItems 193 u + recherche mots-clés
+      27×100 = 2 700 u + enricher 19 u (908 vidéos → 19 appels) ≈ **2 916 u** ;
+      avant le batch le même run aurait coûté ≈ 3 805 u (908 appels d'enrichissement).
+      Économie ~890 u/jour ; la recherche mots-clés reste 93 % du coût → cible J2.*
+
+> **Note 08/07** : le cron de Loïc (09:00 UTC) n'a produit AUCUNE exécution aujourd'hui —
+> l'endpoint n'est probablement pas encore branché côté RunPod (cf. DIX-56). Le run du jour
+> a été déclenché manuellement à 12:28 UTC avec les paramètres cibles (vert, 188 vidéos).
 
 ### J2 (09/07) — Rendement des requêtes mots-clés
 - [ ] Mesurer le **rendement unique par requête** (vidéos introuvables via les chaînes suivies).
