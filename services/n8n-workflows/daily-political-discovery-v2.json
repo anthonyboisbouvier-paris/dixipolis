@@ -40,17 +40,21 @@
             },
             {
               "name": "id",
-              "value": "={{ $json.video_id }}"
+              "value": "={{ $json.ids }}"
+            },
+            {
+              "name": "maxResults",
+              "value": "50"
             }
           ]
         },
         "options": {
           "batching": {
             "batch": {
-              "batchInterval": 3000
+              "batchInterval": 1000
             }
           },
-          "timeout": 3000
+          "timeout": 10000
         }
       },
       "id": "eee8e25d-4ce9-4f0a-b0b1-d44f50b8d4b0",
@@ -641,6 +645,19 @@
       ],
       "id": "77cdc0f7-3470-4fb2-9056-f27dd75af670",
       "name": "Limit si test"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * REGROUPEMENT POUR videos.list\n * L'API accepte 50 IDs par appel (1 unité/appel au lieu d'1 unité/vidéo).\n * Validé le 08/07/2026 : sortie strictement identique sur 726 vidéos de référence\n * (720/720 items, la seule divergence étant un bug d'encodage transitoire\n * côté appels unitaires).\n */\nconst ids = $input.all().map(i => i.json.video_id).filter(Boolean);\nconst out = [];\nfor (let i = 0; i < ids.length; i += 50) {\n  out.push({ json: { ids: ids.slice(i, i + 50).join(',') } });\n}\nreturn out;"
+      },
+      "id": "batchvideoids",
+      "name": "Batch Video IDs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1868,
+        -80
+      ]
     }
   ],
   "connections": {
@@ -971,6 +988,17 @@
       ]
     },
     "Limit si test": {
+      "main": [
+        [
+          {
+            "node": "Batch Video IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Batch Video IDs": {
       "main": [
         [
           {

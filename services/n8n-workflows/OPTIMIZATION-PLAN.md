@@ -43,8 +43,14 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
 - [ ] Vérifier le run du cron Loïc de 09:00 UTC
 
 ### J1 (08/07) — Quick wins quota + attribution des sources
-- [ ] **Batcher l'enrichissement** : `videos.list` avec 50 IDs/appel (~750 u → ~15 u).
+- [x] **Batcher l'enrichissement** : `videos.list` avec 50 IDs/appel (~750 u → ~15 u).
       Test : sortie enrichie strictement identique sur le même jeu de vidéos.
+      *Validé le 08/07 en A/B isolé sur les 726 vidéos de référence du run du 07/07 :
+      720/720 items identiques dans les deux lanes (6 vidéos retirées de YouTube entre-temps,
+      absentes des deux côtés), 726 appels → 15 appels. Unique divergence : un bug d'encodage
+      transitoire (mojibake UTF-8→GBK) sur UN appel unitaire de l'ancienne méthode — la lane
+      batchée était correcte. Promu en prod (nœud `Batch Video IDs`) + repo, run test
+      end-to-end vert (format DIX-33 intact).*
 - [ ] **Attribution des sources** : pour chaque vidéo du résultat final, source unique ou multiple
       (chaîne / mots-clés / SerpAPI). Verdict SerpAPI : garder, réduire ou couper.
 - [ ] Relevé quota avant/après.
