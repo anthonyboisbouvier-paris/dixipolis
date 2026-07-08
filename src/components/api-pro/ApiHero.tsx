@@ -129,7 +129,7 @@ export default function ApiHero() {
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-success)]"
                 aria-hidden="true"
               />
-              99.9% de disponibilit&eacute;
+              Objectif de disponibilit&eacute; 99,9%
             </span>
             <span className="flex items-center gap-1.5">
               <span
@@ -143,21 +143,12 @@ export default function ApiHero() {
                 className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"
                 aria-hidden="true"
               />
-              R&eacute;ponse en &lt; 200ms
+              Objectif de r&eacute;ponse &lt; 200 ms
             </span>
           </div>
         </div>
       </div>
 
-      {/* ----------------------------------------------------------------
-       * Element decoratif de fond
-       * Cercle flou en arriere-plan pour renforcer la profondeur du degrade.
-       * Position absolue, aucun impact sur le layout.
-       * ---------------------------------------------------------------- */}
-      <div
-        className="pointer-events-none absolute -bottom-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-[var(--color-primary)] opacity-[0.04] blur-3xl"
-        aria-hidden="true"
-      />
     </section>
   );
 }

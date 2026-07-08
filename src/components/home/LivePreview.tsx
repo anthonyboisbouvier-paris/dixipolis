@@ -1,64 +1,34 @@
 /* =============================================================================
  * components/home/LivePreview.tsx
  *
- * Section "Aperçu en direct" — montre un extrait réel de la base.
- * Simule un résultat de recherche pour rendre le produit tangible.
+ * Section "Aperçu" — vitrine honnête : montre 2 résultats RÉELS de recherche
+ * (app_search_transcripts, requête "pouvoir d'achat") passés en props depuis
+ * app/page.tsx, avec leur vraie source et lien YouTube horodaté.
+ * Si aucune donnée n'est disponible, la section est masquée.
+ *
  * Composant serveur (Server Component).
  * ============================================================================= */
 
-import { Play, Clock, User, Tag, ExternalLink, Search } from "lucide-react";
+import { Play, Clock, User, ExternalLink, Search } from "lucide-react";
+import { formatDate, formatTimecode } from "@/lib/utils";
+import type { TranscriptResult } from "@/lib/supabase-server";
 
 /* -------------------------------------------------------------------------- */
-interface PreviewResult {
+export default function LivePreview({
+  results,
+  query,
+}: {
+  results: TranscriptResult[];
   query: string;
-  politician: string;
-  party: string;
-  partyColor: string;
-  date: string;
-  context: string;
-  quote: string;
-  videoTitle: string;
-  timecode: string;
-  theme: string;
-  relevanceScore: number;
-}
+}) {
+  /* Pas de données réelles → on masque la section (honnêteté avant tout) */
+  if (results.length === 0) return null;
 
-const PREVIEW_RESULTS: PreviewResult[] = [
-  {
-    query: "Qu\u2019a dit Macron sur la r\u00e9industrialisation ?",
-    politician: "Emmanuel Macron",
-    party: "RE",
-    partyColor: "#ca8a04",
-    date: "15 janvier 2025",
-    context: "Visite d\u2019usine, Douai (Nord)",
-    quote: "Nous devons r\u00e9industrialiser la France. C\u2019est un combat de long terme qui n\u00e9cessite des investissements massifs dans la formation, l\u2019innovation et les infrastructures.",
-    videoTitle: "D\u00e9placement pr\u00e9sidentiel \u2014 r\u00e9industrialisation du Nord",
-    timecode: "14:23",
-    theme: "\u00c9conomie",
-    relevanceScore: 0.94,
-  },
-  {
-    query: "Qu\u2019a dit Macron sur la r\u00e9industrialisation ?",
-    politician: "Emmanuel Macron",
-    party: "RE",
-    partyColor: "#ca8a04",
-    date: "9 janvier 2025",
-    context: "Conseil europ\u00e9en, Bruxelles",
-    quote: "L\u2019Europe doit \u00eatre un continent de production, pas seulement de consommation. La r\u00e9industrialisation est un enjeu de souverainet\u00e9.",
-    videoTitle: "Conf\u00e9rence de presse \u2014 Conseil europ\u00e9en",
-    timecode: "42:07",
-    theme: "Europe",
-    relevanceScore: 0.89,
-  },
-];
-
-/* -------------------------------------------------------------------------- */
-export default function LivePreview() {
   return (
     <section
       className="relative overflow-hidden py-16 sm:py-20 lg:py-24"
       style={{ backgroundColor: "var(--color-bg-page)" }}
-      aria-label="Apercu en direct de la base Dixipolis"
+      aria-label="Exemples réels tirés du corpus Dixipolis"
     >
       <div className="page-container">
         {/* En-tête */}
@@ -72,9 +42,8 @@ export default function LivePreview() {
           </p>
         </div>
 
-        {/* Simulation de résultat */}
         <div className="mx-auto max-w-3xl">
-          {/* Barre de recherche simulée */}
+          {/* Requête réellement exécutée sur le corpus */}
           <div
             className="mb-6 flex items-center gap-3 rounded-2xl border-2 px-5 py-4"
             style={{
@@ -85,62 +54,58 @@ export default function LivePreview() {
           >
             <Search className="h-5 w-5 shrink-0" style={{ color: "var(--color-primary)" }} />
             <p className="text-base font-medium" style={{ color: "var(--color-text-primary)" }}>
-              {PREVIEW_RESULTS[0].query}
+              {query}
             </p>
           </div>
 
-          {/* Indicateur de résultats */}
+          {/* Label d'honnêteté */}
           <div className="mb-4 flex items-center gap-2 px-1">
             <span className="text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
-              2 r&eacute;sultats trouv&eacute;s
+              Exemple r&eacute;el tir&eacute; du corpus
             </span>
             <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-              &middot; 0.3s
+              &middot; {results.length} extrait{results.length > 1 ? "s" : ""}
             </span>
           </div>
 
-          {/* Résultats */}
+          {/* Résultats réels */}
           <div className="space-y-4">
-            {PREVIEW_RESULTS.map((result, i) => (
-              <div
-                key={i}
-                className="card overflow-hidden p-5 transition-all duration-300 hover:shadow-lg"
+            {results.map((result) => (
+              <a
+                key={result.segment_id}
+                href={`https://www.youtube.com/watch?v=${result.youtube_id}&t=${Math.max(0, Math.floor(result.start_sec))}s`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="card block overflow-hidden p-5 transition-shadow duration-300 hover:shadow-lg"
               >
                 {/* Header du résultat */}
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-1.5">
                     <User className="h-3.5 w-3.5" style={{ color: "var(--color-primary)" }} />
                     <span className="text-sm font-bold" style={{ color: "var(--color-text-primary)" }}>
-                      {result.politician}
+                      {result.person_name ?? "Locuteur non identifié"}
                     </span>
                   </div>
-                  <span
-                    className="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                    style={{ backgroundColor: result.partyColor + "20", color: result.partyColor }}
-                  >
-                    {result.party}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
-                    <Clock className="h-3 w-3" />
-                    {result.date}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
-                    <Tag className="h-3 w-3" />
-                    {result.theme}
-                  </span>
-                  {/* Score */}
-                  <span
-                    className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold"
-                    style={{
-                      backgroundColor: result.relevanceScore > 0.9 ? "var(--color-success-light)" : "var(--color-info-light)",
-                      color: result.relevanceScore > 0.9 ? "var(--color-success)" : "var(--color-info)",
-                    }}
-                  >
-                    {(result.relevanceScore * 100).toFixed(0)}% pertinent
-                  </span>
+                  {result.party && (
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-bold"
+                      style={{
+                        backgroundColor: "var(--color-primary-light)",
+                        color: "var(--color-primary)",
+                      }}
+                    >
+                      {result.party}
+                    </span>
+                  )}
+                  {result.published_at && (
+                    <span className="flex items-center gap-1 text-xs" style={{ color: "var(--color-text-muted)" }}>
+                      <Clock className="h-3 w-3" />
+                      {formatDate(result.published_at)}
+                    </span>
+                  )}
                 </div>
 
-                {/* Citation */}
+                {/* Citation réelle */}
                 <div
                   className="mb-3 rounded-lg border-l-4 py-2 pl-4"
                   style={{
@@ -149,11 +114,11 @@ export default function LivePreview() {
                   }}
                 >
                   <p className="text-sm italic leading-relaxed" style={{ color: "var(--color-text-primary)" }}>
-                    &laquo;&nbsp;{result.quote}&nbsp;&raquo;
+                    &laquo;&nbsp;{result.text.trim()}&nbsp;&raquo;
                   </p>
                 </div>
 
-                {/* Source vidéo */}
+                {/* Source vidéo réelle */}
                 <div className="flex items-center gap-2">
                   <div
                     className="flex h-7 w-7 items-center justify-center rounded-md"
@@ -163,15 +128,15 @@ export default function LivePreview() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                      {result.videoTitle}
+                      {result.video_title}
                     </p>
                     <p className="text-[11px]" style={{ color: "var(--color-text-muted)" }}>
-                      {result.context} &middot; {result.timecode}
+                      {result.channel ?? "Chaîne inconnue"} &middot; &agrave; {formatTimecode(result.start_sec)}
                     </p>
                   </div>
                   <ExternalLink className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--color-text-muted)" }} />
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

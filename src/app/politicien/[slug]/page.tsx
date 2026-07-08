@@ -1,130 +1,207 @@
 /* =============================================================================
  * app/politicien/[slug]/page.tsx
  *
- * Page dynamique de profil d'un politicien.
- * Composant serveur (Server Component) utilisant le routing dynamique de Next.js 15+.
+ * Page de profil d'un politicien — 100 % données réelles.
  *
- * Fonctionnement :
- *   1. Le parametre [slug] est extrait de l'URL (ex: /politicien/emmanuel-macron)
- *   2. Le politicien correspondant est recherche dans MOCK_POLITICIANS par son slug
- *   3. Si le politicien est trouve : affichage de son profil complet via PoliticianProfile
- *   4. Si le politicien n'est pas trouve : affichage d'un message d'erreur avec lien retour
+ * Composant serveur async : le profil vient d'un unique appel RPC Supabase
+ * (app_person_profile) exécuté côté serveur. Si la personne n'existe pas
+ * dans la base → notFound(). Page dynamique (pas de generateStaticParams).
  *
- * Donnees :
- *   - Les politiciens sont importes depuis lib/constants.ts (MOCK_POLITICIANS)
- *   - La recherche par slug est une simple comparaison de chaines
- *   - Dans une version future, cette recherche sera remplacee par un appel API Supabase
- *
- * Design :
- *   - Le profil est enveloppe dans PageWrapper pour le centrage et le padding header
- *   - La page 404 (politicien non trouve) est minimaliste avec un lien de retour
- *   - Style coherent avec le reste de l'application (cartes blanches, accents bleus)
+ * Affichage :
+ *   - Avatar (image ou initiale), nom, parti, fonction, lien Wikipedia
+ *   - 3 stats réelles : temps de parole, vidéos, prises de parole
+ *   - Dernières prises de parole (extraits réels avec lien YouTube horodaté)
  * ============================================================================= */
 
+import { notFound } from "next/navigation";
+import {
+  CalendarDays,
+  Clock,
+  ExternalLink,
+  Film,
+  Mic2,
+  Quote,
+} from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
-import PoliticianProfile from "@/components/politician/PoliticianProfile";
-import { MOCK_POLITICIANS } from "@/lib/constants";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { rpc } from "@/lib/supabase-server";
+import { formatDate, formatNumber, formatTimecode } from "@/lib/utils";
+
+export const dynamic = "force-dynamic";
 
 /* --------------------------------------------------------------------------
- * Types — Parametres de la route dynamique
- *
- * Next.js 15+ passe les params de maniere asynchrone.
- * Le parametre "slug" correspond au segment dynamique [slug] dans l'URL.
+ * Types du contrat RPC app_person_profile
  * -------------------------------------------------------------------------- */
-interface PoliticienPageProps {
-  params: Promise<{
-    slug: string;
-  }>;
+interface PersonProfile {
+  person: {
+    id: number;
+    name: string;
+    party: string | null;
+    position: string | null;
+    avatar: string | null;
+    birth_date: string | null;
+    wikipedia: string | null;
+  };
+  stats: {
+    speak_sec: number;
+    n_videos: number;
+    n_slots: number;
+  };
+  recent_segments: {
+    segment_id: number;
+    text: string;
+    start_sec: number;
+    video_title: string;
+    youtube_id: string;
+    published_at: string;
+    channel: string | null;
+  }[];
 }
 
 /* --------------------------------------------------------------------------
- * PoliticienPage — Composant principal de la page /politicien/[slug]
- *
- * Etapes :
- *   1. Extraction du slug depuis les parametres de route (await params)
- *   2. Recherche du politicien dans la liste mock par correspondance de slug
- *   3. Rendu conditionnel : profil complet ou message "non trouve"
- *
- * Ce composant est async car Next.js 15+ requiert l'attente des params
- * dans les composants serveur avec des routes dynamiques.
+ * Helpers d'affichage
  * -------------------------------------------------------------------------- */
-export default async function PoliticienPage({ params }: PoliticienPageProps) {
-  /* --------------------------------------------------------
-   * Extraction du slug depuis les parametres de route.
-   * Next.js 15+ rend les params asynchrones pour les composants serveur.
-   * -------------------------------------------------------- */
+function fmtDuration(sec: number | null): string {
+  if (!sec || sec <= 0) return "—";
+  const h = Math.floor(sec / 3600);
+  const m = Math.round((sec % 3600) / 60);
+  return h > 0 ? `${h}h ${String(m).padStart(2, "0")}` : `${m} min`;
+}
+
+/* -------------------------------------------------------------------------- */
+export default async function PoliticienPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
+  const profile = await rpc<PersonProfile | null>("app_person_profile", {
+    p_slug: slug,
+  });
 
-  /* --------------------------------------------------------
-   * Recherche du politicien par slug dans les donnees mock.
-   * La methode .find() retourne undefined si aucun politicien
-   * ne correspond au slug fourni dans l'URL.
-   * -------------------------------------------------------- */
-  const politician = MOCK_POLITICIANS.find(
-    (p) => p.slug === slug
-  );
-
-  /* ==================================================================
-   * CAS 1 — Politicien non trouve
-   *
-   * Si le slug ne correspond a aucun politicien dans la base mock,
-   * on affiche un message d'erreur elegant avec :
-   *   - Un titre clair "Politicien non trouve"
-   *   - Un message explicatif
-   *   - Un lien de retour vers la page d'accueil
-   *
-   * Note : dans une version future, on pourrait utiliser notFound()
-   * de Next.js pour declencher la page 404 globale.
-   * ================================================================== */
-  if (!politician) {
-    return (
-      <PageWrapper className="py-12 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-lg text-center">
-          {/* Carte d'erreur avec style coherent */}
-          <div className="card border border-[var(--color-border)] p-8 lg:p-12">
-            {/* Code d'erreur stylise */}
-            <div className="mb-6 text-6xl font-extrabold text-[var(--color-text-muted)]">
-              404
-            </div>
-
-            {/* Titre de l'erreur */}
-            <h1 className="mb-3 text-2xl font-bold text-[var(--color-text-primary)]">
-              Politicien non trouve
-            </h1>
-
-            {/* Message explicatif */}
-            <p className="mb-8 leading-relaxed text-[var(--color-text-secondary)]">
-              Le politicien que vous recherchez n&apos;existe pas dans notre base de
-              donnees ou le lien est incorrect. Verifiez l&apos;URL ou retournez a
-              l&apos;accueil pour explorer nos profils disponibles.
-            </p>
-
-            {/* Lien de retour vers l'accueil */}
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-primary)] px-6 py-3 text-sm font-semibold text-white transition-colors duration-[var(--transition-fast)] hover:bg-[var(--color-primary-hover)]"
-            >
-              <span>Retour a l&apos;accueil</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </PageWrapper>
-    );
+  /* Personne absente de la base (ou base indisponible) → 404 */
+  if (!profile || !profile.person) {
+    notFound();
   }
 
-  /* ==================================================================
-   * CAS 2 — Politicien trouve
-   *
-   * Le politicien existe dans la base mock : on affiche son profil
-   * complet via le composant PoliticianProfile.
-   * Le PageWrapper fournit le centrage, le padding header et la largeur max.
-   * ================================================================== */
+  const { person, stats, recent_segments: segments } = profile;
+
   return (
-    <PageWrapper className="py-12 sm:py-16 lg:py-20">
-      <PoliticianProfile politician={politician} />
+    <PageWrapper className="py-12 sm:py-16">
+      <div className="mx-auto max-w-3xl">
+        {/* ── En-tête du profil ─────────────────────────────────────────── */}
+        <section className="card mb-6 flex flex-col items-center gap-5 p-6 text-center sm:flex-row sm:text-left">
+          {person.avatar ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={person.avatar}
+              alt={`Portrait de ${person.name}`}
+              className="h-24 w-24 shrink-0 rounded-full object-cover"
+            />
+          ) : (
+            <span className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-light)] text-3xl font-bold text-[var(--color-primary)]">
+              {person.name.slice(0, 1)}
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
+              {person.name}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+              {[person.party, person.position].filter(Boolean).join(" · ") ||
+                "Affiliation inconnue"}
+            </p>
+            {person.birth_date && (
+              <p className="mt-0.5 flex items-center justify-center gap-1.5 text-xs text-[var(--color-text-muted)] sm:justify-start">
+                <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+                N&eacute;{"(e)"} le {formatDate(person.birth_date)}
+              </p>
+            )}
+            {person.wikipedia && (
+              <a
+                href={person.wikipedia}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)] hover:underline"
+              >
+                Wikipedia
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            )}
+          </div>
+        </section>
+
+        {/* ── Stats réelles ─────────────────────────────────────────────── */}
+        <section className="mb-8 grid grid-cols-3 gap-3" aria-label="Statistiques dans le corpus">
+          <div className="card flex flex-col items-center gap-1 p-4 text-center">
+            <Clock className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
+            <span className="text-lg font-bold text-[var(--color-text-primary)]">
+              {fmtDuration(stats.speak_sec)}
+            </span>
+            <span className="text-[11px] leading-tight text-[var(--color-text-secondary)]">
+              temps de parole
+            </span>
+          </div>
+          <div className="card flex flex-col items-center gap-1 p-4 text-center">
+            <Film className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
+            <span className="text-lg font-bold text-[var(--color-text-primary)]">
+              {formatNumber(stats.n_videos)}
+            </span>
+            <span className="text-[11px] leading-tight text-[var(--color-text-secondary)]">
+              vid&eacute;os
+            </span>
+          </div>
+          <div className="card flex flex-col items-center gap-1 p-4 text-center">
+            <Mic2 className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
+            <span className="text-lg font-bold text-[var(--color-text-primary)]">
+              {formatNumber(stats.n_slots)}
+            </span>
+            <span className="text-[11px] leading-tight text-[var(--color-text-secondary)]">
+              prises de parole
+            </span>
+          </div>
+        </section>
+
+        {/* ── Dernières prises de parole ────────────────────────────────── */}
+        <section aria-label="Dernières prises de parole">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-[var(--color-text-primary)]">
+            <Quote className="h-4 w-4 text-[var(--color-primary)]" aria-hidden="true" />
+            Derni&egrave;res prises de parole
+          </h2>
+
+          {stats.n_slots === 0 || segments.length === 0 ? (
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Aucune prise de parole identifi&eacute;e pour cette personne dans le
+              corpus actuel.
+            </p>
+          ) : (
+            <ul className="space-y-3">
+              {segments.map((s) => (
+                <li key={s.segment_id} className="card p-4">
+                  <p className="text-sm leading-relaxed text-[var(--color-text-primary)]">
+                    &laquo;&nbsp;{s.text.trim()}&nbsp;&raquo;
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <a
+                      href={`https://www.youtube.com/watch?v=${s.youtube_id}&t=${Math.max(0, Math.floor(s.start_sec))}s`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-[var(--color-primary)] hover:underline"
+                    >
+                      <span className="truncate">
+                        &#9654; {s.video_title} &mdash; &agrave; {formatTimecode(s.start_sec)}
+                      </span>
+                    </a>
+                    <span className="shrink-0 text-[11px] text-[var(--color-text-muted)]">
+                      {s.channel ?? "Chaîne inconnue"}
+                      {s.published_at ? ` · ${formatDate(s.published_at)}` : ""}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </PageWrapper>
   );
 }

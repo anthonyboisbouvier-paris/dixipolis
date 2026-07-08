@@ -70,6 +70,25 @@ export function formatTimecode(seconds: number): string {
 }
 
 /* --------------------------------------------------------------------------
+ * formatDuration — Convertit des secondes en durée lisible ("2h 05", "12 min").
+ * Utilisé pour les temps de parole et durées de vidéo (données réelles).
+ * @param sec - Durée en secondes (null/0 → "—")
+ * @returns String formatée
+ * -------------------------------------------------------------------------- */
+export function formatDuration(sec: number | null): string {
+  if (!sec || sec <= 0) return "—";
+  let h = Math.floor(sec / 3600);
+  let m = Math.round((sec % 3600) / 60);
+  if (m === 60) {
+    h += 1;
+    m = 0;
+  }
+  if (h > 0) return `${h}h ${String(m).padStart(2, "0")}`;
+  if (m > 0) return `${m} min`;
+  return `${Math.round(sec)} s`;
+}
+
+/* --------------------------------------------------------------------------
  * truncateText — Coupe un texte à une longueur donnée avec "...".
  * @param text - Texte source
  * @param maxLength - Longueur maximale

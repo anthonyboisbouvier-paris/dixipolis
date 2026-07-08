@@ -23,7 +23,7 @@
  * ============================================================================= */
 
 import type { Metadata } from "next";
-import { Shield } from "lucide-react";
+import { Shield, Info } from "lucide-react";
 import PageWrapper from "@/components/layout/PageWrapper";
 import FeaturedContent from "@/components/contenu/FeaturedContent";
 import ContentGrid from "@/components/contenu/ContentGrid";
@@ -54,6 +54,29 @@ export const metadata: Metadata = {
 export default function ContenuPage() {
   return (
     <PageWrapper className="py-8 sm:py-12">
+      {/* ================================================================
+       * BANDEAU D'AVERTISSEMENT — Contenus illustratifs
+       *
+       * Les formats presentes sur cette page ne sont pas encore publies :
+       * le bandeau l'indique clairement pour ne pas presenter des exemples
+       * fictifs comme des contenus reels. Style carte, bordure ambre discrete.
+       * ================================================================ */}
+      <div
+        role="note"
+        className="mb-6 flex items-start gap-3 rounded-[var(--radius-lg)] border border-amber-300 bg-amber-50 p-4"
+      >
+        <Info
+          className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"
+          aria-hidden="true"
+        />
+        <p className="text-sm leading-relaxed text-amber-900">
+          <span className="font-semibold">
+            Aper&ccedil;u des formats &eacute;ditoriaux &agrave; venir
+          </span>{" "}
+          &mdash; les contenus ci-dessous sont des exemples illustratifs.
+        </p>
+      </div>
+
       {/* ================================================================
        * EN-TETE DE PAGE
        *

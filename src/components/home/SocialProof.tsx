@@ -1,12 +1,17 @@
 /* =============================================================================
  * components/home/SocialProof.tsx
  *
- * Section "Qui utilise Dixipolis" — preuve sociale + personas.
- * Montre les profils utilisateurs et des citations-témoignages.
+ * Section "Qui utilise Dixipolis" — personas + le corpus en chiffres.
+ * Les anciens témoignages fictifs ont été supprimés : ils sont remplacés
+ * par 3 cartes de chiffres RÉELS du corpus (app_global_stats, prop de
+ * app/page.tsx). Si les stats sont indisponibles → "—".
+ *
  * Composant serveur (Server Component).
  * ============================================================================= */
 
-import { Newspaper, GraduationCap, Users, Briefcase, Quote } from "lucide-react";
+import { Newspaper, GraduationCap, Users, Briefcase, Clock, Mic2, CalendarRange } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
+import type { GlobalStats } from "@/lib/supabase-server";
 
 /* -------------------------------------------------------------------------- */
 interface Persona {
@@ -16,67 +21,65 @@ interface Persona {
   gradient: string;
 }
 
-interface Testimonial {
-  quote: string;
-  name: string;
-  role: string;
-  initials: string;
-  color: string;
-}
-
 const PERSONAS: Persona[] = [
   {
     icon: Newspaper,
     title: "Journalistes",
-    description: "V\u00e9rifiez en 30 secondes ce qu\u2019un politique a vraiment dit. Retrouvez la source vid\u00e9o avec le timecode exact.",
+    description: "Vérifiez en 30 secondes ce qu’un politique a vraiment dit. Retrouvez la source vidéo avec le timecode exact.",
     gradient: "linear-gradient(135deg, #2563eb, #6366f1)",
   },
   {
     icon: GraduationCap,
     title: "Chercheurs",
-    description: "Analysez des milliers de discours : distance id\u00e9ologique, \u00e9volution du vocabulaire, fr\u00e9quence th\u00e9matique.",
+    description: "Analysez des milliers de segments transcrits : temps de parole, thèmes abordés, évolution du vocabulaire.",
     gradient: "linear-gradient(135deg, #16a34a, #10b981)",
   },
   {
     icon: Users,
-    title: "Citoyens engag\u00e9s",
-    description: "Ne vous fiez plus aux extraits tronqu\u00e9s. Acc\u00e9dez au discours complet et formez votre propre opinion.",
+    title: "Citoyens engagés",
+    description: "Ne vous fiez plus aux extraits tronqués. Accédez au discours complet et formez votre propre opinion.",
     gradient: "linear-gradient(135deg, #d97706, #f59e0b)",
   },
   {
     icon: Briefcase,
-    title: "D\u00e9veloppeurs",
-    description: "Int\u00e9grez Dixipolis dans vos apps via notre API : recherche s\u00e9mantique, inventaire vid\u00e9o, r\u00e9solution d\u2019entit\u00e9s.",
+    title: "Développeurs",
+    description: "Intégrez Dixipolis dans vos apps via notre API : recherche sémantique, inventaire vidéo, résolution d’entités.",
     gradient: "linear-gradient(135deg, #7c3aed, #a78bfa)",
   },
 ];
 
-const TESTIMONIALS: Testimonial[] = [
-  {
-    quote: "Dixipolis m\u2019a fait gagner des heures sur mes v\u00e9rifications. Je retrouve la citation exacte avec la vid\u00e9o en quelques secondes.",
-    name: "Cl\u00e9ment D.",
-    role: "Journaliste politique, M\u00e9diapart",
-    initials: "CD",
-    color: "#2563eb",
-  },
-  {
-    quote: "La matrice id\u00e9ologique est impressionnante. On visualise enfin les convergences et divergences r\u00e9elles entre partis.",
-    name: "Sophie M.",
-    role: "Chercheuse en sciences politiques, Sciences Po",
-    initials: "SM",
-    color: "#16a34a",
-  },
-  {
-    quote: "J\u2019ai int\u00e9gr\u00e9 l\u2019API dans notre chatbot en 2 heures. La doc est claire et les r\u00e9sultats sont excellents.",
-    name: "Thomas L.",
-    role: "D\u00e9veloppeur full-stack",
-    initials: "TL",
-    color: "#7c3aed",
-  },
-];
+/* -------------------------------------------------------------------------- */
+function fmtDayFr(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 /* -------------------------------------------------------------------------- */
-export default function SocialProof() {
+export default function SocialProof({ stats }: { stats: GlobalStats | null }) {
+  const corpusFigures = [
+    {
+      icon: Clock,
+      value: stats ? `${formatNumber(stats.total_hours)}h` : "—",
+      label: "de vidéo transcrites",
+      color: "#2563eb",
+    },
+    {
+      icon: Mic2,
+      value: stats ? formatNumber(stats.n_speakers_resolved) : "—",
+      label: "orateurs identifiés",
+      color: "#16a34a",
+    },
+    {
+      icon: CalendarRange,
+      value: stats ? `${fmtDayFr(stats.first_day)} → ${fmtDayFr(stats.last_day)}` : "—",
+      label: "période couverte",
+      color: "#7c3aed",
+    },
+  ];
+
   return (
     <section
       className="py-16 sm:py-20 lg:py-24"
@@ -102,10 +105,10 @@ export default function SocialProof() {
             return (
               <div
                 key={p.title}
-                className="card group flex flex-col items-center p-6 text-center transition-all duration-300 hover:shadow-lg"
+                className="card group flex flex-col items-center p-6 text-center"
               >
                 <div
-                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white transition-transform duration-300 group-hover:scale-110"
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl text-white"
                   style={{ background: p.gradient }}
                 >
                   <Icon className="h-7 w-7" />
@@ -121,38 +124,33 @@ export default function SocialProof() {
           })}
         </div>
 
-        {/* Témoignages — 3 colonnes */}
+        {/* Le corpus en chiffres — 3 cartes réelles */}
+        <div className="mx-auto mb-8 max-w-2xl text-center">
+          <h3 className="text-xl font-bold" style={{ color: "var(--color-text-primary)" }}>
+            Le corpus en chiffres
+          </h3>
+        </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((t) => (
-            <div
-              key={t.name}
-              className="card relative flex flex-col p-6"
-            >
-              <Quote
-                className="mb-3 h-6 w-6 opacity-20"
-                style={{ color: t.color }}
-                aria-hidden="true"
-              />
-              <p
-                className="mb-5 flex-1 text-sm italic leading-relaxed"
-                style={{ color: "var(--color-text-secondary)" }}
-              >
-                &laquo;&nbsp;{t.quote}&nbsp;&raquo;
-              </p>
-              <div className="flex items-center gap-3 border-t pt-4" style={{ borderColor: "var(--color-border)" }}>
+          {corpusFigures.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div key={f.label} className="card flex flex-col items-center p-6 text-center">
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white"
-                  style={{ backgroundColor: t.color }}
+                  className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: f.color + "15", color: f.color }}
+                  aria-hidden="true"
                 >
-                  {t.initials}
+                  <Icon className="h-5 w-5" />
                 </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "var(--color-text-primary)" }}>{t.name}</p>
-                  <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{t.role}</p>
-                </div>
+                <p className="mb-1 text-xl font-extrabold tracking-tight" style={{ color: "var(--color-text-primary)" }}>
+                  {f.value}
+                </p>
+                <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+                  {f.label}
+                </p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

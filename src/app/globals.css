@@ -123,10 +123,17 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Scroll fluide : uniquement sur desktop et si l'utilisateur ne demande
+ * pas de réduction des animations (perf mobile + accessibilité). */
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -250,7 +257,7 @@ a {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
-  transition: all var(--transition-normal);
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
 }
 
 .card:hover {
@@ -260,6 +267,7 @@ a {
 
 .card-interactive {
   cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
 }
 
 .card-interactive:hover {
@@ -308,17 +316,14 @@ a {
 /* --------------------------------------------------------------------------
  * GLASSMORPHISM — pour les éléments flottants
  * -------------------------------------------------------------------------- */
+/* Fond semi-opaque solide (sans backdrop-filter, trop coûteux sur mobile) */
 .glass {
-  background: rgb(255 255 255 / 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgb(255 255 255 / 0.5);
 }
 
 .glass-dark {
-  background: rgb(15 23 42 / 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgb(255 255 255 / 0.1);
 }
 
@@ -396,16 +401,6 @@ a {
   50% { box-shadow: 0 0 0 8px rgb(37 99 235 / 0); }
 }
 
-/* Float doux — décoration */
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.animate-float {
-  animation: float 4s ease-in-out infinite;
-}
-
 /* Scale in depuis le centre */
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.92); }
@@ -440,7 +435,7 @@ a {
   border: none;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
   box-shadow: 0 1px 3px rgb(37 99 235 / 0.3), 0 1px 2px rgb(37 99 235 / 0.2);
 }
 
@@ -466,11 +461,26 @@ a {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease;
 }
 
 .btn-secondary:hover {
   border-color: var(--color-border-hover);
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+ * ACCESSIBILITÉ & PERF — neutralise animations/transitions si l'utilisateur
+ * demande une réduction des animations (prefers-reduced-motion).
+ * -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

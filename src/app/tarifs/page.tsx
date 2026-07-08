@@ -9,7 +9,9 @@
  *   2. Barre de navigation    — Liens ancres "Offres Web" / "Offres API" (CSS only)
  *   3. Section "Offres Web"   — 3 cartes tarifaires (Decouverte, Essentiel, Pro)
  *   4. Section "Offres API"   — 3 cartes tarifaires (Starter, Pro, Entreprise)
- *   5. Section FAQ            — 4 questions/reponses avec details/summary
+ *   5. Section liste d'attente — Les offres ne sont pas encore souscriptibles :
+ *      chaque carte pointe vers l'ancre #waitlist (WaitlistForm source="tarifs")
+ *   6. Section FAQ            — 4 questions/reponses avec details/summary
  *
  * Donnees :
  *   - Les plans tarifaires sont importes depuis lib/constants.ts
@@ -31,8 +33,9 @@
 import type { Metadata } from "next";
 import PageWrapper from "@/components/layout/PageWrapper";
 import Link from "next/link";
+import WaitlistForm from "@/components/shared/WaitlistForm";
 import { PRICING_PLANS_WEB, PRICING_PLANS_API } from "@/lib/constants";
-import { Check, ArrowRight, Star, Zap, Globe, Code } from "lucide-react";
+import { Check, ArrowRight, Star, Zap, Globe, Code, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PricingPlan } from "@/types";
 
@@ -53,36 +56,31 @@ export const metadata: Metadata = {
  * -------------------------------------------------------------------------- */
 const FAQ_ITEMS = [
   {
-    question: "Puis-je changer d'offre a tout moment ?",
+    question: "Quand les offres seront-elles disponibles ?",
     answer:
-      "Oui, vous pouvez passer d'une offre a une autre a tout moment depuis votre espace personnel. " +
-      "Le changement prend effet immediatement. Si vous passez a une offre superieure, la difference " +
-      "est calculee au prorata. Si vous revenez a une offre inferieure, le credit restant est reporte " +
-      "sur votre prochaine facture.",
+      "Les offres presentees sur cette page ne sont pas encore souscriptibles : elles seront ouvertes " +
+      "au lancement commercial de Dixipolis. Inscrivez-vous a la liste d'attente pour etre prevenu " +
+      "des l'ouverture et beneficier des premieres places.",
   },
   {
-    question: "Comment fonctionne la periode d'essai ?",
+    question: "Pourrai-je changer d'offre ?",
     answer:
-      "Chaque nouvelle inscription beneficie d'un essai gratuit de 14 jours sur l'offre Essentiel. " +
-      "Durant cette periode, vous avez acces a toutes les fonctionnalites de l'offre sans engagement. " +
-      "Aucun moyen de paiement n'est requis pour demarrer l'essai. A l'issue des 14 jours, vous pouvez " +
-      "choisir de souscrire ou de continuer avec l'offre Decouverte gratuite.",
+      "Oui, c'est prevu : une fois les offres ouvertes, vous pourrez passer d'une formule a une autre " +
+      "depuis votre espace personnel. Les modalites precises (prorata, report de credit) seront " +
+      "detaillees au lancement.",
   },
   {
     question: "Les donnees sont-elles securisees ?",
     answer:
-      "Absolument. Dixipolis heberge l'ensemble de ses donnees sur des serveurs situes en France, " +
-      "conformement au RGPD. Les communications sont chiffrees en TLS 1.3, et les donnees au repos " +
-      "sont chiffrees en AES-256. Nous ne revendons jamais vos donnees personnelles et vous pouvez " +
-      "demander leur suppression a tout moment.",
+      "La securite des donnees est une priorite : les communications sont chiffrees en transit et un " +
+      "hebergement dans l'Union europeenne est prevu, dans le respect du RGPD. Nous ne revendons jamais " +
+      "vos donnees personnelles et vous pouvez demander leur suppression a tout moment.",
   },
   {
-    question: "Comment contacter le support ?",
+    question: "Comment nous contacter ?",
     answer:
-      "Notre equipe support est disponible par email a support@dixipolis.fr du lundi au vendredi, " +
-      "de 9h a 18h (heure de Paris). Les abonnes Pro et API Pro beneficient d'un support prioritaire " +
-      "avec un temps de reponse garanti sous 4 heures ouvrees. Vous pouvez egalement consulter notre " +
-      "centre d'aide en ligne pour les questions les plus courantes.",
+      "Pour toute question sur les offres ou le produit, ecrivez-nous via la page Contact du site. " +
+      "Nous repondons a toutes les demandes dans les meilleurs delais.",
   },
 ];
 
@@ -93,7 +91,9 @@ const FAQ_ITEMS = [
  *   - Nom et description
  *   - Prix mensuel (ou "Gratuit" / "Sur devis" selon le contexte)
  *   - Liste des fonctionnalites avec icones Check
- *   - CTA sous forme de Link (navigation SPA)
+ *   - CTA : les offres n'etant pas encore souscriptibles, chaque plan pointe
+ *     vers l'ancre #waitlist (liste d'attente en bas de page). Seul le plan
+ *     Entreprise conserve un lien vers la page Contact (demande de devis).
  *   - Badge "Populaire" si le plan est mis en avant (isPopular)
  *
  * Props :
@@ -107,12 +107,9 @@ function PricingCard({
   plan: PricingPlan;
   isEnterprise?: boolean;
 }) {
-  /* ---- Determiner le href du CTA ---- */
-  const ctaHref = isEnterprise
-    ? "/contact"
-    : plan.price === 0
-      ? "/inscription"
-      : "/inscription";
+  /* ---- CTA : ancre vers la liste d'attente (ou Contact pour Entreprise) ---- */
+  const ctaHref = isEnterprise ? "/contact" : "#waitlist";
+  const ctaLabel = isEnterprise ? plan.ctaLabel : "Rejoindre la liste d'attente";
 
   return (
     <div
@@ -253,7 +250,7 @@ function PricingCard({
        * CTA — Lien de navigation (pas un bouton)
        * Le plan populaire a un style plein primaire.
        * Les autres plans ont un style outline.
-       * Utilise le composant Link de Next.js pour une navigation SPA.
+       * Pointe vers l'ancre #waitlist (liste d'attente) ou /contact.
        * ---------------------------------------------------------------- */}
       <Link
         href={ctaHref}
@@ -273,7 +270,7 @@ function PricingCard({
               }
         }
       >
-        <span>{plan.ctaLabel}</span>
+        <span>{ctaLabel}</span>
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
     </div>
@@ -430,7 +427,51 @@ export default function TarifsPage() {
       </section>
 
       {/* ==================================================================
-       * SECTION 5 — Foire Aux Questions (FAQ)
+       * SECTION 5 — Liste d'attente
+       *
+       * Les offres ne sont pas encore souscriptibles : les CTA des cartes
+       * tarifaires pointent vers cette section (ancre #waitlist).
+       * scroll-mt compense le header fixe lors de la navigation par ancre.
+       * ================================================================== */}
+      <section
+        id="waitlist"
+        className="mx-auto mb-16 max-w-md scroll-mt-24 lg:mb-24"
+        aria-labelledby="waitlist-heading"
+      >
+        <div className="card p-6 sm:p-8">
+          <div className="mb-6 text-center">
+            <div
+              className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+              style={{
+                backgroundColor: "var(--color-primary-light)",
+                color: "var(--color-primary)",
+              }}
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              Liste d&apos;attente
+            </div>
+            <h2
+              id="waitlist-heading"
+              className="mb-3 text-2xl font-bold tracking-tight"
+              style={{ color: "var(--color-text-primary)" }}
+            >
+              Les offres ouvrent bient&ocirc;t
+            </h2>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Les abonnements ne sont pas encore souscriptibles. Laissez votre
+              email pour &ecirc;tre pr&eacute;venu du lancement des offres Web
+              et API.
+            </p>
+          </div>
+          <WaitlistForm source="tarifs" />
+        </div>
+      </section>
+
+      {/* ==================================================================
+       * SECTION 6 — Foire Aux Questions (FAQ)
        *
        * 4 questions/reponses en accordeon natif HTML (details/summary).
        * Avantages du details/summary natif :

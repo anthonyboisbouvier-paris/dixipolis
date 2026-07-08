@@ -26,6 +26,7 @@
 
 "use client";
 
+import { Suspense } from "react";
 import ChatInterface from "@/components/prompt/ChatInterface";
 
 /* --------------------------------------------------------------------------
@@ -46,8 +47,12 @@ export default function PromptPage() {
       className="w-full"
       style={{ height: "calc(100vh - var(--header-height, 72px))" }}
     >
-      {/* Interface de chat — composant client interactif */}
-      <ChatInterface />
+      {/* Interface de chat — composant client interactif.
+          Suspense requis : ChatInterface lit ?q= via useSearchParams
+          (recherche initiale lancée automatiquement depuis la homepage). */}
+      <Suspense fallback={null}>
+        <ChatInterface />
+      </Suspense>
     </div>
   );
 }

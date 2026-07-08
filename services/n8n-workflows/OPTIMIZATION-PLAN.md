@@ -1,0 +1,129 @@
+# Plan d'optimisation du pipeline Discovery (DIX-33)
+
+**Objectif : maximiser le nombre de vidéos politiques pertinentes ramenées chaque jour,
+à budget constant** (quota YouTube 10 000 unités/jour, tokens OpenAI, crédits SerpAPI).
+
+KPI central : **coût par vidéo pertinente** = (unités quota + tokens LLM + crédits SerpAPI) / vidéos ≥ min_score.
+Chaque phase mesure ce KPI avant/après et ne consolide que ce qui l'améliore sans perte de couverture.
+
+## État des lieux (audit du 07/07/2026)
+
+Dépense actuelle par run quotidien, mesurée sur les exécutions réelles :
+
+| Poste | Mécanisme actuel | Coût/run | Part |
+|---|---|---|---|
+| Recherche mots-clés YouTube | 27 requêtes `search.list` × 100 unités | **2 700 u** | ~73 % |
+| Vidéos des 193 chaînes suivies | `playlistItems.list` × 1 unité *(migré le 07/07, était 19 300 u)* | 193 u | ~5 % |
+| Enrichissement métadonnées | `videos.list` **1 appel par vidéo** (~750 vidéos) | **~750 u** | ~20 % |
+| Abonnements (pagination) | `subscriptions.list` | ~4 u | — |
+| Scoring sémantique | gpt-4o-mini, **1 appel par vidéo** ≥ 2 min, le prompt exige de ré-émettre toutes les métadonnées | ~400-700 appels | 100 % du coût OpenAI |
+| SerpAPI | 15 requêtes/run (contribution unique **à mesurer** — probablement ~0) | 15 crédits | 100 % du coût SerpAPI |
+
+Trois gisements identifiés :
+
+1. **`videos.list` accepte 50 IDs par appel** → l'enrichissement peut passer de ~750 à ~15 unités (÷50).
+2. **Le scoring peut être batché** (20-25 vidéos par appel, sortie `video_id`+`score` uniquement,
+   métadonnées re-jointes par `video_id` en aval — l'infra de jointure existe déjà depuis le patch
+   `channel_id`). Appels ÷20, tokens de sortie ÷5, et suppression du risque `invalid_json`
+   (le LLM ne recopie plus les titres).
+3. **Les 27 recherches mots-clés (2 700 u) doivent justifier leur coût** : avec 193 chaînes suivies,
+   leur valeur unique = les vidéos de chaînes *hors registre*. À mesurer requête par requête,
+   élaguer les mortes, et réorienter vers la **découverte de nouvelles chaînes** (longue traîne
+   locale : « conseil municipal », « conseil communautaire », « séance plénière »).
+
+Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → marge pour suivre
+**5 000-8 000 chaînes** ou poller plusieurs fois par jour.
+
+## Phases de test
+
+### J0 — Baseline (07/07)
+- [x] Migration `playlistItems.list` validée (193/193 chaînes, 753 vidéos, 0 perte légitime)
+- [ ] Run complet post-reset quota (test auto programmé à 07:12 UTC)
+- [ ] Relevé du funnel complet + dépense quota réelle du run
+- [ ] Vérifier le run du cron Loïc de 09:00 UTC
+
+### J1 (08/07) — Quick wins quota + attribution des sources
+- [x] **Batcher l'enrichissement** : `videos.list` avec 50 IDs/appel (~750 u → ~15 u).
+      Test : sortie enrichie strictement identique sur le même jeu de vidéos.
+      *Validé le 08/07 en A/B isolé sur les 726 vidéos de référence du run du 07/07 :
+      720/720 items identiques dans les deux lanes (6 vidéos retirées de YouTube entre-temps,
+      absentes des deux côtés), 726 appels → 15 appels. Unique divergence : un bug d'encodage
+      transitoire (mojibake UTF-8→GBK) sur UN appel unitaire de l'ancienne méthode — la lane
+      batchée était correcte. Promu en prod (nœud `Batch Video IDs`) + repo, run test
+      end-to-end vert (format DIX-33 intact).*
+- [x] **Attribution des sources** : pour chaque vidéo du résultat final, source unique ou multiple
+      (chaîne / mots-clés / SerpAPI). Verdict SerpAPI : garder, réduire ou couper.
+      *Run prod du 08/07 (exécution 29, publication_day=07/07, min_score=0.7, 188 vidéos finales) :
+      175 vidéos (93 %) proviennent du flux chaînes seul, 13 (7 %) chaînes+mots-clés, 0 orpheline.
+      MAIS le bug Merge dual-run fait perdre 39 vidéos uniques du flux mots-clés qui passaient
+      le score (51 au Filter By Score du 2e run, 12 en doublon avec le flux chaînes) → à réparer
+      en J2, gain attendu ~+20 % de vidéos finales. SerpAPI : le nœud `Normalize SerpAPI Results`
+      ne s'exécute JAMAIS (câblage) — 15 requêtes/jour (300 résultats bruts, très bruités type
+      sport/people) pour un apport strictement nul, constaté sur les runs des 07 et 08/07.
+      **Verdict SerpAPI : COUPER** (désactiver la branche, économie de 15 crédits SerpAPI/jour) ;
+      réévaluation possible plus tard si un manque de rappel est constaté.*
+- [x] Relevé quota avant/après.
+      *Run du 08/07 avec batch : subscriptions 4 u + playlistItems 193 u + recherche mots-clés
+      27×100 = 2 700 u + enricher 19 u (908 vidéos → 19 appels) ≈ **2 916 u** ;
+      avant le batch le même run aurait coûté ≈ 3 805 u (908 appels d'enrichissement).
+      Économie ~890 u/jour ; la recherche mots-clés reste 93 % du coût → cible J2.*
+
+> **Note 08/07** : le cron de Loïc (09:00 UTC) n'a produit AUCUNE exécution aujourd'hui —
+> l'endpoint n'est probablement pas encore branché côté RunPod (cf. DIX-56). Le run du jour
+> a été déclenché manuellement à 12:28 UTC avec les paramètres cibles (vert, 188 vidéos).
+
+### J2 — exécutée par anticipation le 08/07 (demande Anthony : 2 runs/jour, < 5 000 u/run)
+- [x] **Merge dual-run RÉPARÉ** : cause racine = les flux chaînes et mots-clés étaient branchés
+      sur la MÊME entrée (index 0) de `Merge All Sources` → 2 exécutions de toute la chaîne aval,
+      seule la 1re réponse (chaînes) sortait. Fix : chaînes → entrée 0, mots-clés → entrée 1
+      (mode append, 1 seule exécution), `Merge All Sources` → `Deduplicate Videos` en direct.
+      Validé à blanc (synthétique) puis en prod : chaque nœud tourne exactement 1 fois.
+- [x] **SerpAPI coupé** : branche déconnectée + nœuds `disabled` (documentation). La branche
+      mourait de toute façon dans `Filter Date Range` (0 item ressorti, runs des 07 et 08/07).
+      Économie : 15 crédits SerpAPI/jour.
+- [x] **Requêtes mots-clés élargies : 27 → 40** (exécutif, ministres, Assemblée, Sénat,
+      parlementaires, élus locaux — maires/régions/départements —, vie politique, institutions)
+      + `maxResults` 20 → 50 (gratuit, même coût 100 u/requête).
+- [x] **Résultat mesuré (run 31 du 08/07, publication_day=07/07, min_score=0.7)** :
+      **233 vidéos finales / 143 h 39 / 113 chaînes** contre 188 / 89 h / 61 chaînes le matin
+      (+24 % de vidéos, +61 % d'heures). 175 via chaînes, 57 UNIQUEMENT via mots-clés
+      (récupérées grâce au fix), 1 orpheline. Top requêtes : « conseil municipal seance »
+      (17 uniques !), « assemblee nationale debat » (7), « debat politique france » (7).
+      19/40 requêtes à 0 unique CE jour-là — dépendantes de l'actualité (allocution du
+      Président…), à réévaluer sur une semaine avant élagage.
+- [x] **Budget quota validé pour 2 runs/jour** : 40×100 + 193 (chaînes) + 19 (enricher batché)
+      + 4 (abonnements) = **4 216 u/run** → 2 runs = **8 432 u/jour < 10 000** ✅
+      (chaque run < 5 000 ✅). Reste ~1 500 u/jour de marge pour tests.
+
+### J2 (09/07) — Rendement des requêtes mots-clés
+- [ ] Mesurer le **rendement unique par requête** (vidéos introuvables via les chaînes suivies).
+- [ ] Élaguer les requêtes à rendement nul (chacune coûte 100 u).
+- [ ] Tester des requêtes longue traîne « petit maire » : conseils municipaux, intercommunalités,
+      séances plénières régionales/départementales.
+- [ ] Chaque `channel_id` nouvellement découvert = candidat au registre de chaînes (lien DIX-56).
+
+### J3 (10/07) — Optimisation du scoring OpenAI
+- [ ] **Scoring par lots** : 20-25 vidéos/appel, sortie JSON `[{video_id, score}]` uniquement.
+- [ ] Contrôle de cohérence : re-scorer le même jeu de vidéos, corrélation ancien/nouveau ≥ 0,9.
+- [ ] Mesure tokens avant/après (attendu : −80 à −90 %).
+
+### J4 (11/07) — Calibration de la pertinence
+- [ ] Distribution complète des scores (0,0 → 1,0) sur une journée pleine.
+- [ ] Revue d'échantillon de la bande 0,6-0,7 : que perd-on à min_score 0,7 ? Recommandation de seuil.
+- [ ] Quantifier ce que coupe le filtre « < 2 min » (Shorts avec déclarations complètes ?).
+- [ ] Cas limites de dates : lives, `videoPublishedAt` vs `publishedAt`.
+
+### J5 (12/07) — Consolidation
+- [ ] Appliquer en prod + repo la configuration validée (uniquement les phases gagnantes).
+- [ ] Rapport final : vidéos pertinentes/jour et coût/vidéo pertinente, avant vs après.
+- [ ] Proposition d'architecture « registre de chaînes » (croissance auto via les channel_id
+      découverts) pour l'exhaustivité du petit maire au Président.
+
+## Garde-fous
+
+- Toute modification est d'abord testée **en isolation** (workflow temporaire) contre un run de
+  référence, avec comparaison exhaustive des `video_id` — zéro perte tolérée hors faux positifs
+  démontrés (cf. migration playlistItems).
+- Le format de réponse DIX-33 (`statistics` + `videos[]` avec `channel_id`) est **gelé** :
+  aucune optimisation ne doit le casser (contrat avec l'ingestion).
+- Le cron de Loïc (09:00 UTC) doit rester vert chaque jour pendant les tests.

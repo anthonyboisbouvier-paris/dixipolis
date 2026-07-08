@@ -4,11 +4,11 @@
  * Hero section Dixipolis — messaging centré sur la BASE DE DONNÉES.
  * "Chaque mot prononcé par un politique français, transcrit et cherchable."
  *
- * Branding fort : gradient audacieux, compteur animé, schéma pipeline inline.
+ * Les compteurs affichent les statistiques RÉELLES du corpus (app_global_stats)
+ * passées en prop depuis app/page.tsx. Si les stats sont indisponibles → "—".
  * Composant serveur (Server Component).
  * ============================================================================= */
 
-import Link from "next/link";
 import {
   ArrowRight,
   Search,
@@ -18,9 +18,22 @@ import {
   Database,
   Play,
 } from "lucide-react";
+import { formatNumber } from "@/lib/utils";
+import type { GlobalStats } from "@/lib/supabase-server";
+
+/* --------------------------------------------------------------------------
+ * Helpers d'affichage
+ * -------------------------------------------------------------------------- */
+function fmtDayFr(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 
 /* -------------------------------------------------------------------------- */
-export default function HeroSection() {
+export default function HeroSection({ stats }: { stats: GlobalStats | null }) {
   return (
     <section
       className="relative overflow-hidden"
@@ -39,20 +52,15 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      {/* Formes décoratives */}
+      {/* Formes décoratives — dégradés radiaux statiques (sans filter, perf mobile) */}
       <div
-        className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full opacity-20 blur-3xl"
-        style={{ background: "var(--color-primary)" }}
+        className="pointer-events-none absolute -top-24 right-0 h-96 w-96 rounded-full opacity-20"
+        style={{ background: "radial-gradient(circle, var(--color-primary) 0%, transparent 70%)" }}
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-20 -left-10 h-72 w-72 rounded-full opacity-10 blur-3xl"
-        style={{ background: "var(--color-accent)" }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute left-1/2 top-1/4 h-40 w-40 -translate-x-1/2 rounded-full opacity-[0.07] blur-2xl"
-        style={{ background: "#ec4899" }}
+        className="pointer-events-none absolute -bottom-20 -left-10 h-72 w-72 rounded-full opacity-10"
+        style={{ background: "radial-gradient(circle, var(--color-accent) 0%, transparent 70%)" }}
         aria-hidden="true"
       />
 
@@ -69,8 +77,8 @@ export default function HeroSection() {
             </span>
           </div>
 
-          {/* Titre h1 — le message clé */}
-          <h1 className="animate-fade-in-up mb-6 text-4xl font-extrabold leading-[1.06] tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-[3.75rem]">
+          {/* Titre h1 — le message clé (largeur resserrée pour la lisibilité) */}
+          <h1 className="animate-fade-in-up mx-auto mb-6 max-w-3xl text-4xl font-extrabold leading-[1.06] tracking-tight text-[var(--color-text-primary)] sm:text-5xl lg:text-[3.5rem]">
             Chaque mot prononc&eacute; par un{" "}
             <span
               style={{
@@ -218,41 +226,51 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* CTA barre de recherche */}
+          {/* Barre de recherche RÉELLE — formulaire GET vers /prompt?q=...
+              (la page /prompt lit ?q= et lance la recherche automatiquement) */}
           <div
             className="animate-fade-in-up"
             style={{ animationDelay: "250ms" }}
           >
-            <Link
-              href="/prompt"
-              className="group mx-auto inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-white px-6 py-4 text-base font-medium text-[var(--color-text-secondary)] shadow-[var(--shadow-md)] transition-all duration-300 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-[var(--shadow-glow)] sm:px-8 sm:text-lg"
+            <form
+              action="/prompt"
+              method="get"
+              role="search"
+              className="group mx-auto flex max-w-xl items-center gap-3 rounded-full border border-[var(--color-border)] bg-white py-2 pl-5 pr-2 shadow-[var(--shadow-md)] transition-all duration-300 focus-within:border-[var(--color-primary)] focus-within:shadow-[var(--shadow-glow)] hover:border-[var(--color-primary-200)]"
             >
               <Search
-                className="h-5 w-5 text-[var(--color-text-muted)] transition-colors group-hover:text-[var(--color-primary)]"
+                className="h-5 w-5 shrink-0 text-[var(--color-text-muted)]"
                 aria-hidden="true"
               />
-              <span>
-                &laquo; Qu&apos;a dit Macron sur la r&eacute;forme des
-                retraites ? &raquo;
-              </span>
-              <ArrowRight
-                className="h-5 w-5 text-[var(--color-primary)] transition-transform group-hover:translate-x-1"
-                aria-hidden="true"
+              <input
+                type="search"
+                name="q"
+                maxLength={300}
+                placeholder="Qu'a dit Macron sur la réforme des retraites ?"
+                className="min-w-0 flex-1 bg-transparent py-2 text-base text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-muted)]"
+                aria-label="Rechercher dans les transcriptions politiques"
               />
-            </Link>
+              <button
+                type="submit"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-white shadow-sm transition-all hover:bg-[var(--color-primary-hover)] hover:shadow-md"
+                aria-label="Lancer la recherche"
+              >
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </form>
           </div>
 
-          {/* Compteurs chiffrés — crédibilité immédiate */}
+          {/* Compteurs chiffrés — statistiques réelles du corpus */}
           <div
             className="animate-fade-in-up mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
             style={{ animationDelay: "350ms" }}
           >
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                45&nbsp;000<span className="text-[var(--color-primary)]">+</span>
+                {stats ? formatNumber(stats.n_segments) : "—"}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                discours transcrits
+                segments transcrits
               </p>
             </div>
             <div
@@ -262,10 +280,10 @@ export default function HeroSection() {
             />
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                2&nbsp;000<span className="text-[var(--color-primary)]">+</span>
+                {stats ? formatNumber(stats.n_persons) : "—"}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                politiciens suivis
+                politiciens r&eacute;f&eacute;renc&eacute;s
               </p>
             </div>
             <div
@@ -275,7 +293,14 @@ export default function HeroSection() {
             />
             <div className="text-center">
               <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                10&nbsp;500<span className="text-[var(--color-primary)]">h</span>
+                {stats ? (
+                  <>
+                    {formatNumber(stats.total_hours)}
+                    <span className="text-[var(--color-primary)]">h</span>
+                  </>
+                ) : (
+                  "—"
+                )}
               </p>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
                 de vid&eacute;o analys&eacute;es
@@ -293,11 +318,11 @@ export default function HeroSection() {
                   aria-hidden="true"
                 />
                 <p className="text-2xl font-extrabold tracking-tight text-[var(--color-text-primary)] sm:text-3xl">
-                  24<span className="text-[var(--color-success)]">h</span>
+                  {stats ? fmtDayFr(stats.last_day) : "—"}
                 </p>
               </div>
               <p className="text-xs font-medium text-[var(--color-text-muted)]">
-                fraîcheur des donn&eacute;es
+                corpus mis &agrave; jour
               </p>
             </div>
           </div>

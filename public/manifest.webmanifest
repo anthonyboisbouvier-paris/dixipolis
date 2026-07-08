@@ -1,0 +1,19 @@
+{
+  "name": "Dixipolis",
+  "short_name": "Dixipolis",
+  "description": "La plateforme d'analyse du discours politique par l'IA : recherchez tout ce qui a été dit par les politiciens et partis.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icon-dixipolis.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
