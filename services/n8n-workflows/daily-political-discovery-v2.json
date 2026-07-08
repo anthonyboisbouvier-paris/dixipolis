@@ -101,7 +101,8 @@
       ],
       "id": "70b188bc-d7eb-4370-9856-951ac6b1fb5a",
       "name": "Normalize SerpAPI Results",
-      "notes": "Extraction s�curis�e des IDs depuis SerpAPI (videos + shorts)"
+      "notes": "Extraction s�curis�e des IDs depuis SerpAPI (videos + shorts)",
+      "disabled": true
     },
     {
       "parameters": {},
@@ -112,7 +113,8 @@
       "position": [
         1472,
         80
-      ]
+      ],
+      "disabled": true
     },
     {
       "parameters": {
@@ -201,7 +203,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Configuration des requêtes YouTube selon le mode\nconst mode = $json?.mode ?? \"prod\";\n\n/**\n * QUERIES YOUTUBE - MODE PRODUCTION\n * Requêtes optimisées pour capturer les discours politiques français\n * Version réduite : 27 requêtes les plus pertinentes\n */\nconst YT_QUERIES_PROD = [\n  // Président de la République (4)\n  \"interview president republique\",\n  \"discours president republique\",\n  \"allocution president republique\",\n  \"declaration president republique\",\n  \n  // Premier Ministre (3)\n  \"interview premier ministre\",\n  \"discours premier ministre\",\n  \"declaration premier ministre\",\n  \n  // Ministres (3)\n  \"interview ministre\",\n  \"conference presse ministre\",\n  \"declaration ministre\",\n  \n  // Assemblée Nationale (3)\n  \"Assemblee nationale debat\",\n  \"Assemblee nationale questions gouvernement\",\n  \"Assemblee nationale commission\",\n  \n  // Sénat (2)\n  \"Senat debat\",\n  \"Senat commission\",\n  \n  // Parlementaires (2)\n  \"interview depute\",\n  \"interview senateur\",\n  \n  // Maires (2)\n  \"interview maire\",\n  \"declaration maire\",\n  \n  // Événements politiques majeurs (4)\n  \"meeting politique\",\n  \"debat politique France\",\n  \"campagne electorale\",\n  \"motion censure\",\n  \n  // Institutions (4)\n  \"Elysee declaration\",\n  \"Matignon conference presse\",\n  \"Conseil ministres\",\n  \"budget parlement\"\n];\n\n/**\n * QUERIES YOUTUBE - MODE TEST\n * Version réduite pour tests rapides\n */\nconst YT_QUERIES_TEST = [\n  \"interview ministre\",\n  \"discours president republique\"\n];\n\nconst queries = mode === \"test\" ? YT_QUERIES_TEST : YT_QUERIES_PROD;\n\nreturn queries.map(query => ({\n  json: {\n    query,\n    mode,\n    source_type: \"youtube_search\"\n  }\n}));"
+        "jsCode": "// Configuration des requêtes YouTube selon le mode\nconst mode = $json?.mode ?? \"prod\";\n\n/**\n * QUERIES YOUTUBE - MODE PRODUCTION\n * Requêtes optimisées pour capturer les discours politiques français\n * Version réduite : 27 requêtes les plus pertinentes\n */\nconst YT_QUERIES_PROD = [\n  // Exécutif (8)\n  \"interview president republique\",\n  \"discours president republique\",\n  \"allocution president republique\",\n  \"declaration president republique\",\n  \"interview premier ministre\",\n  \"discours premier ministre\",\n  \"declaration premier ministre\",\n  \"conference presse gouvernement\",\n\n  // Ministres (4)\n  \"interview ministre\",\n  \"conference presse ministre\",\n  \"declaration ministre\",\n  \"audition ministre\",\n\n  // Assemblée nationale (5)\n  \"assemblee nationale debat\",\n  \"assemblee nationale questions gouvernement\",\n  \"assemblee nationale commission audition\",\n  \"assemblee nationale seance publique\",\n  \"motion censure\",\n\n  // Sénat (3)\n  \"senat debat\",\n  \"senat commission audition\",\n  \"senat questions gouvernement\",\n\n  // Parlementaires (4)\n  \"interview depute\",\n  \"interview senateur\",\n  \"reaction depute\",\n  \"declaration senateur\",\n\n  // Élus locaux — maires, régions, départements (7)\n  \"interview maire\",\n  \"declaration maire\",\n  \"conseil municipal seance\",\n  \"interview president region\",\n  \"conseil regional seance\",\n  \"conseil departemental seance\",\n  \"interview elu local\",\n\n  // Vie politique (6)\n  \"meeting politique\",\n  \"debat politique france\",\n  \"campagne electorale\",\n  \"congres parti politique\",\n  \"interview politique matinale\",\n  \"invite politique\",\n\n  // Institutions (3)\n  \"elysee declaration\",\n  \"matignon conference presse\",\n  \"conseil ministres\"\n];\n\n/**\n * QUERIES YOUTUBE - MODE TEST\n * Version réduite pour tests rapides\n */\nconst YT_QUERIES_TEST = [\n  \"interview ministre\",\n  \"discours president republique\"\n];\n\nconst queries = mode === \"test\" ? YT_QUERIES_TEST : YT_QUERIES_PROD;\n\nreturn queries.map(query => ({\n  json: {\n    query,\n    mode,\n    source_type: \"youtube_search\"\n  }\n}));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -225,7 +227,8 @@
       ],
       "id": "be7b2bfd-4303-4f90-a24b-190331ae05ce",
       "name": "Build SerpAPI Queries",
-      "notes": "G�n�re les requ�tes SerpAPI selon le mode (test/prod)"
+      "notes": "G�n�re les requ�tes SerpAPI selon le mode (test/prod)",
+      "disabled": true
     },
     {
       "parameters": {
@@ -289,7 +292,7 @@
             },
             {
               "name": "maxResults",
-              "value": "20"
+              "value": "50"
             },
             {
               "name": "relevanceLanguage",
@@ -371,7 +374,8 @@
           "id": "TO_RECONFIGURE_SERPAPI",
           "name": "SerpAPI account"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -591,7 +595,8 @@
       ],
       "id": "a80f35dd-727a-4c8e-af90-067a3689ba7b",
       "name": "Filter Date Range",
-      "notes": "Filtre pour ne garder que les vid�os publi�es il y a exactement 1 jour"
+      "notes": "Filtre pour ne garder que les vid�os publi�es il y a exactement 1 jour",
+      "disabled": true
     },
     {
       "parameters": {
@@ -667,34 +672,12 @@
           {
             "node": "Merge All Sources",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Normalize SerpAPI Results": {
-      "main": [
-        [
-          {
-            "node": "Merge Normalized Sources",
-            "type": "main",
             "index": 1
           }
         ]
       ]
     },
     "Merge All Sources": {
-      "main": [
-        [
-          {
-            "node": "Merge Normalized Sources",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge Normalized Sources": {
       "main": [
         [
           {
@@ -783,17 +766,6 @@
         ]
       ]
     },
-    "Build SerpAPI Queries": {
-      "main": [
-        [
-          {
-            "node": "SerpApi Search1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Webhook Trigger": {
       "main": [
         [
@@ -810,17 +782,6 @@
         [
           {
             "node": "Normalize YouTube Results",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "SerpApi Search1": {
-      "main": [
-        [
-          {
-            "node": "Filter Date Range",
             "type": "main",
             "index": 0
           }
@@ -931,23 +892,7 @@
             "index": 0
           },
           {
-            "node": "Build SerpAPI Queries",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "Init Pagination",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Filter Date Range": {
-      "main": [
-        [
-          {
-            "node": "Normalize SerpAPI Results",
             "type": "main",
             "index": 0
           }

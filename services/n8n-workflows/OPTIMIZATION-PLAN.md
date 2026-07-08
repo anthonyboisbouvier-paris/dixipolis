@@ -72,6 +72,29 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
 > l'endpoint n'est probablement pas encore branché côté RunPod (cf. DIX-56). Le run du jour
 > a été déclenché manuellement à 12:28 UTC avec les paramètres cibles (vert, 188 vidéos).
 
+### J2 — exécutée par anticipation le 08/07 (demande Anthony : 2 runs/jour, < 5 000 u/run)
+- [x] **Merge dual-run RÉPARÉ** : cause racine = les flux chaînes et mots-clés étaient branchés
+      sur la MÊME entrée (index 0) de `Merge All Sources` → 2 exécutions de toute la chaîne aval,
+      seule la 1re réponse (chaînes) sortait. Fix : chaînes → entrée 0, mots-clés → entrée 1
+      (mode append, 1 seule exécution), `Merge All Sources` → `Deduplicate Videos` en direct.
+      Validé à blanc (synthétique) puis en prod : chaque nœud tourne exactement 1 fois.
+- [x] **SerpAPI coupé** : branche déconnectée + nœuds `disabled` (documentation). La branche
+      mourait de toute façon dans `Filter Date Range` (0 item ressorti, runs des 07 et 08/07).
+      Économie : 15 crédits SerpAPI/jour.
+- [x] **Requêtes mots-clés élargies : 27 → 40** (exécutif, ministres, Assemblée, Sénat,
+      parlementaires, élus locaux — maires/régions/départements —, vie politique, institutions)
+      + `maxResults` 20 → 50 (gratuit, même coût 100 u/requête).
+- [x] **Résultat mesuré (run 31 du 08/07, publication_day=07/07, min_score=0.7)** :
+      **233 vidéos finales / 143 h 39 / 113 chaînes** contre 188 / 89 h / 61 chaînes le matin
+      (+24 % de vidéos, +61 % d'heures). 175 via chaînes, 57 UNIQUEMENT via mots-clés
+      (récupérées grâce au fix), 1 orpheline. Top requêtes : « conseil municipal seance »
+      (17 uniques !), « assemblee nationale debat » (7), « debat politique france » (7).
+      19/40 requêtes à 0 unique CE jour-là — dépendantes de l'actualité (allocution du
+      Président…), à réévaluer sur une semaine avant élagage.
+- [x] **Budget quota validé pour 2 runs/jour** : 40×100 + 193 (chaînes) + 19 (enricher batché)
+      + 4 (abonnements) = **4 216 u/run** → 2 runs = **8 432 u/jour < 10 000** ✅
+      (chaque run < 5 000 ✅). Reste ~1 500 u/jour de marge pour tests.
+
 ### J2 (09/07) — Rendement des requêtes mots-clés
 - [ ] Mesurer le **rendement unique par requête** (vidéos introuvables via les chaînes suivies).
 - [ ] Élaguer les requêtes à rendement nul (chacune coûte 100 u).
