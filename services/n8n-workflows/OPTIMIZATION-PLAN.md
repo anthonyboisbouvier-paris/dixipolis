@@ -127,3 +127,20 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
 - Le format de réponse DIX-33 (`statistics` + `videos[]` avec `channel_id`) est **gelé** :
   aucune optimisation ne doit le casser (contrat avec l'ingestion).
 - Le cron de Loïc (09:00 UTC) doit rester vert chaque jour pendant les tests.
+
+### J3 (09/07) — premier run avec maxResults=50 + réévaluation des requêtes
+- [x] **Cron Loïc** : toujours AUCUNE exécution à 09:00 UTC (3e jour) — DIX-56 en attente ;
+      run du jour relancé manuellement à 11:38 UTC (publication_day=08/07, min_score=0.7).
+- [x] **Funnel sain** après maxResults 20→50 : chaque nœud tourne exactement 1 fois,
+      format DIX-33 intact, coût mesuré **4 219 u** (conforme aux ~4 216 attendus).
+- [x] **Impact maxResults=50** (exécution 43) : **295 vidéos finales / 184 h / 158 chaînes**
+      contre 233 / 143 h / 113 la veille (**+27 % de vidéos, +29 % d'heures, coût identique**).
+      Apport unique du flux mots-clés : **105 vidéos** (57 la veille, ×1,8).
+- [x] **Réévaluation des 19 requêtes à 0 unique du 08/07** : **9 ont produit aujourd'hui**
+      (déclaration ministre 2, interview maire 2, interview président région 2, déclaration
+      président, discours PM, audition ministre, commissions AN et Sénat, réaction député)
+      — confirmation qu'elles sont dépendantes de l'actualité : NE PAS élaguer avant une
+      semaine de cumul. 10 restent à zéro (à suivre : interview/discours/allocution président,
+      conference presse gouvernement, elysee/matignon, conseil régional, élu local,
+      déclaration maire, déclaration PM). Top du jour : « conseil municipal seance »
+      (32 uniques), « assemblee nationale debat » (22), « campagne electorale » (11).
