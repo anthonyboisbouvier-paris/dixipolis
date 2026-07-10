@@ -160,3 +160,11 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
       (~600 vidéos × ~780 tokens ≈ 0,20 $/jour) ne justifie pas ce risque de rappel.
       La ligne « J3 — Optimisation du scoring » est fermée : l'optimisation utile du
       pipeline était le quota YouTube (fait : 4 219 u/run), pas les tokens de scoring.
+
+> **Note J4 phase 2 (10/07)** : cron Loïc toujours absent à 09:00 (5e jour, DIX-56) —
+> run du jour relancé manuellement à 09:10 : **223 vidéos / 105 h / 124 chaînes, 4 218 u**,
+> funnel sain (seule la pagination des abonnements boucle, comportement normal).
+> Requêtes : apport unique mots-clés 85 vidéos ; « interview elu local » (2) et
+> « conference presse gouvernement » (1) sortent de la liste à zéro → **8 requêtes
+> toujours à zéro après 3 jours** (président ×3, PM, maire-déclaration, conseil régional,
+> élysée, matignon) — décision d'élagage à J6 (5 jours de cumul).
