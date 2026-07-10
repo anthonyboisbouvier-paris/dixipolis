@@ -144,3 +144,19 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
       conference presse gouvernement, elysee/matignon, conseil régional, élu local,
       déclaration maire, déclaration PM). Top du jour : « conseil municipal seance »
       (32 uniques), « assemblee nationale debat » (22), « campagne electorale » (11).
+
+### J4 (10/07) — Scoring par lots : TESTÉ ET REJETÉ (données à l'appui)
+- [x] **Expérience A/B en isolation** (150 vidéos stratifiées du run 43, mêmes données) :
+      lots de 25 puis de 12 (texte complet, prompt aligné, temperature 0, json_object) →
+      corrélation Pearson avec les scores de prod : **0,648 puis 0,587**, accord sur la
+      décision min_score 0,7 : ~71-73 % — **41-42 vidéos gardées par la prod passeraient
+      sous le seuil** (perte de rappel inacceptable). Économie tokens réelle : −67 %.
+- [x] **Contrôle de répétabilité** : l'ancienne méthode re-exécutée à l'identique sur les
+      mêmes 150 vidéos ne corrèle qu'à **0,882 avec ses propres scores** (écart moyen 0,077,
+      accord seuil 89,3 %, 1 invalid_json/150) → le critère « ≥ 0,9 » du plan était
+      inatteignable par construction ; le plafond de référence est ~0,88.
+- [x] **Verdict : NE PAS PROMOUVOIR le scoring par lots** — il diverge au-delà du bruit
+      (0,59-0,65 ≪ 0,88), systématiquement plus sévère. Le coût OpenAI du scoring
+      (~600 vidéos × ~780 tokens ≈ 0,20 $/jour) ne justifie pas ce risque de rappel.
+      La ligne « J3 — Optimisation du scoring » est fermée : l'optimisation utile du
+      pipeline était le quota YouTube (fait : 4 219 u/run), pas les tokens de scoring.
