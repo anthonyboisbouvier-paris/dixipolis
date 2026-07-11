@@ -168,3 +168,38 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
 > « conference presse gouvernement » (1) sortent de la liste à zéro → **8 requêtes
 > toujours à zéro après 3 jours** (président ×3, PM, maire-déclaration, conseil régional,
 > élysée, matignon) — décision d'élagage à J6 (5 jours de cumul).
+
+## J5 — 11/07/2026 (session du matin, 07:30 UTC)
+
+**Cron Loïc : toujours absent (6e jour).** Run prod lancé manuellement 07:32 UTC
+(publication_day=2026-07-10, min_score 0.7) → **184 vidéos publiées**, 92 chaînes,
+score moyen 0,757, 484 scorées / 978 dédupliquées / 1 012 brutes. DIX-56 reste le
+dernier maillon manquant.
+
+**Cumul requêtes (4e jour d'observation) :** 2 sorties de la liste des zéros
+aujourd'hui — `interview president republique` (1) et `declaration maire` (1).
+Restent à ZÉRO depuis 4 jours : `discours/allocution/declaration president
+republique`, `declaration premier ministre`, `conseil regional seance`,
+`elysee declaration`, `matignon conference presse` (7 requêtes). Zéros du jour
+(non cumulés) : 13/40. Décision d'élagage à J6 sur le cumul 5 jours.
+
+**Calibration du seuil (chantier du jour) :**
+- Distribution des 484 scorées : gros pic à exactement 0,70 (100 vidéos), zone
+  0,65-0,70 quasi vide (5) — le scoreur « arrondit » sa zone grise à 0,70.
+- Jugement manuel de 14 vidéos de la bande 0,65-0,75 : les faux positifs ne sont
+  PAS des vidéos « pas assez politiques » mais de la **politique africaine
+  francophone** (Sénégal, RDC, Cameroun) et du **sport avec vocabulaire national**
+  qui passent à 0,70-0,80.
+- Quantification sur les 184 publiées : **16 hors-sujet (8 %)**, dont 10 pile à
+  0,70. Monter le seuil à 0,75 supprimerait 100 vidéos (−54 % de volume) pour
+  n'éliminer que 10 hors-sujet → NON.
+- **Recommandation pour Loïc : GARDER min_score=0,7, corriger le PROMPT du
+  Semantic Scoring** : « politique FRANÇAISE uniquement ; les personnalités
+  politiques étrangères (Sénégal, RDC, Cameroun…) scorent < 0,5 sauf implication
+  directe d'un politique français ; le sport reste < 0,3 même avec drapeau/équipe
+  de France ». Gain attendu : ~+8 pts de précision à volume constant, zéro effet
+  sur le rappel français.
+
+**Prochaine session (J6, 12/07) :** élagage des requêtes mortes sur cumul 5 jours
++ décision finale ; si Loïc n'a pas branché le cron, proposer un Schedule Trigger
+n8n natif en attendant DIX-56.
