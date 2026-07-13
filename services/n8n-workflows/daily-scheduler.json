@@ -1,0 +1,93 @@
+{
+    "name": "Dixipolis \u2014 ordonnanceur quotidien (temporaire, en attendant DIX-56)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "triggerAtHour": 9,
+                            "triggerAtMinute": 0
+                        }
+                    ]
+                }
+            },
+            "id": "sch",
+            "name": "Schedule 09:00 UTC",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.2,
+            "position": [
+                0,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "// publication_day = la veille (UTC)\nconst d = new Date();\nd.setUTCDate(d.getUTCDate() - 1);\nreturn [{ json: { mode: 'prod', publication_day: d.toISOString().split('T')[0], min_score: 0.7 } }];"
+            },
+            "id": "prm",
+            "name": "Params (veille)",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                220,
+                0
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.WEBHOOK_URL ? '' : '' }}https://n8n.srv1810171.hstgr.cloud/webhook/discover/political-videosV2",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json) }}",
+                "options": {
+                    "timeout": 300000
+                }
+            },
+            "id": "call",
+            "name": "Lance le run prod",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                440,
+                0
+            ],
+            "credentials": {
+                "httpHeaderAuth": {
+                    "id": "pUy7RaDmED1kRMSY",
+                    "name": "Discovery Webhook Bearer"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Schedule 09:00 UTC": {
+            "main": [
+                [
+                    {
+                        "node": "Params (veille)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Params (veille)": {
+            "main": [
+                [
+                    {
+                        "node": "Lance le run prod",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    }
+}

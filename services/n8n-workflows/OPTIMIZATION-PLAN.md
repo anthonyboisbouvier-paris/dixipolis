@@ -203,3 +203,38 @@ republique`, `declaration premier ministre`, `conseil regional seance`,
 **Prochaine session (J6, 12/07) :** élagage des requêtes mortes sur cumul 5 jours
 + décision finale ; si Loïc n'a pas branché le cron, proposer un Schedule Trigger
 n8n natif en attendant DIX-56.
+
+## J6 — 13/07/2026 (session 07:30 UTC)
+
+**Rattrapage** : la session du 12/07 n'a jamais eu lieu (saut de temps) → deux runs
+manuels : 11/07 (99 vidéos, 79 chaînes) et 12/07 (72 vidéos, 52 chaînes).
+
+**Cron : 8e jour sans exécution planifiée** → création d'un workflow
+ORDONNANCEUR SÉPARÉ `daily-scheduler.json` (id se8jMw4k1gcjagZZ, actif) :
+Schedule 09:00 UTC → POST authentifié sur le webhook prod avec
+publication_day=veille, min_score 0.7. Le workflow prod n'est pas touché
+(son « Respond to Webhook » casserait en exécution planifiée). À désactiver
+quand Loïc branchera le vrai cron (DIX-56).
+
+**Élagage FINAL (cumul 5 jours)** : les 7 requêtes mortes confirmées encore à
+zéro sur le run du 11/07 → RETIRÉES du workflow prod : discours/allocution/
+declaration president republique, declaration premier ministre, conseil
+regional seance, elysee declaration, matignon conference presse.
+Remplacées par 7 requêtes fécondes : emission politique france, grand
+entretien politique, point presse gouvernement, face a face politique,
+gouvernement annonce reforme, conseil des ministres compte rendu, polemique
+politique gouvernement. Rendement 1er jour : 10 résultats bruts (4/7 actives,
+3 à zéro — à observer, même règle des 5 jours).
+
+**Calibration APPLIQUÉE (Loïc silencieux)** : prompt du Semantic Scoring durci —
+politique FRANÇAISE uniquement (étrangers < 0,5 sauf implication française),
+sport < 0,3 même avec « équipe de France ». **Mesure avant/après :
+hors-sujet 13/99 (13 %) le 11/07 → 0/72 (0 %) le 12/07** ; score moyen
+0,754 → 0,808 (la zone grise étrangère à 0,70 est passée sous le seuil).
+Le volume 12/07 (72) reflète un samedi calme + le nettoyage — vérifier à J7
+que le rappel français ne s'est pas dégradé (le score moyen en hausse suggère
+que non).
+
+**J7 (14/07)** : run auto attendu à 09:00 UTC via l'ordonnanceur — VÉRIFIER
+qu'il a tourné seul (1re exécution non manuelle du pipeline) ; contrôle rappel
+français post-calibration ; rendement J2 des 7 remplaçantes.
