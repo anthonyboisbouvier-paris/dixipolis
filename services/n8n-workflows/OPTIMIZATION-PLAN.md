@@ -262,3 +262,27 @@ conseil des ministres compte rendu (0 aujourd'hui, 2 hier). Règle des 5 jours.
 
 **J8 (15/07)** : vérifier que l'ordonnanceur CORRIGÉ a tourné seul à 07:00 UTC
 sans erreur (2e tentative) ; cumul J3 des remplaçantes ; volume d'un mardi.
+
+## J8 — 16/07/2026 (session 07:30 UTC)
+
+**🎉 PREMIÈRE CHAÎNE 100 % AUTONOME** : l'ordonnanceur se8jMw4k1gcjagZZ a tiré
+seul à 07:00 UTC et le pipeline a tourné sans erreur → **120 vidéos publiées**
+(538 scorées, publication du mercredi 15/07). L'erreur du 15/07 s'explique par
+les sauts d'horloge : le correctif $env de J7 n'a été réellement appliqué que
+le 16/07 à ~02:00 réel. Le pipeline ne dépend plus d'aucune intervention
+manuelle (DIX-56 reste souhaitable comme solution cible).
+
+**Rattrapage** : 14/07 ingéré manuellement → 64 vidéos, avg 0,816 (volume bas
+normal : lendemain de fête nationale). Couverture des publications désormais
+complète du 07/07 au 15/07, zéro trou.
+
+**Volume post-calibration** : 120 un mercredi ≥ 100 attendu ✔ — le rappel
+français est confirmé sain, la calibration (0 % hors-sujet) ne coûte rien.
+
+**Remplaçantes (J3 réel)** : conseil des ministres compte rendu 1,
+polemique politique gouvernement 1 (sorties des zéros) · grand entretien
+politique 0, gouvernement annonce reforme 0 (3e jour) — décision d'élagage à
+J10 (règle des 5 jours).
+
+**J9 (17/07)** : contrôle de routine — run autonome de 07:00 OK ? volume
+jeudi ; cumul J4 des 2 requêtes à zéro.
