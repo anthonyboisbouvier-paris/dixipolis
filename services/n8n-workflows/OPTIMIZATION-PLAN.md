@@ -238,3 +238,27 @@ que non).
 **J7 (14/07)** : run auto attendu à 09:00 UTC via l'ordonnanceur — VÉRIFIER
 qu'il a tourné seul (1re exécution non manuelle du pipeline) ; contrôle rappel
 français post-calibration ; rendement J2 des 7 remplaçantes.
+
+## J7 — 14/07/2026 (session 07:30 UTC)
+
+**Ordonnanceur : il a TIRÉ TOUT SEUL à 07:00 UTC (09:00 Paris)** — 1re exécution
+autonome du pipeline — mais en ERREUR : « access to env vars denied » (mon
+expression d'URL utilisait $env, interdit sur l'instance). URL remplacée par la
+chaîne littérale, workflow re-poussé (PUT 200, actif). Run du 13/07 lancé
+manuellement en compensation : **68 vidéos, 54 chaînes, avg 0,797**.
+
+**Contrôle rappel post-calibration** : 385 scorées, 68 publiées un lundi (bas
+vs ~184 le vendredi 10/07 pré-calibration). Échantillon des écartées 0,4-0,7
+(26 vidéos) : exclusions LÉGITIMES — Sénégal/RDC désormais à 0,40 ✔, faits
+divers, tech, best-of ; deux cas discutables à 0,60 (France Culture « forces de
+l'ordre », l'Humanité « présidentielle 2027 ») mais sans politicien s'exprimant
+→ conformes au critère. La baisse de volume = purge du hors-sujet + lundi d'été,
+PAS une perte de rappel français. RAS.
+
+**Remplaçantes J2** : emission politique france 6, face a face politique 8,
+point presse gouvernement 1 · à zéro : grand entretien politique (2j),
+gouvernement annonce reforme (2j), polemique politique gouvernement (2j),
+conseil des ministres compte rendu (0 aujourd'hui, 2 hier). Règle des 5 jours.
+
+**J8 (15/07)** : vérifier que l'ordonnanceur CORRIGÉ a tourné seul à 07:00 UTC
+sans erreur (2e tentative) ; cumul J3 des remplaçantes ; volume d'un mardi.
