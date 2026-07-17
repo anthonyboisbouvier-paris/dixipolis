@@ -286,3 +286,24 @@ J10 (règle des 5 jours).
 
 **J9 (17/07)** : contrôle de routine — run autonome de 07:00 OK ? volume
 jeudi ; cumul J4 des 2 requêtes à zéro.
+
+## J9 — 17/07/2026 (session 07:31 UTC)
+
+**Autonomie confirmée (2e run consécutif)** : l'ordonnanceur se8jMw4k1gcjagZZ
+a tiré seul à 07:00:00 UTC le 16/07 (exec 117 → discovery 118, publication du
+15/07) et le 17/07 (exec 154 → discovery 155, publication du 16/07), succès
+sans erreur les deux fois. Couverture des publications complète du 07/07 au
+16/07 — zéro trou, zéro rattrapage manuel nécessaire.
+
+**Volume** : 107 vidéos publiées pour le jeudi 16/07 (jour ouvré ≥ 100 ✔),
+53 h 16 m de contenu, avg score 0,792, distribution saine (0 vidéo sous 0,6 ;
+66 dans 0,8-1,0). 965 candidates → 504 scorées → 107 retenues à 0,7.
+
+**Remplaçantes (J4 réel)** : grand entretien politique **1**, gouvernement
+annonce reforme **1** — les deux dernières requêtes à zéro sont sorties du
+rouge. Aucune requête à zéro sur le run du 17/07 (40/40 productives).
+**Élagage J10 annulé** : la règle des 5 jours ne s'applique plus à personne.
+
+**J10 (18/07)** : contrôle de routine allégé — run autonome 07:00 OK ?
+volume vendredi ; plus aucune requête sous surveillance. Si 3e run autonome
+consécutif OK, passer les contrôles à un rythme hebdomadaire (J11 = J17).
