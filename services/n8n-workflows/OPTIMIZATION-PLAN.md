@@ -127,3 +127,183 @@ Budget cible après optimisation : **~1 500-2 900 u/jour** selon élagage → ma
 - Le format de réponse DIX-33 (`statistics` + `videos[]` avec `channel_id`) est **gelé** :
   aucune optimisation ne doit le casser (contrat avec l'ingestion).
 - Le cron de Loïc (09:00 UTC) doit rester vert chaque jour pendant les tests.
+
+### J3 (09/07) — premier run avec maxResults=50 + réévaluation des requêtes
+- [x] **Cron Loïc** : toujours AUCUNE exécution à 09:00 UTC (3e jour) — DIX-56 en attente ;
+      run du jour relancé manuellement à 11:38 UTC (publication_day=08/07, min_score=0.7).
+- [x] **Funnel sain** après maxResults 20→50 : chaque nœud tourne exactement 1 fois,
+      format DIX-33 intact, coût mesuré **4 219 u** (conforme aux ~4 216 attendus).
+- [x] **Impact maxResults=50** (exécution 43) : **295 vidéos finales / 184 h / 158 chaînes**
+      contre 233 / 143 h / 113 la veille (**+27 % de vidéos, +29 % d'heures, coût identique**).
+      Apport unique du flux mots-clés : **105 vidéos** (57 la veille, ×1,8).
+- [x] **Réévaluation des 19 requêtes à 0 unique du 08/07** : **9 ont produit aujourd'hui**
+      (déclaration ministre 2, interview maire 2, interview président région 2, déclaration
+      président, discours PM, audition ministre, commissions AN et Sénat, réaction député)
+      — confirmation qu'elles sont dépendantes de l'actualité : NE PAS élaguer avant une
+      semaine de cumul. 10 restent à zéro (à suivre : interview/discours/allocution président,
+      conference presse gouvernement, elysee/matignon, conseil régional, élu local,
+      déclaration maire, déclaration PM). Top du jour : « conseil municipal seance »
+      (32 uniques), « assemblee nationale debat » (22), « campagne electorale » (11).
+
+### J4 (10/07) — Scoring par lots : TESTÉ ET REJETÉ (données à l'appui)
+- [x] **Expérience A/B en isolation** (150 vidéos stratifiées du run 43, mêmes données) :
+      lots de 25 puis de 12 (texte complet, prompt aligné, temperature 0, json_object) →
+      corrélation Pearson avec les scores de prod : **0,648 puis 0,587**, accord sur la
+      décision min_score 0,7 : ~71-73 % — **41-42 vidéos gardées par la prod passeraient
+      sous le seuil** (perte de rappel inacceptable). Économie tokens réelle : −67 %.
+- [x] **Contrôle de répétabilité** : l'ancienne méthode re-exécutée à l'identique sur les
+      mêmes 150 vidéos ne corrèle qu'à **0,882 avec ses propres scores** (écart moyen 0,077,
+      accord seuil 89,3 %, 1 invalid_json/150) → le critère « ≥ 0,9 » du plan était
+      inatteignable par construction ; le plafond de référence est ~0,88.
+- [x] **Verdict : NE PAS PROMOUVOIR le scoring par lots** — il diverge au-delà du bruit
+      (0,59-0,65 ≪ 0,88), systématiquement plus sévère. Le coût OpenAI du scoring
+      (~600 vidéos × ~780 tokens ≈ 0,20 $/jour) ne justifie pas ce risque de rappel.
+      La ligne « J3 — Optimisation du scoring » est fermée : l'optimisation utile du
+      pipeline était le quota YouTube (fait : 4 219 u/run), pas les tokens de scoring.
+
+> **Note J4 phase 2 (10/07)** : cron Loïc toujours absent à 09:00 (5e jour, DIX-56) —
+> run du jour relancé manuellement à 09:10 : **223 vidéos / 105 h / 124 chaînes, 4 218 u**,
+> funnel sain (seule la pagination des abonnements boucle, comportement normal).
+> Requêtes : apport unique mots-clés 85 vidéos ; « interview elu local » (2) et
+> « conference presse gouvernement » (1) sortent de la liste à zéro → **8 requêtes
+> toujours à zéro après 3 jours** (président ×3, PM, maire-déclaration, conseil régional,
+> élysée, matignon) — décision d'élagage à J6 (5 jours de cumul).
+
+## J5 — 11/07/2026 (session du matin, 07:30 UTC)
+
+**Cron Loïc : toujours absent (6e jour).** Run prod lancé manuellement 07:32 UTC
+(publication_day=2026-07-10, min_score 0.7) → **184 vidéos publiées**, 92 chaînes,
+score moyen 0,757, 484 scorées / 978 dédupliquées / 1 012 brutes. DIX-56 reste le
+dernier maillon manquant.
+
+**Cumul requêtes (4e jour d'observation) :** 2 sorties de la liste des zéros
+aujourd'hui — `interview president republique` (1) et `declaration maire` (1).
+Restent à ZÉRO depuis 4 jours : `discours/allocution/declaration president
+republique`, `declaration premier ministre`, `conseil regional seance`,
+`elysee declaration`, `matignon conference presse` (7 requêtes). Zéros du jour
+(non cumulés) : 13/40. Décision d'élagage à J6 sur le cumul 5 jours.
+
+**Calibration du seuil (chantier du jour) :**
+- Distribution des 484 scorées : gros pic à exactement 0,70 (100 vidéos), zone
+  0,65-0,70 quasi vide (5) — le scoreur « arrondit » sa zone grise à 0,70.
+- Jugement manuel de 14 vidéos de la bande 0,65-0,75 : les faux positifs ne sont
+  PAS des vidéos « pas assez politiques » mais de la **politique africaine
+  francophone** (Sénégal, RDC, Cameroun) et du **sport avec vocabulaire national**
+  qui passent à 0,70-0,80.
+- Quantification sur les 184 publiées : **16 hors-sujet (8 %)**, dont 10 pile à
+  0,70. Monter le seuil à 0,75 supprimerait 100 vidéos (−54 % de volume) pour
+  n'éliminer que 10 hors-sujet → NON.
+- **Recommandation pour Loïc : GARDER min_score=0,7, corriger le PROMPT du
+  Semantic Scoring** : « politique FRANÇAISE uniquement ; les personnalités
+  politiques étrangères (Sénégal, RDC, Cameroun…) scorent < 0,5 sauf implication
+  directe d'un politique français ; le sport reste < 0,3 même avec drapeau/équipe
+  de France ». Gain attendu : ~+8 pts de précision à volume constant, zéro effet
+  sur le rappel français.
+
+**Prochaine session (J6, 12/07) :** élagage des requêtes mortes sur cumul 5 jours
++ décision finale ; si Loïc n'a pas branché le cron, proposer un Schedule Trigger
+n8n natif en attendant DIX-56.
+
+## J6 — 13/07/2026 (session 07:30 UTC)
+
+**Rattrapage** : la session du 12/07 n'a jamais eu lieu (saut de temps) → deux runs
+manuels : 11/07 (99 vidéos, 79 chaînes) et 12/07 (72 vidéos, 52 chaînes).
+
+**Cron : 8e jour sans exécution planifiée** → création d'un workflow
+ORDONNANCEUR SÉPARÉ `daily-scheduler.json` (id se8jMw4k1gcjagZZ, actif) :
+Schedule 09:00 UTC → POST authentifié sur le webhook prod avec
+publication_day=veille, min_score 0.7. Le workflow prod n'est pas touché
+(son « Respond to Webhook » casserait en exécution planifiée). À désactiver
+quand Loïc branchera le vrai cron (DIX-56).
+
+**Élagage FINAL (cumul 5 jours)** : les 7 requêtes mortes confirmées encore à
+zéro sur le run du 11/07 → RETIRÉES du workflow prod : discours/allocution/
+declaration president republique, declaration premier ministre, conseil
+regional seance, elysee declaration, matignon conference presse.
+Remplacées par 7 requêtes fécondes : emission politique france, grand
+entretien politique, point presse gouvernement, face a face politique,
+gouvernement annonce reforme, conseil des ministres compte rendu, polemique
+politique gouvernement. Rendement 1er jour : 10 résultats bruts (4/7 actives,
+3 à zéro — à observer, même règle des 5 jours).
+
+**Calibration APPLIQUÉE (Loïc silencieux)** : prompt du Semantic Scoring durci —
+politique FRANÇAISE uniquement (étrangers < 0,5 sauf implication française),
+sport < 0,3 même avec « équipe de France ». **Mesure avant/après :
+hors-sujet 13/99 (13 %) le 11/07 → 0/72 (0 %) le 12/07** ; score moyen
+0,754 → 0,808 (la zone grise étrangère à 0,70 est passée sous le seuil).
+Le volume 12/07 (72) reflète un samedi calme + le nettoyage — vérifier à J7
+que le rappel français ne s'est pas dégradé (le score moyen en hausse suggère
+que non).
+
+**J7 (14/07)** : run auto attendu à 09:00 UTC via l'ordonnanceur — VÉRIFIER
+qu'il a tourné seul (1re exécution non manuelle du pipeline) ; contrôle rappel
+français post-calibration ; rendement J2 des 7 remplaçantes.
+
+## J7 — 14/07/2026 (session 07:30 UTC)
+
+**Ordonnanceur : il a TIRÉ TOUT SEUL à 07:00 UTC (09:00 Paris)** — 1re exécution
+autonome du pipeline — mais en ERREUR : « access to env vars denied » (mon
+expression d'URL utilisait $env, interdit sur l'instance). URL remplacée par la
+chaîne littérale, workflow re-poussé (PUT 200, actif). Run du 13/07 lancé
+manuellement en compensation : **68 vidéos, 54 chaînes, avg 0,797**.
+
+**Contrôle rappel post-calibration** : 385 scorées, 68 publiées un lundi (bas
+vs ~184 le vendredi 10/07 pré-calibration). Échantillon des écartées 0,4-0,7
+(26 vidéos) : exclusions LÉGITIMES — Sénégal/RDC désormais à 0,40 ✔, faits
+divers, tech, best-of ; deux cas discutables à 0,60 (France Culture « forces de
+l'ordre », l'Humanité « présidentielle 2027 ») mais sans politicien s'exprimant
+→ conformes au critère. La baisse de volume = purge du hors-sujet + lundi d'été,
+PAS une perte de rappel français. RAS.
+
+**Remplaçantes J2** : emission politique france 6, face a face politique 8,
+point presse gouvernement 1 · à zéro : grand entretien politique (2j),
+gouvernement annonce reforme (2j), polemique politique gouvernement (2j),
+conseil des ministres compte rendu (0 aujourd'hui, 2 hier). Règle des 5 jours.
+
+**J8 (15/07)** : vérifier que l'ordonnanceur CORRIGÉ a tourné seul à 07:00 UTC
+sans erreur (2e tentative) ; cumul J3 des remplaçantes ; volume d'un mardi.
+
+## J8 — 16/07/2026 (session 07:30 UTC)
+
+**🎉 PREMIÈRE CHAÎNE 100 % AUTONOME** : l'ordonnanceur se8jMw4k1gcjagZZ a tiré
+seul à 07:00 UTC et le pipeline a tourné sans erreur → **120 vidéos publiées**
+(538 scorées, publication du mercredi 15/07). L'erreur du 15/07 s'explique par
+les sauts d'horloge : le correctif $env de J7 n'a été réellement appliqué que
+le 16/07 à ~02:00 réel. Le pipeline ne dépend plus d'aucune intervention
+manuelle (DIX-56 reste souhaitable comme solution cible).
+
+**Rattrapage** : 14/07 ingéré manuellement → 64 vidéos, avg 0,816 (volume bas
+normal : lendemain de fête nationale). Couverture des publications désormais
+complète du 07/07 au 15/07, zéro trou.
+
+**Volume post-calibration** : 120 un mercredi ≥ 100 attendu ✔ — le rappel
+français est confirmé sain, la calibration (0 % hors-sujet) ne coûte rien.
+
+**Remplaçantes (J3 réel)** : conseil des ministres compte rendu 1,
+polemique politique gouvernement 1 (sorties des zéros) · grand entretien
+politique 0, gouvernement annonce reforme 0 (3e jour) — décision d'élagage à
+J10 (règle des 5 jours).
+
+**J9 (17/07)** : contrôle de routine — run autonome de 07:00 OK ? volume
+jeudi ; cumul J4 des 2 requêtes à zéro.
+
+## J9 — 17/07/2026 (session 07:31 UTC)
+
+**Autonomie confirmée (2e run consécutif)** : l'ordonnanceur se8jMw4k1gcjagZZ
+a tiré seul à 07:00:00 UTC le 16/07 (exec 117 → discovery 118, publication du
+15/07) et le 17/07 (exec 154 → discovery 155, publication du 16/07), succès
+sans erreur les deux fois. Couverture des publications complète du 07/07 au
+16/07 — zéro trou, zéro rattrapage manuel nécessaire.
+
+**Volume** : 107 vidéos publiées pour le jeudi 16/07 (jour ouvré ≥ 100 ✔),
+53 h 16 m de contenu, avg score 0,792, distribution saine (0 vidéo sous 0,6 ;
+66 dans 0,8-1,0). 965 candidates → 504 scorées → 107 retenues à 0,7.
+
+**Remplaçantes (J4 réel)** : grand entretien politique **1**, gouvernement
+annonce reforme **1** — les deux dernières requêtes à zéro sont sorties du
+rouge. Aucune requête à zéro sur le run du 17/07 (40/40 productives).
+**Élagage J10 annulé** : la règle des 5 jours ne s'applique plus à personne.
+
+**J10 (18/07)** : contrôle de routine allégé — run autonome 07:00 OK ?
+volume vendredi ; plus aucune requête sous surveillance. Si 3e run autonome
+consécutif OK, passer les contrôles à un rythme hebdomadaire (J11 = J17).
