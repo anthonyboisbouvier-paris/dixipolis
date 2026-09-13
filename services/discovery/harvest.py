@@ -19,6 +19,7 @@ Commandes :
             → JSONL enrichi (matched_person_ids, matched_names, match_sources, rule score)
   to-sql    --in matched.jsonl            → SQL d'upsert prêt pour execute_sql
   push      --in matched.jsonl [--run '{json}'] → envoi par lots au relais n8n (DISCOVERY_RELAY_TOKEN)
+  score     --limit 50 --rounds N          → qualification LLM (gpt-4o-mini via n8n) des candidates de chaînes tierces
 
 Aucune dépendance hors bibliothèque standard. Clé : variable YOUTUBE_API_KEY.
 """
@@ -290,6 +291,26 @@ def cmd_push(a):
     print(json.dumps({"pushed": len(items), "inserted": tot_ins, "updated": tot_upd}), file=sys.stderr)
 
 
+def cmd_score(a):
+    """Déclenche le scoring LLM côté n8n (workflow « Discovery — scoring LLM ») par lots de --limit candidates."""
+    token = a.token or os.environ.get("DISCOVERY_RELAY_TOKEN")
+    if not token:
+        sys.exit("DISCOVERY_RELAY_TOKEN manquant")
+    url = os.environ.get("DISCOVERY_SCORE_URL", "https://n8n.srv1810171.hstgr.cloud/webhook/discovery-score")
+    tot = {"scored": 0, "relevant": 0, "rejected": 0, "grey": 0}
+    for i in range(a.rounds):
+        req = urllib.request.Request(url, data=json.dumps({"p_token": token, "limit": a.limit}).encode(),
+                                     headers={"Content-Type": "application/json", "X-Harvest-Token": token}, method="POST")
+        with urllib.request.urlopen(req, timeout=900) as r:
+            res = json.load(r)
+        for k in tot:
+            tot[k] += int(res.get(k, 0) or 0)
+        print(f"lot {i + 1}: {res}", file=sys.stderr)
+        if not res.get("scored"):
+            break
+    print(json.dumps(tot), file=sys.stderr)
+
+
 def parse_duration(iso_d):
     m = re.match(r"P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", iso_d or "")
     if not m:
@@ -319,8 +340,9 @@ def main():
     t = sp.add_parser("to-sql"); t.add_argument("--in", dest="inp", required=True)
     ps = sp.add_parser("push"); ps.add_argument("--in", dest="inp", required=True); ps.add_argument("--batch", type=int, default=150)
     ps.add_argument("--run"); ps.add_argument("--token"); ps.add_argument("--url"); ps.add_argument("--no-raw", action="store_true")
+    sc = sp.add_parser("score"); sc.add_argument("--limit", type=int, default=50); sc.add_argument("--rounds", type=int, default=1); sc.add_argument("--token")
     a = p.parse_args()
-    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push}[a.cmd](a)
+    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push, "score": cmd_score}[a.cmd](a)
 
 
 if __name__ == "__main__":
