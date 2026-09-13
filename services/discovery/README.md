@@ -17,7 +17,7 @@ reste indépendant et inchangé.
 | Registre des chaînes (246 : 193 abonnements + 68 déjà chez Loïc) | `discovery.channels` (kind : person / party / institution / media / other) |
 | Vidéos trouvées, qualifiées, dédupliquées | `discovery.videos` (clé `youtube_video_id`) |
 | Journal des passes et unités consommées | `discovery.harvest_runs`, `discovery.quota_ledger` |
-| Sortie pour Loïc | vue `discovery.v_ready_for_ingestion` + fonction `discovery.export_to_public(n)` |
+| Sortie pour Loïc | vue `discovery.v_ready_for_ingestion` + fonction `discovery.export_to_public() (tout) ou export_to_public(n)` |
 | Outils | `harvest.py` (stdlib Python, clé `YOUTUBE_API_KEY`), `phase.py` (orchestration canal par canal) |
 | Écriture en base depuis le sandbox | relais n8n `POST /webhook/discovery-ingest` (en-tête `X-Harvest-Token`) → RPC `public.discovery_upsert_videos` |
 

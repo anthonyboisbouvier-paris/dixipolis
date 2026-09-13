@@ -127,7 +127,7 @@ alter table discovery.quota_ledger enable row level security;
 -- RPC public.discovery_* : appelées par les relais n8n (jeton discovery.settings.relay_token)
 
 -- discovery.export_to_public
-CREATE OR REPLACE FUNCTION discovery.export_to_public(p_limit integer DEFAULT 100)
+CREATE OR REPLACE FUNCTION discovery.export_to_public(p_limit integer DEFAULT NULL::integer)
  RETURNS TABLE(exported integer, channels_created integer)
  LANGUAGE plpgsql
 AS $function$
@@ -143,7 +143,7 @@ begin
   with batch as (
     select v.* from discovery.v_ready_for_ingestion v
      order by v.tier nulls last, v.relevance_score desc nulls last, v.published_at desc
-     limit p_limit
+     limit coalesce(p_limit, 2147483647)
   ), ins as (
     insert into public.youtube_videos (title, description, duration, published_at, url, youtube_channel_id, tags, youtube_video_id)
     select b.title, b.description, b.duration, b.published_at::timestamp, b.url, y.id, nullif(b.tags, ''), b.youtube_video_id
