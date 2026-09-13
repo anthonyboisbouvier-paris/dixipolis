@@ -1,129 +1,275 @@
-UC_2Xe0tzVXvLMvCxmtDmdQA|person|
-UC07oLgmZcMS5JLIW9o9sM4Q|institution|
-UC0Y9vEv67BYRhgbRwJGj35w|institution|
-UC2XZY-bjIEmyLZ9MPJQytZg|person|43
-UC2Y9964TQIewqKwa_9h8K0Q|party|
-UC3Ma4tRFxx85oZI_XKVTPwg|party|
-UC3q3FLPQtuWWv1uTkTfpEtw|person|
-UC3U0VIDgANFaXeOAtt1m5Mw|person|2
-UC4A3K4CT4swDAW57fzXIMVA|person|
-UC4laiPXKXMwWkQweO29yt8Q|person|36
-UC54YoNfHto00CYABQsPr5qg|party|
-UC7OMeUFuZMacpPk2fc9UlOA|party|
-UC7vBQ7qT7sFCHwzwTWeoXBg|other|
-UC8ba7bn2fuU_lsVweb4YM4Q|person|28
-UC9SVhrnsGxWwiBRWT9c7Ozw|other|
-UCA5aTt71DXLuX78SF2Hcxxw|person|
-UCA8JG3JY883RjCmAU9lABzw|person|33
-UCAkBdKn0B-xUlr6TLPx14wg|person|20
-UCAKzgWr5laB3Yf44hvqqZZQ|party|
-UCB8Q3N-nvX1YlMUL7Zl_16w|party|
-UCbj2azYYE_MHl0NCeaoC_iQ|party|
-UCbrxgk7y0DZpK3v94FgHIPw|person|49
-UCBSroHXoLzRXEw_6oubTKwg|institution|
-UCC9-paBZnwA6Bp-oNZUioWA|person|55
-UCCCf90jjhSxgkR6_Fb-u30g|institution|
-UCcMryUp6ME3BvP2alkS1dKg|person|57
-UCcru_TwWwshPbjIWvp6B7dg|person|37
-UCcu6jHeGFnTdSfVXr3rh9tA|person|
-UCcvK-yrz2_dSJUSNDJfq7JA|person|
-UCD2T6hSuOzkT2CMt4iwxw-A|person|
-UCdbzUS1IjDZXBxerJL5U_vA|person|
-UCDErKauugfWOLRmU16WN5pw|person|
-UCdL89Z0gQUDc1HT1882AGLw|other|
-UCDmff0YxGkS8JRMGzaAe-jg|person|
-UCdUat4f2yol7iMpCYoFUmNg|person|54
-UCe27I-_81PEpsG_GlYPEBog|party|
-UCEe-kBj-0ZJb7QVZ57jVvSg|person|25
-UCEqwfpB34mhHaAx-WE1Tqlg|person|
-UCeu3BbDWzS-XC842DKvmBZA|other|
-UCeWMp4Frgyv275gSnWNYoZQ|party|
-UCfA5DnCDX3Ixy5QOAMGtBlA|person|16
-UCfHWZNJQ7wZpG_cL9ukYX1Q|party|
-UCfidGlehytwCvV3qlsX5uVQ|party|
-UCFmUAFg2tFaRSttT4vMpBNg|person|48
-UCfmXA-zvHtLtthSlkibdcUw|party|
-UCFnbJ89yt8KDIRDDJENRRww|institution|
-UCfNDF4xXMl5L2r5GO_IdgqQ|institution|
-UCFqGa9uitcB-fWyNZK2xImw|person|23
-UCfQpT8ebZlk8PndKVNTiAvA|institution|
-UCFVKtK2LxUkuudXpOGOiUjg|person|
-UCFxDBEN7N1QdECRddUvPivQ|other|
-UCG2qip7ARa-yWQ5xmPpPBUQ|institution|
-UCGHxWumHADmpJEnGZEYRw7A|other|
-UCGMy4lcU26bYb4ZFHYMZQZw|party|
-UCGpO8nWNyNeSQjbNlSyro_A|institution|
-UCgv8ahGLkTVp4WyFK2-fymg|person|
-UChlY6SRpLSk-c1lHirAnXtg|institution|
-UCHpVe-U731TWQYFrk5VlSKA|party|
-UCHQbUAkpnkf_Yg6-xAqj-ZA|person|8
-UCHTEGIA9QrWAOw6cCeHX0FQ|party|
-UCilxiEGEQHVZ25GU_cnyCzg|person|30
-UCIQGSp79vVch0vO3Efqif_w|person|21
-UCiT4UyKh-cF8qBaBQP4p1ow|person|50
-UCixe3VYdKvKavOyopBxsKCw|party|
-UCjb9thdXXl4wmeb8ArPna9g|party|
-UCJEJTYYZkYjLnGCgRDqnIGA|person|18
-UCjo4wCbga9X01yGwm0gB0Wg|person|26
-UCjTbZBXEw-gplUAnMXLYHpg|person|10
-UCjtwBBNjlyd-wPmEFvgbK4w|party|
-UCJw8np695wqWOaKVhFjkRyg|party|
-UCk-_PEY3iC6DIGJKuoEe9bw|person|6
-UCK5wDULXMDasfob_yHPI2rQ|institution|
-UCKa1uttXqCvGpOyUDfc2wdg|person|
-UCKHKSD-yanY2ZwwU_4Tgf0w|party|
-UCL_ZV_Qg9WIdZ2DAjaaN9Rw|party|
-UCL2yCOZoelQCQ4iPH75mCNA|person|
-UCl3n298ddvMpS4hkzxE5Cjw|institution|
-UClaa_CwoQEmSo9Mb_M1f91g|person|17
-UCLGw2aLOaIa-1XF4IBfFyvg|person|38
-UClPZVAobhtv4n1bIPLuLnTg|person|
-UCmGGbm7h1E2W3YPYttyLPKA|person|44
-UCMIpCiZdVlMoqfra4hT6d4Q|person|11
-UCmYK9AZch3EV33vIFld1QTg|person|
-UCnflyRN1KOXDp6VM-_EZJgw|institution|
-UCNlu6bn_Vu37IDINEpVlEog|person|
-UCo7xGEOV-RfxOAxRfhlR3Ww|party|
-UCOACoqMR83_oB1O3X0xlJzw|other|
-UCOcDPuYTuxoRBtfmTBXtqBA|person|3
-UCoDttl6w1T-Stuw_pvNOvLA|person|4
-UCoMCFzv2L1q2-xJCvxrB9hg|person|
-UCOxXS5E2bR-e_zIgHfvggXA|person|
-UCPaeEhnVIdn4T01gUphIltw|institution|
-UCpfLNjG97sWjGSKYiveWz3w|institution|
-UCPgwe5A4feZq2nYBhaQsFDw|institution|
-UCpQ4STl8j62KeiApns4FndA|person|
-UCpU9riAixpc1Xn9Q4i7AkOw|person|56
-UCPyfEEhMVlNo_waWwkSGCZg|person|
-UCQcOjAB27zVvTq7WPost9hA|party|
-UCqQto5vnoiVq3kfX758Lk4g|party|
-UCr7r7gh9N45WVwYAmHQ3m3w|person|29
-UCRkuLQabW1hsihpZuHJSbEA|person|5
-UCRnWO39xk6YWdbRhdzZ3yXA|person|
-UCS1lRt6He-GQGhV7W6VeD8w|institution|
-UCScGc5Cd6h3Y_djPloqI7UA|person|40
-UCSwPcnzaMTuDcTgjRiJvZnw|party|
-UCTItQw_aTIIt1i8ysgYMH3w|institution|
-UCTyqSSRd75F2suFFgLtFuMg|person|
-UCU-rlzGnegN61Y3BdoJqTkQ|party|
-UCU3z3px1_RCqYBwrs8LJVWg|person|1
-UCu4nws5yvkvbcFUjDEh3cgw|institution|
-UCum5JuxrF9qc43AvmZnE_lw|other|
-UCuViTVc1yXoIbBodmzZajFw|institution|
-UCUzk9hBisz4aSMVTl37pWgw|party|
-UCv98oI0HCY7ClMpzbTjPznQ|person|
-UCvJ7MfsC_VxHQeYHAIo6Y6A|institution|
-UCw3waV6T2mhLC3BG8q0W55w|person|47
-UCW5lPpB4-rzpujVm5yp3cOw|party|
-UCwGBtRyFgWH9l0zGIF8eh3Q|party|
-UCwupzUX-SYyt3y4yx8cYdpg|person|27
-UCx-1PndeXmfkI8w9MtFQbmA|person|
-UCx8mQU1dOemRUTPmrjs_Jaw|person|
-UCXAKlEXGwoavQuOMaNBeaXw|person|34
-UCyHieXWJ4oewUR3ZTHdyzDw|person|32
-UCYSL3vTNPcnTMBOKTi1oPBQ|institution|
-UCyVYj4HdtEbcMngyD6_OLzg|person|9
-UCyX-_BipdNpdFgeZEQBNstA|person|35
-UCZgJ_r_Ewlu1Ck-RzNCHuUQ|person|31
-UCZgZMerNKBkXf0seibfKzJQ|person|13
-UCzWh602__JIO6U445LSS4sw|party|
+UCnflyRN1KOXDp6VM-_EZJgw|institution||1|Assemblée nationale
+UCPaeEhnVIdn4T01gUphIltw|institution||1|Élysée
+UCfQpT8ebZlk8PndKVNTiAvA|institution||1|Gouvernement
+UCK5wDULXMDasfob_yHPI2rQ|institution||1|Sénat
+UCG2qip7ARa-yWQ5xmPpPBUQ|institution||2|Commission européenne en France
+UC07oLgmZcMS5JLIW9o9sM4Q|institution||2|Conseil d'État
+UCu4nws5yvkvbcFUjDEh3cgw|institution||2|Conseil économique social et environnemental
+UCYSL3vTNPcnTMBOKTi1oPBQ|institution||2|Cour des comptes
+UCFnbJ89yt8KDIRDDJENRRww|institution||2|Défenseur des droits
+UCGpO8nWNyNeSQjbNlSyro_A|institution||2|Fondapol
+UCfNDF4xXMl5L2r5GO_IdgqQ|institution||2|Fondation Jean-Jaurès
+UCpfLNjG97sWjGSKYiveWz3w|institution||2|Institut français des relations internationales
+UCBSroHXoLzRXEw_6oubTKwg|institution||2|institutmontaigne
+UCCCf90jjhSxgkR6_Fb-u30g|institution||2|IRIS
+UCPgwe5A4feZq2nYBhaQsFDw|institution||2|IRSEM
+UCS1lRt6He-GQGhV7W6VeD8w|institution||2|Ministère de l'Économie et des Finances
+UCTItQw_aTIIt1i8ysgYMH3w|institution||2|Ministère de l'Europe et des Affaires étrangères
+UCvJ7MfsC_VxHQeYHAIo6Y6A|institution||2|Ministère de l'Intérieur
+UCuViTVc1yXoIbBodmzZajFw|institution||2|Ministère de la Justice
+UC0Y9vEv67BYRhgbRwJGj35w|institution||2|Ministère des Armées et des Anciens combattants
+UChlY6SRpLSk-c1lHirAnXtg|institution||2|Ministère Éducation nationale
+UCl3n298ddvMpS4hkzxE5Cjw|institution||2|Parlement européen en France
+UCUsBMOIUl_ad6JUOC16DpmQ|media||1|BFM Business
+UCXwDLMDV86ldKoFVc_g8P0g|media||1|BFMTV
+UCejTWYquMXD_MFHRZiqo_Aw|media||1|C à vous - France Télévisions
+UCvg4_wSz4Cmo4xRPXaKU47A|media||1|C dans l'air - France Télévisions
+UCXKJrYczY2_fJEZgFPGY0HQ|media||1|CNEWS
+UCIMGfEAERXjmWwQeg15BFsg|media||1|Europe 1
+UCCCPCZNChQdGa9EkATeye4g|media||1|FRANCE 24
+UCd5DKToXYTKAQ6khzewww2g|media||1|France Culture
+UCJldRgT_D7Am-ErRHQZ90uw|media||1|France Inter
+UCO6K_kkdP-lnSCiO3tPx7WA|media||1|franceinfo
+UCewhc0fvja891XkpIPGRMxQ|media||1|LCI
+UCHGFbA0KWBgf6gMbyUCZeCQ|media||1|LCP - Assemblée nationale
+UCCDz_XYeKWd0OIyjp95dqyQ|media||1|Le Figaro
+UCfHn_8-ehdem86fEvlFg-Gw|media||1|Le Parisien
+UCIh7PDUAP226Pa_NtjN9Jqw|media||1|LEGEND
+UCTa1bPArjpvNMgSHAb_pflA|media||1|Public Sénat
+UCpi-4daExRSchtsJzO06rwA|media||1|Quotidien
+UCPzRiKcU-bvBMZ08OepxU4w|media||1|Radio Classique
+UCxPd2eZWiZ_ZJax71fyfrnA|media||1|Radio J
+UCgGb7tN3tIH5_Kk05D1J_bA|media||1|RMC
+UC_ykXc7v9zZQdOG5QvJqpgg|media||1|RTL
+UCESTwDXpoMgiYBHipMdKTkQ|media||1|Sud Radio
+UCsrPUA0ZSDCNZC6wyRlR7ZA|media||1|TF1 INFO
+UCD25QI36ly-8hWm9OPOz7aw|media||2|20 Minutes France
+UC8EzKGkEiusTm7g0mTfkWkg|media||2|28 minutes - ARTE
+UCh57LRfcD3Z4TK6WrzL39GA|media||2|2A TV - LA CHAÎNE DU PEUPLE
+UCkfPKgTSJljrXmwm1m0iY8Q|media||2|313  DIGITAL
+UC86dbj-lbDks_hZ5gRKL49Q|media||2|AFP News Agency
+UCWiee11ejrdY8-dTO9GxElQ|media||2|Agir Pour Le Thor 2026
+UC-g3axVNt-E92HJdX2Bd9gA|media||2|AMAL AMELIA LAKRAFI - FDE CIRCO 10
+UCYsGHGGnGqiyvKESOYIouhQ|media||2|Angle Droit
+UCXHWT_QoQSsdGXbqF0hAMtg|media||2|Arrêt sur images
+UC3FW22U-kHcu6z8GjmBynJQ|media||2|Assemblée nationale du Québec
+UC8-FN_ftL-crIaXMouuykyQ|media||2|Au Poste
+UCHKib3PFscrSEFOINC2ZJCQ|media||2|B SMART
+UCR_C4rru48vq0j4zNCujPfw|media||2|Beur FM
+UC__xRB5L4toU9yYawt_lIKg|media||2|BLAST, Le souffle de l'info
+UCx9ygIxPfYR05kY92KzvbvA|media||2|Boulevard Voltaire
+UC31ilW5A2Y0_V293Ea1ExjQ|media||2|Brief.me
+UCSKdvgqdnj72_SLggp7BDTg|media||2|Brut
+UCb4UAZwZqS4a35FrBcLlMXA|media||2|CANAL+
+UCLSoWZjCGrdZo7ltIR3lEHg|media||2|Causeur
+UCyamXi0qEQJghCjJbj__aWQ|media||2|Chaîne officielle TVL
+UCFZSV_So_OaXgXVzgu58tJQ|media||2|cpac
+UC46uLyumV-YFu43QyYQRVjw|media||2|Croix & Patrie Officiel
+UC48e1bQSz_FYKSqIPjZW_BA|media||2|Député Didier Le Gac
+UCc0ugW1l2Y8B8GD1Kw8ImFA|media||2|Dorian mamona- France conquérante du peuple
+UCrvG04V6wbOau6fVJI01OlQ|media||2|DRM News
+UCrrXvYmau-9oMA6XJKZS2fQ|media||2|DWS News
+UCkgO4A3Fzm5D9Xu1Y_4vCKQ|media||2|ÉLUCID
+UCJAmVjrMyq64RCO2IzwmgGg|media||2|Emilie Bonnivard
+UCXyFWteWs8wbXgarsBZanEQ|media||2|Emmanuel MANDON  Député de la Loire
+UCNmhg527bUEX_YSOXKhnvjQ|media||2|Eric Bothorel - Député des Côtes d'Armor
+UCa7klG2eM9MHpOfOvxMQpGw|media||2|Éthique et tac
+UCW2QcKZiU8aUGg4yxCIditg|media||2|euronews (en français)
+UCtLWSPWa5bUMPO0wF9qcXhA|media||2|Feeling Dakar TV
+UCMzxbsxxRl9vsIqrpbczUQg|media||2|focus politique
+UC_GxHrDkwwADSaAjmXxqtXA|media||2|France 3 Auvergne-Rhône-Alpes
+UCW3mewW-ZMdk3byz5F8gfHA|media||2|France 3 Bretagne
+UC6kvMQP9gzv6qwwzMLuwZTg|media||2|France 3 Grand Est
+UCFC3nJ8GXl5yONe3tB_vhsw|media||2|France 3 Hauts-de-France
+UCWiQCbdC05zfzNg83F2kc3A|media||2|France 3 Normandie
+UCwTvW0qRQXV-yvBghNVgqKg|media||2|France 3 Nouvelle-Aquitaine
+UC20dglUTkVqzY9ipx_iOnng|media||2|France 3 Occitanie
+UCJgNMdfAExlU7MwHlET6XCw|media||2|France 3 Paris Ile-de-France
+UCazDBRKv_Bh6Gf0ebKbFRPQ|media||2|France 3 Pays de la Loire
+UCMPnD8fhwPMk_9XsYfc96JQ|media||2|France 3 Provence-Alpes-Côte d'Azur
+UCn_smTYmROafIdN_Ykomy8w|media||2|France 3 Toutes Régions
+UCCBR4hxc0hMbWs0IfBljQMg|media||2|France Télévisions
+UCXz1rrA8Pp2-1LJSkQQhbxw|media||2|France-Antilles & France-Guyane
+UC4nJVU1qbP4gCJ5zTSGtN6Q|media||2|Francine
+UCysox6U9HnqgCiJ-Pd-Jy_w|media||2|Frontières
+UCI-8QMy9n3I5Pv6mTmXoAXA|media||2|Gaspard G
+UC-LaL6VO2SpXpjPdQT668wg|media||2|Groupe Nice-Matin
+UCAcAnMF0OrCtUep3Y4M-ZPw|media||2|HugoDécrypte - Actus du jour
+UCgPYsPyGhhQJQ9zOUQDWDMA|media||2|i24NEWS Français
+UC5WjQI_NY-PODOQ3kTewebA|media||2|ici
+UCi1h68Fys0apnhLaJ-ijQOw|media||2|INA Politique
+UCUT7-8PSQkgyJrEiEfvvzcA|media||2|Jallale TV
+UC60SJ7wkWjjYUUsjWK8N_aA|media||2|Jean-Baptiste BLANC
+UCar0yo-PpeMk51m116826pQ|media||2|Journal l'Humanité
+UCHQda5vLxrH0Ff0I0kMq4zw|media||2|Konbini
+UCEbAvE1IBl0AVH12BqRlrTQ|media||2|L'Assemblée du Peuple
+UCp2kK3DyhpgFOdILF3BBC9A|media||2|L'Express
+UCfsTAnYne5szhoMc381A5wg|media||2|L'Opinion
+UCtJk8WNzhAu37r-QBmY7pRA|media||2|La Croix
+UCm-ftC1IP5k_YwxwyEmWiBA|media||2|La Dépêche du Midi
+UC2i-BljAg1w_MMMA1JuFm7w|media||2|La Provence
+UCmHw3H5Eq05tksL0Df-XP_A|media||2|La Voix du Nord
+UCbXWhsd805LfcbAy7xL9d-A|media||2|Le Crayon
+UCTdoBpACYnRL-Hb5pTvfnsg|media||2|Le Département de l'Hérault
+UCb0xB4NwoAANhxikOjw3Tnw|media||2|Le JDD
+UCT67YOMntJxfRnO_9bXDpvw|media||2|Le Média
+UCYpRDnhk5H8h16jpS84uqsA|media||2|Le Monde
+UCA3dZqGawAvJO6Lexbj8EGg|media||2|Le Monde Moderne
+UC1ObaaFz4XHVPN2T5IFsU4w|media||2|Le Nouvel Obs
+UCQd5LYcykaFeZtjDaP3bNSA|media||2|Le Point
+UC1iWBzG6ZesVI_XaG820GFg|media||2|Le Regard
+UCQ-K-v5Xzu54iPqT5PTNcSA|media||2|Le Regard Politique
+UCr_Oz6MFGScoquaZDKdjD-A|media||2|le stUDIo
+UC9GGzAhhvhJO1hL10-BcgNA|media||2|LeHuffPost
+UCiPalhEYJyydGPZ3EHdsVQA|media||2|LeMediaHuit
+UChZWs6PJY0hND384d2_RrhQ|media||2|Les Echos
+UC_KyKHzQdFQo9K1QFa2IyJw|media||2|Les Répliques
+UCyhzJw7pS5Ks4-hgWfQpU1A|media||2|Les secrets de l'Assemblée Nationale
+UCdMMTVKABzOcanBYuEYq80w|media||2|LeSage REACTS
+UC9x4Iyu-D257P0P-VDRwSzw|media||2|Libération
+UCIA3flGw7EPkw9c7S-qGjbQ|media||2|Ligne Droite • La matinale de Radio Courtoisie
+UC6bn_ABjeTwbJFGFMQbZFlw|media||2|Loopsider
+UC3Sk_YpjPd_Lz_oPQfhPQXQ|media||2|M6 Info
+UCTXDgOedpu82TKpdcoBt5iA|media||2|Magjournal 77
+UC4V5osIDMjFwtCRxMm2e0LA|media||2|Marianne
+UCD3CQpAYhDWPyIqzvqv9Fow|media||2|Maxime LAISNEY
+UCdnaDhU-LDQrIEEmSIfq0-Q|media||2|Mediapart
+UCrc5iD627cYVES64dODUoDA|media||2|Ministère de la Communication et Des Médias
+UC-0kfhensYKGFYvXpyVxmOQ|media||2|Moe Media
+UCQC0xLG_W0QpqAXQ4-yhwBA|media||2|Mosaïk Cristal
+UCQKmfKnJ9ZpNLGxjt0RiMJA|media||2|Mouv'
+UCVXKFbyJxnx2s4LcCJ_riIg|media||2|Noovo Info
+UC3lacWBPVK-JfmGyyHx4AAw|media||2|OMERTA
+UCrpsdF7UreiF-2r5Jp0YpRg|media||2|Ouest-France
+UCwVhIWn5uFYaUrurDS5tWEA|media||2|outremernews onews
+UCVKKJnrFnp318hrMRLUHW7A|media||2|Philippe Bonnecarrère
+UCTFjmvpWb_gfIAFsEZqD3NQ|media||2|Politicon
+UCtjc5x0RIiTsdYS4IFMjCGQ|media||2|Politis
+UCxSUslP_JMH3Bb50oXd1Nnw|media||2|Puissance Télévision
+UCYkZbyXcVmtdRUpCBi713vw|media||2|Pure Politique
+UCqaZpAnjhuNJMjk4f68QJSw|media||2|Putsch Media
+UC6V-tTuTNwnnysyYkiHkZ2Q|media||2|Radio Notre Dame
+UCGvjUWz3mGV9cssraATuEsw|media||2|Radio Nova
+UCBmUTlXAkTU1pi56O76FYZA|media||2|Radio One
+UCuYN15i2J_gETGamUAjEIWA|media||2|RADIO RCJ
+UC45NsEyqTGMtOeEM-UvlTuQ|media||2|Regards
+UCDn6zvBZNEWUv44xjgELicA|media||2|Reporterre - le média de l'écologie
+UCihYCHXhm3X3qgk0L-hBZxw|media||2|Revue Conflits
+UCm4fSpMpPIZ9z6KHoezLUAg|media||2|RFI
+UCzBoVtUqSyAyr0kF5ABW7gQ|media||2|RTL (2)
+UCip2DNtZUPC82a_xLLTFcgA|media||2|RTNC
+UCbLkrHoMcA0fA4-Egu-LbJQ|media||2|Séances Publics
+UCw3RBtxhFWr0ahJ6XzliMRQ|media||2|Senegal5
+UC5eVGjO4ITJA1KM_tva_OSQ|media||2|Senegal7
+UCGcjB36gJuZdeZ53do42moQ|media||2|Solution Démocratique
+UCHkmW5IhEM9brH9CGH-yJiw|media||2|Solution TV
+UCmbhrKMU_X7Gi47bZEEajEQ|media||2|StreetPress
+UC7PX-myPpcT4YfZEWqZxGGg|media||2|Sud Ouest
+UCAUXyESHY44j2QOLUsm5fAg|media||2|Sunugal 24
+UCfwCPzdT1i87xWYh1P3suTw|media||2|Tele Senegal
+UCQgWpmt02UtJkyO32HGUASQ|media||2|Thinkerview
+UCLuLxfwPrxe4wUPkdYM_VDA|media||2|Tocsin
+UCu0C2YqRHjyG-5KwozeyLFA|media||2|ToneFrance
+UCmimWvZbHUEBMoZu7agHniA|media||2|Tripotay Lakay
+UCzKH70qfN_yuXq3s91fdwmg|media||2|TV5MONDE Info
+UCfQdRWBSyfxcuGhnXS7tq7w|media||2|Valeurs Actuelles Actu
+UCH_G9INP8Zi34ZgAwOZOpeg|media||2|Vincent Capo-Canellas
+UCQcOjAB27zVvTq7WPost9hA|party||1|Debout!
+UCqQto5vnoiVq3kfX758Lk4g|party||1|Députés Renaissance
+UCfidGlehytwCvV3qlsX5uVQ|party||1|Front Populaire
+UCGMy4lcU26bYb4ZFHYMZQZw|party||1|Groupe CRCE-K
+UCbj2azYYE_MHl0NCeaoC_iQ|party||1|Groupe Démocrate
+UC2Y9964TQIewqKwa_9h8K0Q|party||1|Groupe Ecologiste et Social - Assemblée nationale
+UCfmXA-zvHtLtthSlkibdcUw|party||1|Groupe Rassemblement National
+UCU-rlzGnegN61Y3BdoJqTkQ|party||1|Groupe Union Centriste Sénat
+UCKHKSD-yanY2ZwwU_4Tgf0w|party||1|La France insoumise
+UCHTEGIA9QrWAOw6cCeHX0FQ|party||1|La France insoumise à l'Assemblée nationale
+UCHpVe-U731TWQYFrk5VlSKA|party||1|Le Groupe Écologiste au Sénat
+UC54YoNfHto00CYABQsPr5qg|party||1|Les Centristes
+UCe27I-_81PEpsG_GlYPEBog|party||1|Les députés communistes
+UCL_ZV_Qg9WIdZ2DAjaaN9Rw|party||1|Les Députés Les Républicains
+UCB8Q3N-nvX1YlMUL7Zl_16w|party||1|Les Écologistes
+UCjb9thdXXl4wmeb8ArPna9g|party||1|Les Patriotes
+UC3Ma4tRFxx85oZI_XKVTPwg|party||1|les Républicains
+UCwGBtRyFgWH9l0zGIF8eh3Q|party||1|Les Républicains Sénat
+UCUzk9hBisz4aSMVTl37pWgw|party||1|Lutte ouvrière
+UCfHWZNJQ7wZpG_cL9ukYX1Q|party||1|MoDem
+UCAKzgWr5laB3Yf44hvqqZZQ|party||1|NPA - L'Anticapitaliste
+UCSwPcnzaMTuDcTgjRiJvZnw|party||1|PCF - Parti communiste français (PCF)
+UCixe3VYdKvKavOyopBxsKCw|party||1|Place publique
+UCo7xGEOV-RfxOAxRfhlR3Ww|party||1|PS - Parti socialiste
+UCeWMp4Frgyv275gSnWNYoZQ|party||1|Rassemblement National
+UCJw8np695wqWOaKVhFjkRyg|party||1|Renaissance
+UCW5lPpB4-rzpujVm5yp3cOw|party||1|Socialistes Sénat
+UCzWh602__JIO6U445LSS4sw|party||1|UDR
+UCjtwBBNjlyd-wPmEFvgbK4w|party||1|Union nationale
+UC7OMeUFuZMacpPk2fc9UlOA|party||1|Union Populaire Républicaine
+UCcvK-yrz2_dSJUSNDJfq7JA|person||1|Anne Hidalgo
+UC3q3FLPQtuWWv1uTkTfpEtw|person||1|Antoine Léaument
+UCcu6jHeGFnTdSfVXr3rh9tA|person||1|Aurélien Pradié
+UCDmff0YxGkS8JRMGzaAe-jg|person||1|Aurélien Saintoul - Député des Hauts-de-Seine
+UCiT4UyKh-cF8qBaBQP4p1ow|person|50|1|Aurore Bergé
+UCoDttl6w1T-Stuw_pvNOvLA|person|4|1|Avec Édouard
+UCEqwfpB34mhHaAx-WE1Tqlg|person||1|Bastien Lachaud
+UCcMryUp6ME3BvP2alkS1dKg|person|57|1|Benoit Hamon
+UCPyfEEhMVlNo_waWwkSGCZg|person||1|Bertrand Pancher
+UCScGc5Cd6h3Y_djPloqI7UA|person|40|1|BorisVallaud
+UCFmUAFg2tFaRSttT4vMpBNg|person|48|1|Bruno Le Maire
+UCRkuLQabW1hsihpZuHJSbEA|person|5|1|Bruno Retailleau
+UCpU9riAixpc1Xn9Q4i7AkOw|person|56|1|Clémence Guetté
+UCZgJ_r_Ewlu1Ck-RzNCHuUQ|person|31|1|Clémentine Autain
+UCNlu6bn_Vu37IDINEpVlEog|person||1|David Guiraud
+UC2XZY-bjIEmyLZ9MPJQytZg|person|43|1|David Lisnard
+UCpQ4STl8j62KeiApns4FndA|person||1|Députée Obono
+UCMIpCiZdVlMoqfra4hT6d4Q|person|11|1|Dominique de Villepin
+UCA5aTt71DXLuX78SF2Hcxxw|person||1|Edwige Diaz
+UCFqGa9uitcB-fWyNZK2xImw|person|23|1|Emmanuel Macron
+UCyHieXWJ4oewUR3ZTHdyzDw|person|32|1|Eric Ciotti
+UC4A3K4CT4swDAW57fzXIMVA|person||1|Eric Coquerel
+UCx8mQU1dOemRUTPmrjs_Jaw|person||1|Eric Legaud
+UCL2yCOZoelQCQ4iPH75mCNA|person||1|Eric Piolle
+UCjTbZBXEw-gplUAnMXLYHpg|person|10|1|Éric Zemmour
+UCHQbUAkpnkf_Yg6-xAqj-ZA|person|8|1|Fabien Roussel
+UClaa_CwoQEmSo9Mb_M1f91g|person|17|1|FLORIAN PHILIPPOT
+UCJEJTYYZkYjLnGCgRDqnIGA|person|18|1|François Asselineau
+UCEe-kBj-0ZJb7QVZ57jVvSg|person|25|1|François Bayrou - FB Direct
+UCIQGSp79vVch0vO3Efqif_w|person|21|1|FRANÇOIS RUFFIN
+UCOcDPuYTuxoRBtfmTBXtqBA|person|3|1|Gabriel Attal
+UCAkBdKn0B-xUlr6TLPx14wg|person|20|1|Gérald DARMANIN
+UClPZVAobhtv4n1bIPLuLnTg|person||1|Guillaume Gontard
+UCFVKtK2LxUkuudXpOGOiUjg|person||1|Hadrien Clouet
+UCdUat4f2yol7iMpCYoFUmNg|person|54|1|Jean Lassalle
+UCOxXS5E2bR-e_zIgHfvggXA|person||1|Jean SOL, Sénateur des Pyrénées-Orientales
+UCk-_PEY3iC6DIGJKuoEe9bw|person|6|1|JEAN-LUC MÉLENCHON
+UC3U0VIDgANFaXeOAtt1m5Mw|person|2|1|Jordan Bardella
+UCdbzUS1IjDZXBxerJL5U_vA|person||1|Julien Odoul
+UCD2T6hSuOzkT2CMt4iwxw-A|person||1|Laurent Mazaury
+UCjo4wCbga9X01yGwm0gB0Wg|person|26|1|Laurent Wauquiez
+UCLGw2aLOaIa-1XF4IBfFyvg|person|38|1|Léon Deffontaines
+UCcru_TwWwshPbjIWvp6B7dg|person|37|1|Louis Boyard
+UCTyqSSRd75F2suFFgLtFuMg|person||1|Ludovic Mendes
+UCyX-_BipdNpdFgeZEQBNstA|person|35|1|Manon Aubry
+UCr7r7gh9N45WVwYAmHQ3m3w|person|29|1|Manuel Bompard
+UC_2Xe0tzVXvLMvCxmtDmdQA|person||1|Manuel Valls
+UCU3z3px1_RCqYBwrs8LJVWg|person|1|1|Marine Le Pen
+UCwupzUX-SYyt3y4yx8cYdpg|person|27|1|Marion Maréchal
+UCilxiEGEQHVZ25GU_cnyCzg|person|30|1|Mathilde Panot
+UCDErKauugfWOLRmU16WN5pw|person||1|Michaël Delafosse
+UCbrxgk7y0DZpK3v94FgHIPw|person|49|1|Michel Barnier - Chaîne officielle
+UCfA5DnCDX3Ixy5QOAMGtBlA|person|16|1|Nicolas Dupont-Aignan
+UCRnWO39xk6YWdbRhdzZ3yXA|person||1|Olivier Paccaud
+UCgv8ahGLkTVp4WyFK2-fymg|person||1|Olivier SERVA
+UCC9-paBZnwA6Bp-oNZUioWA|person|55|1|Philippe de Villiers
+UCw3waV6T2mhLC3BG8q0W55w|person|47|1|Rachida Dati
+UCyVYj4HdtEbcMngyD6_OLzg|person|9|1|Raphaël Glucksmann
+UCoMCFzv2L1q2-xJCvxrB9hg|person||1|Rémi Cardon - Sénateur de la Somme
+UC4laiPXKXMwWkQweO29yt8Q|person|36|1|Rima Hassan
+UCA8JG3JY883RjCmAU9lABzw|person|33|1|Sandrine Rousseau
+UC8ba7bn2fuU_lsVweb4YM4Q|person|28|1|Sarah Knafo
+UCmYK9AZch3EV33vIFld1QTg|person||1|Sébastien Delogu
+UCx-1PndeXmfkI8w9MtFQbmA|person||1|Thomas Ménagé
+UCv98oI0HCY7ClMpzbTjPznQ|person||1|Thomas Portes
+UCXAKlEXGwoavQuOMaNBeaXw|person|34|1|Valérie Pécresse
+UCZgZMerNKBkXf0seibfKzJQ|person|13|1|Xavier Bertrand Officiel
+UCmGGbm7h1E2W3YPYttyLPKA|person|44|1|Yaël Braun-Pivet
+UCKa1uttXqCvGpOyUDfc2wdg|person||1|Yan Chantrel

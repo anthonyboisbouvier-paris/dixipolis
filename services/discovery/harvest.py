@@ -189,10 +189,7 @@ def cmd_match(a):
         n_match += 1
         # score de règle : probabilité qu'une personne ciblée PARLE (affiné ensuite par le LLM sur la bande grise)
         score = 0.9 if "own_channel" in sources else 0.75 if any(s.endswith("_title") for s in sources) else 0.5 if "media_description" in sources else 0.4
-        dur = v.get("duration_sec")
-        status, reason = "candidate", None
-        if dur is not None and dur < 120:
-            status, reason = "rejected", "duree < 2 min (regle alignee sur le pipeline quotidien)"
+        status, reason = "candidate", None   # les shorts sont conservés (décision du 13/09) ; pas de rejet sur la durée
         v.update({"matched_person_ids": ids, "matched_names": names, "match_sources": sorted(sources),
                   "relevance_score": score, "scored_by": "rule", "status": status, "relevance_reason": reason})
         out.write(json.dumps(v, ensure_ascii=False) + "\n")

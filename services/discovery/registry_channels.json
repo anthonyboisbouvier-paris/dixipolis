@@ -1,647 +1,1927 @@
 [
 {
-"youtube_channel_id": "UC_2Xe0tzVXvLMvCxmtDmdQA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC07oLgmZcMS5JLIW9o9sM4Q",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC0Y9vEv67BYRhgbRwJGj35w",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC2XZY-bjIEmyLZ9MPJQytZg",
-"kind": "person",
-"person_id": 43
-},
-{
-"youtube_channel_id": "UC2Y9964TQIewqKwa_9h8K0Q",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC3Ma4tRFxx85oZI_XKVTPwg",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC3q3FLPQtuWWv1uTkTfpEtw",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC3U0VIDgANFaXeOAtt1m5Mw",
-"kind": "person",
-"person_id": 2
-},
-{
-"youtube_channel_id": "UC4A3K4CT4swDAW57fzXIMVA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC4laiPXKXMwWkQweO29yt8Q",
-"kind": "person",
-"person_id": 36
-},
-{
-"youtube_channel_id": "UC54YoNfHto00CYABQsPr5qg",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC7OMeUFuZMacpPk2fc9UlOA",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC7vBQ7qT7sFCHwzwTWeoXBg",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UC8ba7bn2fuU_lsVweb4YM4Q",
-"kind": "person",
-"person_id": 28
-},
-{
-"youtube_channel_id": "UC9SVhrnsGxWwiBRWT9c7Ozw",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCA5aTt71DXLuX78SF2Hcxxw",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCA8JG3JY883RjCmAU9lABzw",
-"kind": "person",
-"person_id": 33
-},
-{
-"youtube_channel_id": "UCAkBdKn0B-xUlr6TLPx14wg",
-"kind": "person",
-"person_id": 20
-},
-{
-"youtube_channel_id": "UCAKzgWr5laB3Yf44hvqqZZQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCB8Q3N-nvX1YlMUL7Zl_16w",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCbj2azYYE_MHl0NCeaoC_iQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCbrxgk7y0DZpK3v94FgHIPw",
-"kind": "person",
-"person_id": 49
-},
-{
-"youtube_channel_id": "UCBSroHXoLzRXEw_6oubTKwg",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCC9-paBZnwA6Bp-oNZUioWA",
-"kind": "person",
-"person_id": 55
-},
-{
-"youtube_channel_id": "UCCCf90jjhSxgkR6_Fb-u30g",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCcMryUp6ME3BvP2alkS1dKg",
-"kind": "person",
-"person_id": 57
-},
-{
-"youtube_channel_id": "UCcru_TwWwshPbjIWvp6B7dg",
-"kind": "person",
-"person_id": 37
-},
-{
-"youtube_channel_id": "UCcu6jHeGFnTdSfVXr3rh9tA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCcvK-yrz2_dSJUSNDJfq7JA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCD2T6hSuOzkT2CMt4iwxw-A",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCdbzUS1IjDZXBxerJL5U_vA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCDErKauugfWOLRmU16WN5pw",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCdL89Z0gQUDc1HT1882AGLw",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCDmff0YxGkS8JRMGzaAe-jg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCdUat4f2yol7iMpCYoFUmNg",
-"kind": "person",
-"person_id": 54
-},
-{
-"youtube_channel_id": "UCe27I-_81PEpsG_GlYPEBog",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCEe-kBj-0ZJb7QVZ57jVvSg",
-"kind": "person",
-"person_id": 25
-},
-{
-"youtube_channel_id": "UCEqwfpB34mhHaAx-WE1Tqlg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCeu3BbDWzS-XC842DKvmBZA",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCeWMp4Frgyv275gSnWNYoZQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCfA5DnCDX3Ixy5QOAMGtBlA",
-"kind": "person",
-"person_id": 16
-},
-{
-"youtube_channel_id": "UCfHWZNJQ7wZpG_cL9ukYX1Q",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCfidGlehytwCvV3qlsX5uVQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCFmUAFg2tFaRSttT4vMpBNg",
-"kind": "person",
-"person_id": 48
-},
-{
-"youtube_channel_id": "UCfmXA-zvHtLtthSlkibdcUw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCFnbJ89yt8KDIRDDJENRRww",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCfNDF4xXMl5L2r5GO_IdgqQ",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCFqGa9uitcB-fWyNZK2xImw",
-"kind": "person",
-"person_id": 23
-},
-{
-"youtube_channel_id": "UCfQpT8ebZlk8PndKVNTiAvA",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCFVKtK2LxUkuudXpOGOiUjg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCFxDBEN7N1QdECRddUvPivQ",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCG2qip7ARa-yWQ5xmPpPBUQ",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCGHxWumHADmpJEnGZEYRw7A",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCGMy4lcU26bYb4ZFHYMZQZw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCGpO8nWNyNeSQjbNlSyro_A",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCgv8ahGLkTVp4WyFK2-fymg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UChlY6SRpLSk-c1lHirAnXtg",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCHpVe-U731TWQYFrk5VlSKA",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCHQbUAkpnkf_Yg6-xAqj-ZA",
-"kind": "person",
-"person_id": 8
-},
-{
-"youtube_channel_id": "UCHTEGIA9QrWAOw6cCeHX0FQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCilxiEGEQHVZ25GU_cnyCzg",
-"kind": "person",
-"person_id": 30
-},
-{
-"youtube_channel_id": "UCIQGSp79vVch0vO3Efqif_w",
-"kind": "person",
-"person_id": 21
-},
-{
-"youtube_channel_id": "UCiT4UyKh-cF8qBaBQP4p1ow",
-"kind": "person",
-"person_id": 50
-},
-{
-"youtube_channel_id": "UCixe3VYdKvKavOyopBxsKCw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCjb9thdXXl4wmeb8ArPna9g",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCJEJTYYZkYjLnGCgRDqnIGA",
-"kind": "person",
-"person_id": 18
-},
-{
-"youtube_channel_id": "UCjo4wCbga9X01yGwm0gB0Wg",
-"kind": "person",
-"person_id": 26
-},
-{
-"youtube_channel_id": "UCjTbZBXEw-gplUAnMXLYHpg",
-"kind": "person",
-"person_id": 10
-},
-{
-"youtube_channel_id": "UCjtwBBNjlyd-wPmEFvgbK4w",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCJw8np695wqWOaKVhFjkRyg",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCk-_PEY3iC6DIGJKuoEe9bw",
-"kind": "person",
-"person_id": 6
-},
-{
-"youtube_channel_id": "UCK5wDULXMDasfob_yHPI2rQ",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCKa1uttXqCvGpOyUDfc2wdg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCKHKSD-yanY2ZwwU_4Tgf0w",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCL_ZV_Qg9WIdZ2DAjaaN9Rw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCL2yCOZoelQCQ4iPH75mCNA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCl3n298ddvMpS4hkzxE5Cjw",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UClaa_CwoQEmSo9Mb_M1f91g",
-"kind": "person",
-"person_id": 17
-},
-{
-"youtube_channel_id": "UCLGw2aLOaIa-1XF4IBfFyvg",
-"kind": "person",
-"person_id": 38
-},
-{
-"youtube_channel_id": "UClPZVAobhtv4n1bIPLuLnTg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCmGGbm7h1E2W3YPYttyLPKA",
-"kind": "person",
-"person_id": 44
-},
-{
-"youtube_channel_id": "UCMIpCiZdVlMoqfra4hT6d4Q",
-"kind": "person",
-"person_id": 11
-},
-{
-"youtube_channel_id": "UCmYK9AZch3EV33vIFld1QTg",
-"kind": "person",
-"person_id": null
-},
-{
 "youtube_channel_id": "UCnflyRN1KOXDp6VM-_EZJgw",
 "kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCNlu6bn_Vu37IDINEpVlEog",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCo7xGEOV-RfxOAxRfhlR3Ww",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCOACoqMR83_oB1O3X0xlJzw",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCOcDPuYTuxoRBtfmTBXtqBA",
-"kind": "person",
-"person_id": 3
-},
-{
-"youtube_channel_id": "UCoDttl6w1T-Stuw_pvNOvLA",
-"kind": "person",
-"person_id": 4
-},
-{
-"youtube_channel_id": "UCoMCFzv2L1q2-xJCvxrB9hg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCOxXS5E2bR-e_zIgHfvggXA",
-"kind": "person",
-"person_id": null
+"person_id": null,
+"priority": 1,
+"title": "Assemblée nationale"
 },
 {
 "youtube_channel_id": "UCPaeEhnVIdn4T01gUphIltw",
 "kind": "institution",
-"person_id": null
+"person_id": null,
+"priority": 1,
+"title": "Élysée"
 },
 {
-"youtube_channel_id": "UCpfLNjG97sWjGSKYiveWz3w",
+"youtube_channel_id": "UCfQpT8ebZlk8PndKVNTiAvA",
 "kind": "institution",
-"person_id": null
+"person_id": null,
+"priority": 1,
+"title": "Gouvernement"
 },
 {
-"youtube_channel_id": "UCPgwe5A4feZq2nYBhaQsFDw",
+"youtube_channel_id": "UCK5wDULXMDasfob_yHPI2rQ",
 "kind": "institution",
-"person_id": null
+"person_id": null,
+"priority": 1,
+"title": "Sénat"
 },
 {
-"youtube_channel_id": "UCpQ4STl8j62KeiApns4FndA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCpU9riAixpc1Xn9Q4i7AkOw",
-"kind": "person",
-"person_id": 56
-},
-{
-"youtube_channel_id": "UCPyfEEhMVlNo_waWwkSGCZg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCQcOjAB27zVvTq7WPost9hA",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCqQto5vnoiVq3kfX758Lk4g",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCr7r7gh9N45WVwYAmHQ3m3w",
-"kind": "person",
-"person_id": 29
-},
-{
-"youtube_channel_id": "UCRkuLQabW1hsihpZuHJSbEA",
-"kind": "person",
-"person_id": 5
-},
-{
-"youtube_channel_id": "UCRnWO39xk6YWdbRhdzZ3yXA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCS1lRt6He-GQGhV7W6VeD8w",
+"youtube_channel_id": "UCG2qip7ARa-yWQ5xmPpPBUQ",
 "kind": "institution",
-"person_id": null
+"person_id": null,
+"priority": 2,
+"title": "Commission européenne en France"
 },
 {
-"youtube_channel_id": "UCScGc5Cd6h3Y_djPloqI7UA",
-"kind": "person",
-"person_id": 40
-},
-{
-"youtube_channel_id": "UCSwPcnzaMTuDcTgjRiJvZnw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCTItQw_aTIIt1i8ysgYMH3w",
+"youtube_channel_id": "UC07oLgmZcMS5JLIW9o9sM4Q",
 "kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCTyqSSRd75F2suFFgLtFuMg",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCU-rlzGnegN61Y3BdoJqTkQ",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCU3z3px1_RCqYBwrs8LJVWg",
-"kind": "person",
-"person_id": 1
+"person_id": null,
+"priority": 2,
+"title": "Conseil d'État"
 },
 {
 "youtube_channel_id": "UCu4nws5yvkvbcFUjDEh3cgw",
 "kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCum5JuxrF9qc43AvmZnE_lw",
-"kind": "other",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCuViTVc1yXoIbBodmzZajFw",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCUzk9hBisz4aSMVTl37pWgw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCv98oI0HCY7ClMpzbTjPznQ",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCvJ7MfsC_VxHQeYHAIo6Y6A",
-"kind": "institution",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCw3waV6T2mhLC3BG8q0W55w",
-"kind": "person",
-"person_id": 47
-},
-{
-"youtube_channel_id": "UCW5lPpB4-rzpujVm5yp3cOw",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCwGBtRyFgWH9l0zGIF8eh3Q",
-"kind": "party",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCwupzUX-SYyt3y4yx8cYdpg",
-"kind": "person",
-"person_id": 27
-},
-{
-"youtube_channel_id": "UCx-1PndeXmfkI8w9MtFQbmA",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCx8mQU1dOemRUTPmrjs_Jaw",
-"kind": "person",
-"person_id": null
-},
-{
-"youtube_channel_id": "UCXAKlEXGwoavQuOMaNBeaXw",
-"kind": "person",
-"person_id": 34
-},
-{
-"youtube_channel_id": "UCyHieXWJ4oewUR3ZTHdyzDw",
-"kind": "person",
-"person_id": 32
+"person_id": null,
+"priority": 2,
+"title": "Conseil économique social et environnemental"
 },
 {
 "youtube_channel_id": "UCYSL3vTNPcnTMBOKTi1oPBQ",
 "kind": "institution",
-"person_id": null
+"person_id": null,
+"priority": 2,
+"title": "Cour des comptes"
 },
 {
-"youtube_channel_id": "UCyVYj4HdtEbcMngyD6_OLzg",
-"kind": "person",
-"person_id": 9
+"youtube_channel_id": "UCFnbJ89yt8KDIRDDJENRRww",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Défenseur des droits"
 },
 {
-"youtube_channel_id": "UCyX-_BipdNpdFgeZEQBNstA",
-"kind": "person",
-"person_id": 35
+"youtube_channel_id": "UCGpO8nWNyNeSQjbNlSyro_A",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Fondapol"
 },
 {
-"youtube_channel_id": "UCZgJ_r_Ewlu1Ck-RzNCHuUQ",
-"kind": "person",
-"person_id": 31
+"youtube_channel_id": "UCfNDF4xXMl5L2r5GO_IdgqQ",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Fondation Jean-Jaurès"
 },
 {
-"youtube_channel_id": "UCZgZMerNKBkXf0seibfKzJQ",
-"kind": "person",
-"person_id": 13
+"youtube_channel_id": "UCpfLNjG97sWjGSKYiveWz3w",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Institut français des relations internationales"
+},
+{
+"youtube_channel_id": "UCBSroHXoLzRXEw_6oubTKwg",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "institutmontaigne"
+},
+{
+"youtube_channel_id": "UCCCf90jjhSxgkR6_Fb-u30g",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "IRIS"
+},
+{
+"youtube_channel_id": "UCPgwe5A4feZq2nYBhaQsFDw",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "IRSEM"
+},
+{
+"youtube_channel_id": "UCS1lRt6He-GQGhV7W6VeD8w",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère de l'Économie et des Finances"
+},
+{
+"youtube_channel_id": "UCTItQw_aTIIt1i8ysgYMH3w",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère de l'Europe et des Affaires étrangères"
+},
+{
+"youtube_channel_id": "UCvJ7MfsC_VxHQeYHAIo6Y6A",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère de l'Intérieur"
+},
+{
+"youtube_channel_id": "UCuViTVc1yXoIbBodmzZajFw",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère de la Justice"
+},
+{
+"youtube_channel_id": "UC0Y9vEv67BYRhgbRwJGj35w",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère des Armées et des Anciens combattants"
+},
+{
+"youtube_channel_id": "UChlY6SRpLSk-c1lHirAnXtg",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Ministère Éducation nationale"
+},
+{
+"youtube_channel_id": "UCl3n298ddvMpS4hkzxE5Cjw",
+"kind": "institution",
+"person_id": null,
+"priority": 2,
+"title": "Parlement européen en France"
+},
+{
+"youtube_channel_id": "UCUsBMOIUl_ad6JUOC16DpmQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "BFM Business"
+},
+{
+"youtube_channel_id": "UCXwDLMDV86ldKoFVc_g8P0g",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "BFMTV"
+},
+{
+"youtube_channel_id": "UCejTWYquMXD_MFHRZiqo_Aw",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "C à vous - France Télévisions"
+},
+{
+"youtube_channel_id": "UCvg4_wSz4Cmo4xRPXaKU47A",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "C dans l'air - France Télévisions"
+},
+{
+"youtube_channel_id": "UCXKJrYczY2_fJEZgFPGY0HQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "CNEWS"
+},
+{
+"youtube_channel_id": "UCIMGfEAERXjmWwQeg15BFsg",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Europe 1"
+},
+{
+"youtube_channel_id": "UCCCPCZNChQdGa9EkATeye4g",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "FRANCE 24"
+},
+{
+"youtube_channel_id": "UCd5DKToXYTKAQ6khzewww2g",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "France Culture"
+},
+{
+"youtube_channel_id": "UCJldRgT_D7Am-ErRHQZ90uw",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "France Inter"
+},
+{
+"youtube_channel_id": "UCO6K_kkdP-lnSCiO3tPx7WA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "franceinfo"
+},
+{
+"youtube_channel_id": "UCewhc0fvja891XkpIPGRMxQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "LCI"
+},
+{
+"youtube_channel_id": "UCHGFbA0KWBgf6gMbyUCZeCQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "LCP - Assemblée nationale"
+},
+{
+"youtube_channel_id": "UCCDz_XYeKWd0OIyjp95dqyQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Le Figaro"
+},
+{
+"youtube_channel_id": "UCfHn_8-ehdem86fEvlFg-Gw",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Le Parisien"
+},
+{
+"youtube_channel_id": "UCIh7PDUAP226Pa_NtjN9Jqw",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "LEGEND"
+},
+{
+"youtube_channel_id": "UCTa1bPArjpvNMgSHAb_pflA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Public Sénat"
+},
+{
+"youtube_channel_id": "UCpi-4daExRSchtsJzO06rwA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Quotidien"
+},
+{
+"youtube_channel_id": "UCPzRiKcU-bvBMZ08OepxU4w",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Radio Classique"
+},
+{
+"youtube_channel_id": "UCxPd2eZWiZ_ZJax71fyfrnA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Radio J"
+},
+{
+"youtube_channel_id": "UCgGb7tN3tIH5_Kk05D1J_bA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "RMC"
+},
+{
+"youtube_channel_id": "UC_ykXc7v9zZQdOG5QvJqpgg",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "RTL"
+},
+{
+"youtube_channel_id": "UCESTwDXpoMgiYBHipMdKTkQ",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "Sud Radio"
+},
+{
+"youtube_channel_id": "UCsrPUA0ZSDCNZC6wyRlR7ZA",
+"kind": "media",
+"person_id": null,
+"priority": 1,
+"title": "TF1 INFO"
+},
+{
+"youtube_channel_id": "UCD25QI36ly-8hWm9OPOz7aw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "20 Minutes France"
+},
+{
+"youtube_channel_id": "UC8EzKGkEiusTm7g0mTfkWkg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "28 minutes - ARTE"
+},
+{
+"youtube_channel_id": "UCh57LRfcD3Z4TK6WrzL39GA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "2A TV - LA CHAÎNE DU PEUPLE"
+},
+{
+"youtube_channel_id": "UCkfPKgTSJljrXmwm1m0iY8Q",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "313  DIGITAL"
+},
+{
+"youtube_channel_id": "UC86dbj-lbDks_hZ5gRKL49Q",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "AFP News Agency"
+},
+{
+"youtube_channel_id": "UCWiee11ejrdY8-dTO9GxElQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Agir Pour Le Thor 2026"
+},
+{
+"youtube_channel_id": "UC-g3axVNt-E92HJdX2Bd9gA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "AMAL AMELIA LAKRAFI - FDE CIRCO 10"
+},
+{
+"youtube_channel_id": "UCYsGHGGnGqiyvKESOYIouhQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Angle Droit"
+},
+{
+"youtube_channel_id": "UCXHWT_QoQSsdGXbqF0hAMtg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Arrêt sur images"
+},
+{
+"youtube_channel_id": "UC3FW22U-kHcu6z8GjmBynJQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Assemblée nationale du Québec"
+},
+{
+"youtube_channel_id": "UC8-FN_ftL-crIaXMouuykyQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Au Poste"
+},
+{
+"youtube_channel_id": "UCHKib3PFscrSEFOINC2ZJCQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "B SMART"
+},
+{
+"youtube_channel_id": "UCR_C4rru48vq0j4zNCujPfw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Beur FM"
+},
+{
+"youtube_channel_id": "UC__xRB5L4toU9yYawt_lIKg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "BLAST, Le souffle de l'info"
+},
+{
+"youtube_channel_id": "UCx9ygIxPfYR05kY92KzvbvA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Boulevard Voltaire"
+},
+{
+"youtube_channel_id": "UC31ilW5A2Y0_V293Ea1ExjQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Brief.me"
+},
+{
+"youtube_channel_id": "UCSKdvgqdnj72_SLggp7BDTg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Brut"
+},
+{
+"youtube_channel_id": "UCb4UAZwZqS4a35FrBcLlMXA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "CANAL+"
+},
+{
+"youtube_channel_id": "UCLSoWZjCGrdZo7ltIR3lEHg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Causeur"
+},
+{
+"youtube_channel_id": "UCyamXi0qEQJghCjJbj__aWQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Chaîne officielle TVL"
+},
+{
+"youtube_channel_id": "UCFZSV_So_OaXgXVzgu58tJQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "cpac"
+},
+{
+"youtube_channel_id": "UC46uLyumV-YFu43QyYQRVjw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Croix & Patrie Officiel"
+},
+{
+"youtube_channel_id": "UC48e1bQSz_FYKSqIPjZW_BA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Député Didier Le Gac"
+},
+{
+"youtube_channel_id": "UCc0ugW1l2Y8B8GD1Kw8ImFA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Dorian mamona- France conquérante du peuple"
+},
+{
+"youtube_channel_id": "UCrvG04V6wbOau6fVJI01OlQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "DRM News"
+},
+{
+"youtube_channel_id": "UCrrXvYmau-9oMA6XJKZS2fQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "DWS News"
+},
+{
+"youtube_channel_id": "UCkgO4A3Fzm5D9Xu1Y_4vCKQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "ÉLUCID"
+},
+{
+"youtube_channel_id": "UCJAmVjrMyq64RCO2IzwmgGg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Emilie Bonnivard"
+},
+{
+"youtube_channel_id": "UCXyFWteWs8wbXgarsBZanEQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Emmanuel MANDON  Député de la Loire"
+},
+{
+"youtube_channel_id": "UCNmhg527bUEX_YSOXKhnvjQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Eric Bothorel - Député des Côtes d'Armor"
+},
+{
+"youtube_channel_id": "UCa7klG2eM9MHpOfOvxMQpGw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Éthique et tac"
+},
+{
+"youtube_channel_id": "UCW2QcKZiU8aUGg4yxCIditg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "euronews (en français)"
+},
+{
+"youtube_channel_id": "UCtLWSPWa5bUMPO0wF9qcXhA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Feeling Dakar TV"
+},
+{
+"youtube_channel_id": "UCMzxbsxxRl9vsIqrpbczUQg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "focus politique"
+},
+{
+"youtube_channel_id": "UC_GxHrDkwwADSaAjmXxqtXA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Auvergne-Rhône-Alpes"
+},
+{
+"youtube_channel_id": "UCW3mewW-ZMdk3byz5F8gfHA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Bretagne"
+},
+{
+"youtube_channel_id": "UC6kvMQP9gzv6qwwzMLuwZTg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Grand Est"
+},
+{
+"youtube_channel_id": "UCFC3nJ8GXl5yONe3tB_vhsw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Hauts-de-France"
+},
+{
+"youtube_channel_id": "UCWiQCbdC05zfzNg83F2kc3A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Normandie"
+},
+{
+"youtube_channel_id": "UCwTvW0qRQXV-yvBghNVgqKg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Nouvelle-Aquitaine"
+},
+{
+"youtube_channel_id": "UC20dglUTkVqzY9ipx_iOnng",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Occitanie"
+},
+{
+"youtube_channel_id": "UCJgNMdfAExlU7MwHlET6XCw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Paris Ile-de-France"
+},
+{
+"youtube_channel_id": "UCazDBRKv_Bh6Gf0ebKbFRPQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Pays de la Loire"
+},
+{
+"youtube_channel_id": "UCMPnD8fhwPMk_9XsYfc96JQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Provence-Alpes-Côte d'Azur"
+},
+{
+"youtube_channel_id": "UCn_smTYmROafIdN_Ykomy8w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France 3 Toutes Régions"
+},
+{
+"youtube_channel_id": "UCCBR4hxc0hMbWs0IfBljQMg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France Télévisions"
+},
+{
+"youtube_channel_id": "UCXz1rrA8Pp2-1LJSkQQhbxw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "France-Antilles & France-Guyane"
+},
+{
+"youtube_channel_id": "UC4nJVU1qbP4gCJ5zTSGtN6Q",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Francine"
+},
+{
+"youtube_channel_id": "UCysox6U9HnqgCiJ-Pd-Jy_w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Frontières"
+},
+{
+"youtube_channel_id": "UCI-8QMy9n3I5Pv6mTmXoAXA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Gaspard G"
+},
+{
+"youtube_channel_id": "UC-LaL6VO2SpXpjPdQT668wg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Groupe Nice-Matin"
+},
+{
+"youtube_channel_id": "UCAcAnMF0OrCtUep3Y4M-ZPw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "HugoDécrypte - Actus du jour"
+},
+{
+"youtube_channel_id": "UCgPYsPyGhhQJQ9zOUQDWDMA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "i24NEWS Français"
+},
+{
+"youtube_channel_id": "UC5WjQI_NY-PODOQ3kTewebA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "ici"
+},
+{
+"youtube_channel_id": "UCi1h68Fys0apnhLaJ-ijQOw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "INA Politique"
+},
+{
+"youtube_channel_id": "UCUT7-8PSQkgyJrEiEfvvzcA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Jallale TV"
+},
+{
+"youtube_channel_id": "UC60SJ7wkWjjYUUsjWK8N_aA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Jean-Baptiste BLANC"
+},
+{
+"youtube_channel_id": "UCar0yo-PpeMk51m116826pQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Journal l'Humanité"
+},
+{
+"youtube_channel_id": "UCHQda5vLxrH0Ff0I0kMq4zw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Konbini"
+},
+{
+"youtube_channel_id": "UCEbAvE1IBl0AVH12BqRlrTQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "L'Assemblée du Peuple"
+},
+{
+"youtube_channel_id": "UCp2kK3DyhpgFOdILF3BBC9A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "L'Express"
+},
+{
+"youtube_channel_id": "UCfsTAnYne5szhoMc381A5wg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "L'Opinion"
+},
+{
+"youtube_channel_id": "UCtJk8WNzhAu37r-QBmY7pRA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "La Croix"
+},
+{
+"youtube_channel_id": "UCm-ftC1IP5k_YwxwyEmWiBA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "La Dépêche du Midi"
+},
+{
+"youtube_channel_id": "UC2i-BljAg1w_MMMA1JuFm7w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "La Provence"
+},
+{
+"youtube_channel_id": "UCmHw3H5Eq05tksL0Df-XP_A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "La Voix du Nord"
+},
+{
+"youtube_channel_id": "UCbXWhsd805LfcbAy7xL9d-A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Crayon"
+},
+{
+"youtube_channel_id": "UCTdoBpACYnRL-Hb5pTvfnsg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Département de l'Hérault"
+},
+{
+"youtube_channel_id": "UCb0xB4NwoAANhxikOjw3Tnw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le JDD"
+},
+{
+"youtube_channel_id": "UCT67YOMntJxfRnO_9bXDpvw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Média"
+},
+{
+"youtube_channel_id": "UCYpRDnhk5H8h16jpS84uqsA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Monde"
+},
+{
+"youtube_channel_id": "UCA3dZqGawAvJO6Lexbj8EGg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Monde Moderne"
+},
+{
+"youtube_channel_id": "UC1ObaaFz4XHVPN2T5IFsU4w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Nouvel Obs"
+},
+{
+"youtube_channel_id": "UCQd5LYcykaFeZtjDaP3bNSA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Point"
+},
+{
+"youtube_channel_id": "UC1iWBzG6ZesVI_XaG820GFg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Regard"
+},
+{
+"youtube_channel_id": "UCQ-K-v5Xzu54iPqT5PTNcSA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Le Regard Politique"
+},
+{
+"youtube_channel_id": "UCr_Oz6MFGScoquaZDKdjD-A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "le stUDIo"
+},
+{
+"youtube_channel_id": "UC9GGzAhhvhJO1hL10-BcgNA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "LeHuffPost"
+},
+{
+"youtube_channel_id": "UCiPalhEYJyydGPZ3EHdsVQA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "LeMediaHuit"
+},
+{
+"youtube_channel_id": "UChZWs6PJY0hND384d2_RrhQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Les Echos"
+},
+{
+"youtube_channel_id": "UC_KyKHzQdFQo9K1QFa2IyJw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Les Répliques"
+},
+{
+"youtube_channel_id": "UCyhzJw7pS5Ks4-hgWfQpU1A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Les secrets de l'Assemblée Nationale"
+},
+{
+"youtube_channel_id": "UCdMMTVKABzOcanBYuEYq80w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "LeSage REACTS"
+},
+{
+"youtube_channel_id": "UC9x4Iyu-D257P0P-VDRwSzw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Libération"
+},
+{
+"youtube_channel_id": "UCIA3flGw7EPkw9c7S-qGjbQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Ligne Droite • La matinale de Radio Courtoisie"
+},
+{
+"youtube_channel_id": "UC6bn_ABjeTwbJFGFMQbZFlw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Loopsider"
+},
+{
+"youtube_channel_id": "UC3Sk_YpjPd_Lz_oPQfhPQXQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "M6 Info"
+},
+{
+"youtube_channel_id": "UCTXDgOedpu82TKpdcoBt5iA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Magjournal 77"
+},
+{
+"youtube_channel_id": "UC4V5osIDMjFwtCRxMm2e0LA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Marianne"
+},
+{
+"youtube_channel_id": "UCD3CQpAYhDWPyIqzvqv9Fow",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Maxime LAISNEY"
+},
+{
+"youtube_channel_id": "UCdnaDhU-LDQrIEEmSIfq0-Q",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Mediapart"
+},
+{
+"youtube_channel_id": "UCrc5iD627cYVES64dODUoDA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Ministère de la Communication et Des Médias"
+},
+{
+"youtube_channel_id": "UC-0kfhensYKGFYvXpyVxmOQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Moe Media"
+},
+{
+"youtube_channel_id": "UCQC0xLG_W0QpqAXQ4-yhwBA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Mosaïk Cristal"
+},
+{
+"youtube_channel_id": "UCQKmfKnJ9ZpNLGxjt0RiMJA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Mouv'"
+},
+{
+"youtube_channel_id": "UCVXKFbyJxnx2s4LcCJ_riIg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Noovo Info"
+},
+{
+"youtube_channel_id": "UC3lacWBPVK-JfmGyyHx4AAw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "OMERTA"
+},
+{
+"youtube_channel_id": "UCrpsdF7UreiF-2r5Jp0YpRg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Ouest-France"
+},
+{
+"youtube_channel_id": "UCwVhIWn5uFYaUrurDS5tWEA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "outremernews onews"
+},
+{
+"youtube_channel_id": "UCVKKJnrFnp318hrMRLUHW7A",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Philippe Bonnecarrère"
+},
+{
+"youtube_channel_id": "UCTFjmvpWb_gfIAFsEZqD3NQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Politicon"
+},
+{
+"youtube_channel_id": "UCtjc5x0RIiTsdYS4IFMjCGQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Politis"
+},
+{
+"youtube_channel_id": "UCxSUslP_JMH3Bb50oXd1Nnw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Puissance Télévision"
+},
+{
+"youtube_channel_id": "UCYkZbyXcVmtdRUpCBi713vw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Pure Politique"
+},
+{
+"youtube_channel_id": "UCqaZpAnjhuNJMjk4f68QJSw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Putsch Media"
+},
+{
+"youtube_channel_id": "UC6V-tTuTNwnnysyYkiHkZ2Q",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Radio Notre Dame"
+},
+{
+"youtube_channel_id": "UCGvjUWz3mGV9cssraATuEsw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Radio Nova"
+},
+{
+"youtube_channel_id": "UCBmUTlXAkTU1pi56O76FYZA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Radio One"
+},
+{
+"youtube_channel_id": "UCuYN15i2J_gETGamUAjEIWA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "RADIO RCJ"
+},
+{
+"youtube_channel_id": "UC45NsEyqTGMtOeEM-UvlTuQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Regards"
+},
+{
+"youtube_channel_id": "UCDn6zvBZNEWUv44xjgELicA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Reporterre - le média de l'écologie"
+},
+{
+"youtube_channel_id": "UCihYCHXhm3X3qgk0L-hBZxw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Revue Conflits"
+},
+{
+"youtube_channel_id": "UCm4fSpMpPIZ9z6KHoezLUAg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "RFI"
+},
+{
+"youtube_channel_id": "UCzBoVtUqSyAyr0kF5ABW7gQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "RTL (2)"
+},
+{
+"youtube_channel_id": "UCip2DNtZUPC82a_xLLTFcgA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "RTNC"
+},
+{
+"youtube_channel_id": "UCbLkrHoMcA0fA4-Egu-LbJQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Séances Publics"
+},
+{
+"youtube_channel_id": "UCw3RBtxhFWr0ahJ6XzliMRQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Senegal5"
+},
+{
+"youtube_channel_id": "UC5eVGjO4ITJA1KM_tva_OSQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Senegal7"
+},
+{
+"youtube_channel_id": "UCGcjB36gJuZdeZ53do42moQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Solution Démocratique"
+},
+{
+"youtube_channel_id": "UCHkmW5IhEM9brH9CGH-yJiw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Solution TV"
+},
+{
+"youtube_channel_id": "UCmbhrKMU_X7Gi47bZEEajEQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "StreetPress"
+},
+{
+"youtube_channel_id": "UC7PX-myPpcT4YfZEWqZxGGg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Sud Ouest"
+},
+{
+"youtube_channel_id": "UCAUXyESHY44j2QOLUsm5fAg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Sunugal 24"
+},
+{
+"youtube_channel_id": "UCfwCPzdT1i87xWYh1P3suTw",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Tele Senegal"
+},
+{
+"youtube_channel_id": "UCQgWpmt02UtJkyO32HGUASQ",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Thinkerview"
+},
+{
+"youtube_channel_id": "UCLuLxfwPrxe4wUPkdYM_VDA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Tocsin"
+},
+{
+"youtube_channel_id": "UCu0C2YqRHjyG-5KwozeyLFA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "ToneFrance"
+},
+{
+"youtube_channel_id": "UCmimWvZbHUEBMoZu7agHniA",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Tripotay Lakay"
+},
+{
+"youtube_channel_id": "UCzKH70qfN_yuXq3s91fdwmg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "TV5MONDE Info"
+},
+{
+"youtube_channel_id": "UCfQdRWBSyfxcuGhnXS7tq7w",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Valeurs Actuelles Actu"
+},
+{
+"youtube_channel_id": "UCH_G9INP8Zi34ZgAwOZOpeg",
+"kind": "media",
+"person_id": null,
+"priority": 2,
+"title": "Vincent Capo-Canellas"
+},
+{
+"youtube_channel_id": "UCQcOjAB27zVvTq7WPost9hA",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Debout!"
+},
+{
+"youtube_channel_id": "UCqQto5vnoiVq3kfX758Lk4g",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Députés Renaissance"
+},
+{
+"youtube_channel_id": "UCfidGlehytwCvV3qlsX5uVQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Front Populaire"
+},
+{
+"youtube_channel_id": "UCGMy4lcU26bYb4ZFHYMZQZw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Groupe CRCE-K"
+},
+{
+"youtube_channel_id": "UCbj2azYYE_MHl0NCeaoC_iQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Groupe Démocrate"
+},
+{
+"youtube_channel_id": "UC2Y9964TQIewqKwa_9h8K0Q",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Groupe Ecologiste et Social - Assemblée nationale"
+},
+{
+"youtube_channel_id": "UCfmXA-zvHtLtthSlkibdcUw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Groupe Rassemblement National"
+},
+{
+"youtube_channel_id": "UCU-rlzGnegN61Y3BdoJqTkQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Groupe Union Centriste Sénat"
+},
+{
+"youtube_channel_id": "UCKHKSD-yanY2ZwwU_4Tgf0w",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "La France insoumise"
+},
+{
+"youtube_channel_id": "UCHTEGIA9QrWAOw6cCeHX0FQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "La France insoumise à l'Assemblée nationale"
+},
+{
+"youtube_channel_id": "UCHpVe-U731TWQYFrk5VlSKA",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Le Groupe Écologiste au Sénat"
+},
+{
+"youtube_channel_id": "UC54YoNfHto00CYABQsPr5qg",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les Centristes"
+},
+{
+"youtube_channel_id": "UCe27I-_81PEpsG_GlYPEBog",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les députés communistes"
+},
+{
+"youtube_channel_id": "UCL_ZV_Qg9WIdZ2DAjaaN9Rw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les Députés Les Républicains"
+},
+{
+"youtube_channel_id": "UCB8Q3N-nvX1YlMUL7Zl_16w",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les Écologistes"
+},
+{
+"youtube_channel_id": "UCjb9thdXXl4wmeb8ArPna9g",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les Patriotes"
+},
+{
+"youtube_channel_id": "UC3Ma4tRFxx85oZI_XKVTPwg",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "les Républicains"
+},
+{
+"youtube_channel_id": "UCwGBtRyFgWH9l0zGIF8eh3Q",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Les Républicains Sénat"
+},
+{
+"youtube_channel_id": "UCUzk9hBisz4aSMVTl37pWgw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Lutte ouvrière"
+},
+{
+"youtube_channel_id": "UCfHWZNJQ7wZpG_cL9ukYX1Q",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "MoDem"
+},
+{
+"youtube_channel_id": "UCAKzgWr5laB3Yf44hvqqZZQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "NPA - L'Anticapitaliste"
+},
+{
+"youtube_channel_id": "UCSwPcnzaMTuDcTgjRiJvZnw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "PCF - Parti communiste français (PCF)"
+},
+{
+"youtube_channel_id": "UCixe3VYdKvKavOyopBxsKCw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Place publique"
+},
+{
+"youtube_channel_id": "UCo7xGEOV-RfxOAxRfhlR3Ww",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "PS - Parti socialiste"
+},
+{
+"youtube_channel_id": "UCeWMp4Frgyv275gSnWNYoZQ",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Rassemblement National"
+},
+{
+"youtube_channel_id": "UCJw8np695wqWOaKVhFjkRyg",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Renaissance"
+},
+{
+"youtube_channel_id": "UCW5lPpB4-rzpujVm5yp3cOw",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Socialistes Sénat"
 },
 {
 "youtube_channel_id": "UCzWh602__JIO6U445LSS4sw",
 "kind": "party",
-"person_id": null
+"person_id": null,
+"priority": 1,
+"title": "UDR"
+},
+{
+"youtube_channel_id": "UCjtwBBNjlyd-wPmEFvgbK4w",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Union nationale"
+},
+{
+"youtube_channel_id": "UC7OMeUFuZMacpPk2fc9UlOA",
+"kind": "party",
+"person_id": null,
+"priority": 1,
+"title": "Union Populaire Républicaine"
+},
+{
+"youtube_channel_id": "UCcvK-yrz2_dSJUSNDJfq7JA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Anne Hidalgo"
+},
+{
+"youtube_channel_id": "UC3q3FLPQtuWWv1uTkTfpEtw",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Antoine Léaument"
+},
+{
+"youtube_channel_id": "UCcu6jHeGFnTdSfVXr3rh9tA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Aurélien Pradié"
+},
+{
+"youtube_channel_id": "UCDmff0YxGkS8JRMGzaAe-jg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Aurélien Saintoul - Député des Hauts-de-Seine"
+},
+{
+"youtube_channel_id": "UCiT4UyKh-cF8qBaBQP4p1ow",
+"kind": "person",
+"person_id": 50,
+"priority": 1,
+"title": "Aurore Bergé"
+},
+{
+"youtube_channel_id": "UCoDttl6w1T-Stuw_pvNOvLA",
+"kind": "person",
+"person_id": 4,
+"priority": 1,
+"title": "Avec Édouard"
+},
+{
+"youtube_channel_id": "UCEqwfpB34mhHaAx-WE1Tqlg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Bastien Lachaud"
+},
+{
+"youtube_channel_id": "UCcMryUp6ME3BvP2alkS1dKg",
+"kind": "person",
+"person_id": 57,
+"priority": 1,
+"title": "Benoit Hamon"
+},
+{
+"youtube_channel_id": "UCPyfEEhMVlNo_waWwkSGCZg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Bertrand Pancher"
+},
+{
+"youtube_channel_id": "UCScGc5Cd6h3Y_djPloqI7UA",
+"kind": "person",
+"person_id": 40,
+"priority": 1,
+"title": "BorisVallaud"
+},
+{
+"youtube_channel_id": "UCFmUAFg2tFaRSttT4vMpBNg",
+"kind": "person",
+"person_id": 48,
+"priority": 1,
+"title": "Bruno Le Maire"
+},
+{
+"youtube_channel_id": "UCRkuLQabW1hsihpZuHJSbEA",
+"kind": "person",
+"person_id": 5,
+"priority": 1,
+"title": "Bruno Retailleau"
+},
+{
+"youtube_channel_id": "UCpU9riAixpc1Xn9Q4i7AkOw",
+"kind": "person",
+"person_id": 56,
+"priority": 1,
+"title": "Clémence Guetté"
+},
+{
+"youtube_channel_id": "UCZgJ_r_Ewlu1Ck-RzNCHuUQ",
+"kind": "person",
+"person_id": 31,
+"priority": 1,
+"title": "Clémentine Autain"
+},
+{
+"youtube_channel_id": "UCNlu6bn_Vu37IDINEpVlEog",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "David Guiraud"
+},
+{
+"youtube_channel_id": "UC2XZY-bjIEmyLZ9MPJQytZg",
+"kind": "person",
+"person_id": 43,
+"priority": 1,
+"title": "David Lisnard"
+},
+{
+"youtube_channel_id": "UCpQ4STl8j62KeiApns4FndA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Députée Obono"
+},
+{
+"youtube_channel_id": "UCMIpCiZdVlMoqfra4hT6d4Q",
+"kind": "person",
+"person_id": 11,
+"priority": 1,
+"title": "Dominique de Villepin"
+},
+{
+"youtube_channel_id": "UCA5aTt71DXLuX78SF2Hcxxw",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Edwige Diaz"
+},
+{
+"youtube_channel_id": "UCFqGa9uitcB-fWyNZK2xImw",
+"kind": "person",
+"person_id": 23,
+"priority": 1,
+"title": "Emmanuel Macron"
+},
+{
+"youtube_channel_id": "UCyHieXWJ4oewUR3ZTHdyzDw",
+"kind": "person",
+"person_id": 32,
+"priority": 1,
+"title": "Eric Ciotti"
+},
+{
+"youtube_channel_id": "UC4A3K4CT4swDAW57fzXIMVA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Eric Coquerel"
+},
+{
+"youtube_channel_id": "UCx8mQU1dOemRUTPmrjs_Jaw",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Eric Legaud"
+},
+{
+"youtube_channel_id": "UCL2yCOZoelQCQ4iPH75mCNA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Eric Piolle"
+},
+{
+"youtube_channel_id": "UCjTbZBXEw-gplUAnMXLYHpg",
+"kind": "person",
+"person_id": 10,
+"priority": 1,
+"title": "Éric Zemmour"
+},
+{
+"youtube_channel_id": "UCHQbUAkpnkf_Yg6-xAqj-ZA",
+"kind": "person",
+"person_id": 8,
+"priority": 1,
+"title": "Fabien Roussel"
+},
+{
+"youtube_channel_id": "UClaa_CwoQEmSo9Mb_M1f91g",
+"kind": "person",
+"person_id": 17,
+"priority": 1,
+"title": "FLORIAN PHILIPPOT"
+},
+{
+"youtube_channel_id": "UCJEJTYYZkYjLnGCgRDqnIGA",
+"kind": "person",
+"person_id": 18,
+"priority": 1,
+"title": "François Asselineau"
+},
+{
+"youtube_channel_id": "UCEe-kBj-0ZJb7QVZ57jVvSg",
+"kind": "person",
+"person_id": 25,
+"priority": 1,
+"title": "François Bayrou - FB Direct"
+},
+{
+"youtube_channel_id": "UCIQGSp79vVch0vO3Efqif_w",
+"kind": "person",
+"person_id": 21,
+"priority": 1,
+"title": "FRANÇOIS RUFFIN"
+},
+{
+"youtube_channel_id": "UCOcDPuYTuxoRBtfmTBXtqBA",
+"kind": "person",
+"person_id": 3,
+"priority": 1,
+"title": "Gabriel Attal"
+},
+{
+"youtube_channel_id": "UCAkBdKn0B-xUlr6TLPx14wg",
+"kind": "person",
+"person_id": 20,
+"priority": 1,
+"title": "Gérald DARMANIN"
+},
+{
+"youtube_channel_id": "UClPZVAobhtv4n1bIPLuLnTg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Guillaume Gontard"
+},
+{
+"youtube_channel_id": "UCFVKtK2LxUkuudXpOGOiUjg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Hadrien Clouet"
+},
+{
+"youtube_channel_id": "UCdUat4f2yol7iMpCYoFUmNg",
+"kind": "person",
+"person_id": 54,
+"priority": 1,
+"title": "Jean Lassalle"
+},
+{
+"youtube_channel_id": "UCOxXS5E2bR-e_zIgHfvggXA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Jean SOL, Sénateur des Pyrénées-Orientales"
+},
+{
+"youtube_channel_id": "UCk-_PEY3iC6DIGJKuoEe9bw",
+"kind": "person",
+"person_id": 6,
+"priority": 1,
+"title": "JEAN-LUC MÉLENCHON"
+},
+{
+"youtube_channel_id": "UC3U0VIDgANFaXeOAtt1m5Mw",
+"kind": "person",
+"person_id": 2,
+"priority": 1,
+"title": "Jordan Bardella"
+},
+{
+"youtube_channel_id": "UCdbzUS1IjDZXBxerJL5U_vA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Julien Odoul"
+},
+{
+"youtube_channel_id": "UCD2T6hSuOzkT2CMt4iwxw-A",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Laurent Mazaury"
+},
+{
+"youtube_channel_id": "UCjo4wCbga9X01yGwm0gB0Wg",
+"kind": "person",
+"person_id": 26,
+"priority": 1,
+"title": "Laurent Wauquiez"
+},
+{
+"youtube_channel_id": "UCLGw2aLOaIa-1XF4IBfFyvg",
+"kind": "person",
+"person_id": 38,
+"priority": 1,
+"title": "Léon Deffontaines"
+},
+{
+"youtube_channel_id": "UCcru_TwWwshPbjIWvp6B7dg",
+"kind": "person",
+"person_id": 37,
+"priority": 1,
+"title": "Louis Boyard"
+},
+{
+"youtube_channel_id": "UCTyqSSRd75F2suFFgLtFuMg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Ludovic Mendes"
+},
+{
+"youtube_channel_id": "UCyX-_BipdNpdFgeZEQBNstA",
+"kind": "person",
+"person_id": 35,
+"priority": 1,
+"title": "Manon Aubry"
+},
+{
+"youtube_channel_id": "UCr7r7gh9N45WVwYAmHQ3m3w",
+"kind": "person",
+"person_id": 29,
+"priority": 1,
+"title": "Manuel Bompard"
+},
+{
+"youtube_channel_id": "UC_2Xe0tzVXvLMvCxmtDmdQA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Manuel Valls"
+},
+{
+"youtube_channel_id": "UCU3z3px1_RCqYBwrs8LJVWg",
+"kind": "person",
+"person_id": 1,
+"priority": 1,
+"title": "Marine Le Pen"
+},
+{
+"youtube_channel_id": "UCwupzUX-SYyt3y4yx8cYdpg",
+"kind": "person",
+"person_id": 27,
+"priority": 1,
+"title": "Marion Maréchal"
+},
+{
+"youtube_channel_id": "UCilxiEGEQHVZ25GU_cnyCzg",
+"kind": "person",
+"person_id": 30,
+"priority": 1,
+"title": "Mathilde Panot"
+},
+{
+"youtube_channel_id": "UCDErKauugfWOLRmU16WN5pw",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Michaël Delafosse"
+},
+{
+"youtube_channel_id": "UCbrxgk7y0DZpK3v94FgHIPw",
+"kind": "person",
+"person_id": 49,
+"priority": 1,
+"title": "Michel Barnier - Chaîne officielle"
+},
+{
+"youtube_channel_id": "UCfA5DnCDX3Ixy5QOAMGtBlA",
+"kind": "person",
+"person_id": 16,
+"priority": 1,
+"title": "Nicolas Dupont-Aignan"
+},
+{
+"youtube_channel_id": "UCRnWO39xk6YWdbRhdzZ3yXA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Olivier Paccaud"
+},
+{
+"youtube_channel_id": "UCgv8ahGLkTVp4WyFK2-fymg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Olivier SERVA"
+},
+{
+"youtube_channel_id": "UCC9-paBZnwA6Bp-oNZUioWA",
+"kind": "person",
+"person_id": 55,
+"priority": 1,
+"title": "Philippe de Villiers"
+},
+{
+"youtube_channel_id": "UCw3waV6T2mhLC3BG8q0W55w",
+"kind": "person",
+"person_id": 47,
+"priority": 1,
+"title": "Rachida Dati"
+},
+{
+"youtube_channel_id": "UCyVYj4HdtEbcMngyD6_OLzg",
+"kind": "person",
+"person_id": 9,
+"priority": 1,
+"title": "Raphaël Glucksmann"
+},
+{
+"youtube_channel_id": "UCoMCFzv2L1q2-xJCvxrB9hg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Rémi Cardon - Sénateur de la Somme"
+},
+{
+"youtube_channel_id": "UC4laiPXKXMwWkQweO29yt8Q",
+"kind": "person",
+"person_id": 36,
+"priority": 1,
+"title": "Rima Hassan"
+},
+{
+"youtube_channel_id": "UCA8JG3JY883RjCmAU9lABzw",
+"kind": "person",
+"person_id": 33,
+"priority": 1,
+"title": "Sandrine Rousseau"
+},
+{
+"youtube_channel_id": "UC8ba7bn2fuU_lsVweb4YM4Q",
+"kind": "person",
+"person_id": 28,
+"priority": 1,
+"title": "Sarah Knafo"
+},
+{
+"youtube_channel_id": "UCmYK9AZch3EV33vIFld1QTg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Sébastien Delogu"
+},
+{
+"youtube_channel_id": "UCx-1PndeXmfkI8w9MtFQbmA",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Thomas Ménagé"
+},
+{
+"youtube_channel_id": "UCv98oI0HCY7ClMpzbTjPznQ",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Thomas Portes"
+},
+{
+"youtube_channel_id": "UCXAKlEXGwoavQuOMaNBeaXw",
+"kind": "person",
+"person_id": 34,
+"priority": 1,
+"title": "Valérie Pécresse"
+},
+{
+"youtube_channel_id": "UCZgZMerNKBkXf0seibfKzJQ",
+"kind": "person",
+"person_id": 13,
+"priority": 1,
+"title": "Xavier Bertrand Officiel"
+},
+{
+"youtube_channel_id": "UCmGGbm7h1E2W3YPYttyLPKA",
+"kind": "person",
+"person_id": 44,
+"priority": 1,
+"title": "Yaël Braun-Pivet"
+},
+{
+"youtube_channel_id": "UCKa1uttXqCvGpOyUDfc2wdg",
+"kind": "person",
+"person_id": null,
+"priority": 1,
+"title": "Yan Chantrel"
 }
 ]
