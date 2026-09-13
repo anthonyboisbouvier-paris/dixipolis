@@ -41,9 +41,26 @@ python3 harvest.py ops --sql "select youtube_channel_id, title, scanned_from, sc
 `--sql` n'accepte que des `select` (lecture seule). Budget quotidien : **9 000 unités** (10 000 − marge).
 Le quota YouTube se remet à zéro à 07:00 UTC. `quota_ledger` fait foi pour ce que l'agent a dépensé.
 
-## 2. Fenêtre glissante (chaque jour, ~500 u)
+## 2. Le plan, en une phrase
 
-Nouveautés des 3 derniers jours sur toutes les sources déjà couvertes :
+Chaque jour, dépenser tout le quota (9 000 u) pour **remonter l'historique complet** (jusqu'à 2005,
+naissance de YouTube) de toutes les sources, par ordre de priorité, en reprenant exactement là où la
+veille s'est arrêtée ; puis, quand tout est couvert, **élargir** (nouvelles chaînes, nouvelles personnes).
+
+Ce qui coûte, ce n'est pas le nombre d'années mais le nombre de vidéos publiées : 2 unités pour 50
+vidéos listées + qualifiées. Une chaîne perso de 500 vidéos = 20 u pour tout son historique ; BFMTV
+(83 000 vidéos) = 3 300 u. Estimation au 13/09 : ~40 000 u pour tout l'historique des chaînes actives
+hors médias P2 étrangers, soit **4 à 5 jours de quota** ; médias P2 restants ~40 000 u de plus.
+
+Ordre de traitement (fixé dans `phase.py backfill`) : chaînes perso → partis → institutions →
+médias priorité 1 → médias priorité 2 → priorité 3. Une chaîne est « finie » quand
+`scanned_from <= 2005-01-01`.
+
+## 3. Déroulé quotidien
+
+### 3a. Nouveautés (~300 u) — d'abord, pour que Loïc ait le frais
+
+Les vidéos publiées depuis 3 jours sur les chaînes déjà couvertes (1 page par chaîne, très peu cher) :
 
 ```bash
 python3 phase.py own-channels --from $(date -u -d '3 days ago' +%F)
@@ -51,48 +68,60 @@ python3 phase.py channels --kind party,institution,person --from $(date -u -d '3
 python3 phase.py channels --kind media --priority 1 --from $(date -u -d '3 days ago' +%F)
 ```
 
-## 3. Qualification LLM (après chaque collecte)
+### 3b. Recul complet — tout le reste du quota
+
+```bash
+python3 phase.py backfill --day-cap 8500 --budget 9000 --max-pages 5000
+```
+
+`backfill` lit la couverture en base (`ops coverage`), prend les chaînes non finies dans l'ordre de
+priorité, fait pour chacune UNE passe `[2005-01-01, scanned_from[` (liste → préfiltre noms → détails →
+match → push) et s'arrête seul quand `quota_ledger` du jour atteint `--day-cap`. Le lendemain, il
+reprend à la chaîne suivante. Ne le lance jamais deux fois en parallèle. En cas d'erreur sur une
+chaîne (réseau), il passe à la suivante ; la chaîne sera reprise le lendemain.
+
+### 3c. Qualification LLM (en parallèle du recul, ne coûte pas de quota YouTube)
 
 ```bash
 python3 harvest.py score --limit 30 --rounds 300
 ```
 
-Tourne jusqu'à épuisement des candidates `scored_by = 'rule'` (le script s'arrête seul).
-Relis ensuite 10 vidéos au hasard passées `relevant` et 10 `rejected` :
+Tourne jusqu'à épuisement des candidates `scored_by = 'rule'` (le script s'arrête seul) ; relance-le
+après le backfill s'il reste des candidates (`ops status` → `to_score`). Relis ensuite 10 vidéos au
+hasard passées `relevant` et 10 `rejected` :
 
 ```bash
-python3 harvest.py ops --sql "select youtube_video_id, title, relevance_score, score_reason from discovery.videos where status='relevant' and scored_by like 'gpt%' order by random() limit 10"
-python3 harvest.py ops --sql "select youtube_video_id, title, relevance_score, score_reason from discovery.videos where status='rejected' and scored_by like 'gpt%' order by random() limit 10"
+python3 harvest.py ops --sql "select youtube_video_id, title, relevance_score, relevance_reason from discovery.videos where status='relevant' and scored_by like 'llm%' order by random() limit 10"
+python3 harvest.py ops --sql "select youtube_video_id, title, relevance_score, relevance_reason from discovery.videos where status='rejected' and scored_by like 'llm%' order by random() limit 10"
 ```
 
 Si tu vois une erreur systématique, note-la dans `JOURNAL.md` (ne modifie jamais le workflow n8n).
 
-## 4. Reprise historique avec le reliquat (ordre de priorité)
+## 4. Élargissement (quand `backfill` répond `channels_left: 0`)
 
-Arrête-toi dès que le quota du jour (`ops status`) atteint 8 500 u. Chaque étape ne se lance que si
-la précédente est terminée (vérifie `coverage` / `scanned_from` / `scanned_to`).
+Dans cet ordre, en gardant les mêmes règles de budget :
 
-1. **Médias priorité 1** depuis le 01/01/2025 s'il reste des chaînes `scanned_from is null`
-   (`phase.py channels --kind media --priority 1 --from 2025-01-01`).
-2. **Médias priorité 2** depuis le 01/01/2025 (`--kind media --priority 2`), en excluant les chaînes
-   étrangères/inutiles (Sénégal, Québec, Canada, « Feeling Dakar », etc.) :
-   `harvest.py ops --action set_channel_active --args '{"channel":"UC…","active":false,"notes":"raison"}'`.
-3. **Recul dans le temps**, toutes sources confondues, par tranches : `--from 2024-06-01 --to 2025-01-01`
-   (législatives 2024), puis `2024-01-01 → 2024-06-01`, puis 2023 par semestres. Les chaînes à fort
-   débit (BFMTV, CNEWS, LCI, franceinfo) coûtent ~230 u par an de recul : planifie-les en tête de journée.
-4. **Recherche libre** (`harvest.py search`, 100 u/appel, plafond 1 500 u/jour) pour les personnes du
-   registre SANS chaîne perso (Tondelier, Faure, Hollande, Bouamrane, Cazeneuve, Lecornu, Delga, Borne…) :
-   une requête `"<Nom>" interview` et une `"<Nom>" discours` par trimestre non couvert. Passe les
-   résultats par `details` → `match` → `push`. Toute chaîne inconnue qui remonte ≥ 3 fois est ajoutée :
+1. **Chaînes médias manquantes** : pour chaque média national ou régional français absent de
+   `discovery.channels` que tu connais (JT régionaux, radios, presse quotidienne régionale, chaînes
+   parlementaires, médias en ligne), cherche l'id avec `harvest.py channel --handle @…` et ajoute-le :
    `harvest.py ops --action add_channel --args '{"channel":"UC…","title":"…","kind":"media","priority":3}'`.
-5. **Élargissement des personnes** quand toutes les sources couvrent au moins le 01/01/2024 :
-   ajoute des personnes en tier 3 (ministres en exercice, présidents de groupe, porte-parole de parti,
-   présidents de région, candidats déclarés mineurs) :
-   `harvest.py ops --action add_person --args '{"display_name":"…","aliases":["…"],"tier":3,"youtube_channel_id":"UC… ou null"}'`
+   Les chaînes étrangères (Sénégal, Québec, Canada, Belgique, Suisse, RDC…) restent inactives :
+   `harvest.py ops --action set_channel_active --args '{"channel":"UC…","active":false,"notes":"raison"}'`.
+2. **Recherche libre** (`harvest.py search`, 100 u/appel, plafond 1 500 u/jour) pour les personnes du
+   registre SANS chaîne perso (Tondelier, Faure, Hollande, Bouamrane, Cazeneuve, Lecornu, Delga, Borne…) :
+   une requête `"<Nom>" interview` et une `"<Nom>" discours` par année depuis 2012. Passe les résultats
+   par `details` → `match` → `push`. Toute chaîne inconnue qui remonte ≥ 3 fois est ajoutée (priorité 3),
+   puis `backfill` la remontera entièrement.
+3. **Nouvelles personnes** (tier 3) : ministres en exercice, présidents de groupe parlementaire,
+   porte-parole de parti, présidents de région, candidats déclarés mineurs, anciens Premiers ministres :
+   `harvest.py ops --action add_person --args '{"display_name":"…","aliases":["…"],"tier":3,"youtube_channel_id":"UC… ou null","youtube_channel_title":"…"}'`
    (l'action relie `person_id` à `public.persons` par `lower(display_name)` ; alias prudents, pas de nom
-   de famille seul s'il est ambigu ; chaîne perso trouvée via `harvest.py channel --handle`).
-   Puis `harvest.py registry`, `phase.py own-channels --from 2025-01-01 --only <id>` pour ces personnes ;
-   la fenêtre glissante les inclut d'office ensuite.
+   de famille seul s'il est ambigu ; chaîne perso trouvée via `harvest.py channel --handle`). Ajoute 5 à 10
+   personnes par jour maximum, puis `harvest.py registry` ; `backfill` remonte leur chaîne perso, et les
+   passes « nouveautés » les détectent d'office. Limite connue : l'historique des médias déjà scanné
+   n'est pas relu pour les nouvelles personnes (seules les vidéos retenues sont stockées). Quand le
+   backfill est fini, une relecture complète des médias P1 pour les tiers 3 coûte ~17 000 u (liste seule,
+   1 u / 50 vidéos) : planifie-la sur 2 jours et note-le dans `JOURNAL.md`.
 
 ## 5. Clôture de session
 
