@@ -1,0 +1,57 @@
+1|Marine Le Pen|Marine Le Pen;M. Le Pen;Le Pen|UCU3z3px1_RCqYBwrs8LJVWg
+2|Jordan Bardella|Bardella|UC3U0VIDgANFaXeOAtt1m5Mw
+3|Gabriel Attal|Attal|UCOcDPuYTuxoRBtfmTBXtqBA
+4|Édouard Philippe|Édouard Philippe;Edouard Philippe;E. Philippe|UCoDttl6w1T-Stuw_pvNOvLA
+5|Bruno Retailleau|Retailleau|UCRkuLQabW1hsihpZuHJSbEA
+6|Jean-Luc Mélenchon|Mélenchon;Melenchon;JLM|UCk-_PEY3iC6DIGJKuoEe9bw
+7|Marine Tondelier|Tondelier|
+8|Fabien Roussel|Fabien Roussel;F. Roussel|UCHQbUAkpnkf_Yg6-xAqj-ZA
+9|Raphaël Glucksmann|Glucksmann|UCyVYj4HdtEbcMngyD6_OLzg
+10|Éric Zemmour|Zemmour|UCjTbZBXEw-gplUAnMXLYHpg
+11|Dominique de Villepin|Villepin|UCMIpCiZdVlMoqfra4hT6d4Q
+12|François Hollande|Hollande|
+13|Xavier Bertrand|Xavier Bertrand;X. Bertrand|UCZgZMerNKBkXf0seibfKzJQ
+14|Karim Bouamrane|Bouamrane|
+15|Olivier Faure|Olivier Faure;O. Faure|
+16|Nicolas Dupont-Aignan|Dupont-Aignan;NDA|UCfA5DnCDX3Ixy5QOAMGtBlA
+17|Florian Philippot|Philippot|UClaa_CwoQEmSo9Mb_M1f91g
+18|François Asselineau|Asselineau|UCJEJTYYZkYjLnGCgRDqnIGA
+19|Nathalie Arthaud|Arthaud|
+20|Gérald Darmanin|Darmanin|UCAkBdKn0B-xUlr6TLPx14wg
+21|François Ruffin|Ruffin|UCIQGSp79vVch0vO3Efqif_w
+22|Bernard Cazeneuve|Bernard Cazeneuve;B. Cazeneuve|
+23|Emmanuel Macron|Macron|UCFqGa9uitcB-fWyNZK2xImw
+24|Sébastien Lecornu|Lecornu|
+25|François Bayrou|Bayrou|UCEe-kBj-0ZJb7QVZ57jVvSg
+26|Laurent Wauquiez|Wauquiez|UCjo4wCbga9X01yGwm0gB0Wg
+27|Marion Maréchal|Marion Maréchal;Maréchal|UCwupzUX-SYyt3y4yx8cYdpg
+28|Sarah Knafo|Knafo|UC8ba7bn2fuU_lsVweb4YM4Q
+29|Manuel Bompard|Bompard|UCr7r7gh9N45WVwYAmHQ3m3w
+30|Mathilde Panot|Panot|UCilxiEGEQHVZ25GU_cnyCzg
+31|Clémentine Autain|Autain|UCZgJ_r_Ewlu1Ck-RzNCHuUQ
+32|Éric Ciotti|Ciotti|UCyHieXWJ4oewUR3ZTHdyzDw
+33|Sandrine Rousseau|Sandrine Rousseau|UCA8JG3JY883RjCmAU9lABzw
+34|Valérie Pécresse|Pécresse;Pecresse|UCXAKlEXGwoavQuOMaNBeaXw
+35|Manon Aubry|Manon Aubry|UCyX-_BipdNpdFgeZEQBNstA
+36|Rima Hassan|Rima Hassan|UC4laiPXKXMwWkQweO29yt8Q
+37|Louis Boyard|Boyard|UCcru_TwWwshPbjIWvp6B7dg
+38|Léon Deffontaines|Deffontaines|UCLGw2aLOaIa-1XF4IBfFyvg
+39|Delphine Batho|Batho|
+40|Boris Vallaud|Boris Vallaud|UCScGc5Cd6h3Y_djPloqI7UA
+41|Carole Delga|Delga|
+42|Yannick Jadot|Jadot|
+43|David Lisnard|Lisnard|UC2XZY-bjIEmyLZ9MPJQytZg
+44|Yaël Braun-Pivet|Braun-Pivet|UCmGGbm7h1E2W3YPYttyLPKA
+45|Gérard Larcher|Larcher|
+46|Élisabeth Borne|Borne|
+47|Rachida Dati|Dati|UCw3waV6T2mhLC3BG8q0W55w
+48|Bruno Le Maire|Le Maire|UCFmUAFg2tFaRSttT4vMpBNg
+49|Michel Barnier|Barnier|UCbrxgk7y0DZpK3v94FgHIPw
+50|Aurore Bergé|Bergé;Berge|UCiT4UyKh-cF8qBaBQP4p1ow
+51|Marie Toussaint|Marie Toussaint|
+52|Cyrielle Chatelain|Chatelain|
+53|Philippe Poutou|Poutou|
+54|Jean Lassalle|Lassalle|UCdUat4f2yol7iMpCYoFUmNg
+55|Philippe de Villiers|Villiers|UCC9-paBZnwA6Bp-oNZUioWA
+56|Clémence Guetté|Guetté;Guette|UCpU9riAixpc1Xn9Q4i7AkOw
+57|Benoît Hamon|Hamon|UCcMryUp6ME3BvP2alkS1dKg

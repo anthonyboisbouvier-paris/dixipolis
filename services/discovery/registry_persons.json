@@ -1,0 +1,473 @@
+[
+{
+"id": 1,
+"display_name": "Marine Le Pen",
+"aliases": [
+"Marine Le Pen",
+"M. Le Pen",
+"Le Pen"
+],
+"youtube_channel_id": "UCU3z3px1_RCqYBwrs8LJVWg"
+},
+{
+"id": 2,
+"display_name": "Jordan Bardella",
+"aliases": [
+"Bardella"
+],
+"youtube_channel_id": "UC3U0VIDgANFaXeOAtt1m5Mw"
+},
+{
+"id": 3,
+"display_name": "Gabriel Attal",
+"aliases": [
+"Attal"
+],
+"youtube_channel_id": "UCOcDPuYTuxoRBtfmTBXtqBA"
+},
+{
+"id": 4,
+"display_name": "Édouard Philippe",
+"aliases": [
+"Édouard Philippe",
+"Edouard Philippe",
+"E. Philippe"
+],
+"youtube_channel_id": "UCoDttl6w1T-Stuw_pvNOvLA"
+},
+{
+"id": 5,
+"display_name": "Bruno Retailleau",
+"aliases": [
+"Retailleau"
+],
+"youtube_channel_id": "UCRkuLQabW1hsihpZuHJSbEA"
+},
+{
+"id": 6,
+"display_name": "Jean-Luc Mélenchon",
+"aliases": [
+"Mélenchon",
+"Melenchon",
+"JLM"
+],
+"youtube_channel_id": "UCk-_PEY3iC6DIGJKuoEe9bw"
+},
+{
+"id": 7,
+"display_name": "Marine Tondelier",
+"aliases": [
+"Tondelier"
+],
+"youtube_channel_id": null
+},
+{
+"id": 8,
+"display_name": "Fabien Roussel",
+"aliases": [
+"Fabien Roussel",
+"F. Roussel"
+],
+"youtube_channel_id": "UCHQbUAkpnkf_Yg6-xAqj-ZA"
+},
+{
+"id": 9,
+"display_name": "Raphaël Glucksmann",
+"aliases": [
+"Glucksmann"
+],
+"youtube_channel_id": "UCyVYj4HdtEbcMngyD6_OLzg"
+},
+{
+"id": 10,
+"display_name": "Éric Zemmour",
+"aliases": [
+"Zemmour"
+],
+"youtube_channel_id": "UCjTbZBXEw-gplUAnMXLYHpg"
+},
+{
+"id": 11,
+"display_name": "Dominique de Villepin",
+"aliases": [
+"Villepin"
+],
+"youtube_channel_id": "UCMIpCiZdVlMoqfra4hT6d4Q"
+},
+{
+"id": 12,
+"display_name": "François Hollande",
+"aliases": [
+"Hollande"
+],
+"youtube_channel_id": null
+},
+{
+"id": 13,
+"display_name": "Xavier Bertrand",
+"aliases": [
+"Xavier Bertrand",
+"X. Bertrand"
+],
+"youtube_channel_id": "UCZgZMerNKBkXf0seibfKzJQ"
+},
+{
+"id": 14,
+"display_name": "Karim Bouamrane",
+"aliases": [
+"Bouamrane"
+],
+"youtube_channel_id": null
+},
+{
+"id": 15,
+"display_name": "Olivier Faure",
+"aliases": [
+"Olivier Faure",
+"O. Faure"
+],
+"youtube_channel_id": null
+},
+{
+"id": 16,
+"display_name": "Nicolas Dupont-Aignan",
+"aliases": [
+"Dupont-Aignan",
+"NDA"
+],
+"youtube_channel_id": "UCfA5DnCDX3Ixy5QOAMGtBlA"
+},
+{
+"id": 17,
+"display_name": "Florian Philippot",
+"aliases": [
+"Philippot"
+],
+"youtube_channel_id": "UClaa_CwoQEmSo9Mb_M1f91g"
+},
+{
+"id": 18,
+"display_name": "François Asselineau",
+"aliases": [
+"Asselineau"
+],
+"youtube_channel_id": "UCJEJTYYZkYjLnGCgRDqnIGA"
+},
+{
+"id": 19,
+"display_name": "Nathalie Arthaud",
+"aliases": [
+"Arthaud"
+],
+"youtube_channel_id": null
+},
+{
+"id": 20,
+"display_name": "Gérald Darmanin",
+"aliases": [
+"Darmanin"
+],
+"youtube_channel_id": "UCAkBdKn0B-xUlr6TLPx14wg"
+},
+{
+"id": 21,
+"display_name": "François Ruffin",
+"aliases": [
+"Ruffin"
+],
+"youtube_channel_id": "UCIQGSp79vVch0vO3Efqif_w"
+},
+{
+"id": 22,
+"display_name": "Bernard Cazeneuve",
+"aliases": [
+"Bernard Cazeneuve",
+"B. Cazeneuve"
+],
+"youtube_channel_id": null
+},
+{
+"id": 23,
+"display_name": "Emmanuel Macron",
+"aliases": [
+"Macron"
+],
+"youtube_channel_id": "UCFqGa9uitcB-fWyNZK2xImw"
+},
+{
+"id": 24,
+"display_name": "Sébastien Lecornu",
+"aliases": [
+"Lecornu"
+],
+"youtube_channel_id": null
+},
+{
+"id": 25,
+"display_name": "François Bayrou",
+"aliases": [
+"Bayrou"
+],
+"youtube_channel_id": "UCEe-kBj-0ZJb7QVZ57jVvSg"
+},
+{
+"id": 26,
+"display_name": "Laurent Wauquiez",
+"aliases": [
+"Wauquiez"
+],
+"youtube_channel_id": "UCjo4wCbga9X01yGwm0gB0Wg"
+},
+{
+"id": 27,
+"display_name": "Marion Maréchal",
+"aliases": [
+"Marion Maréchal",
+"Maréchal"
+],
+"youtube_channel_id": "UCwupzUX-SYyt3y4yx8cYdpg"
+},
+{
+"id": 28,
+"display_name": "Sarah Knafo",
+"aliases": [
+"Knafo"
+],
+"youtube_channel_id": "UC8ba7bn2fuU_lsVweb4YM4Q"
+},
+{
+"id": 29,
+"display_name": "Manuel Bompard",
+"aliases": [
+"Bompard"
+],
+"youtube_channel_id": "UCr7r7gh9N45WVwYAmHQ3m3w"
+},
+{
+"id": 30,
+"display_name": "Mathilde Panot",
+"aliases": [
+"Panot"
+],
+"youtube_channel_id": "UCilxiEGEQHVZ25GU_cnyCzg"
+},
+{
+"id": 31,
+"display_name": "Clémentine Autain",
+"aliases": [
+"Autain"
+],
+"youtube_channel_id": "UCZgJ_r_Ewlu1Ck-RzNCHuUQ"
+},
+{
+"id": 32,
+"display_name": "Éric Ciotti",
+"aliases": [
+"Ciotti"
+],
+"youtube_channel_id": "UCyHieXWJ4oewUR3ZTHdyzDw"
+},
+{
+"id": 33,
+"display_name": "Sandrine Rousseau",
+"aliases": [
+"Sandrine Rousseau"
+],
+"youtube_channel_id": "UCA8JG3JY883RjCmAU9lABzw"
+},
+{
+"id": 34,
+"display_name": "Valérie Pécresse",
+"aliases": [
+"Pécresse",
+"Pecresse"
+],
+"youtube_channel_id": "UCXAKlEXGwoavQuOMaNBeaXw"
+},
+{
+"id": 35,
+"display_name": "Manon Aubry",
+"aliases": [
+"Manon Aubry"
+],
+"youtube_channel_id": "UCyX-_BipdNpdFgeZEQBNstA"
+},
+{
+"id": 36,
+"display_name": "Rima Hassan",
+"aliases": [
+"Rima Hassan"
+],
+"youtube_channel_id": "UC4laiPXKXMwWkQweO29yt8Q"
+},
+{
+"id": 37,
+"display_name": "Louis Boyard",
+"aliases": [
+"Boyard"
+],
+"youtube_channel_id": "UCcru_TwWwshPbjIWvp6B7dg"
+},
+{
+"id": 38,
+"display_name": "Léon Deffontaines",
+"aliases": [
+"Deffontaines"
+],
+"youtube_channel_id": "UCLGw2aLOaIa-1XF4IBfFyvg"
+},
+{
+"id": 39,
+"display_name": "Delphine Batho",
+"aliases": [
+"Batho"
+],
+"youtube_channel_id": null
+},
+{
+"id": 40,
+"display_name": "Boris Vallaud",
+"aliases": [
+"Boris Vallaud"
+],
+"youtube_channel_id": "UCScGc5Cd6h3Y_djPloqI7UA"
+},
+{
+"id": 41,
+"display_name": "Carole Delga",
+"aliases": [
+"Delga"
+],
+"youtube_channel_id": null
+},
+{
+"id": 42,
+"display_name": "Yannick Jadot",
+"aliases": [
+"Jadot"
+],
+"youtube_channel_id": null
+},
+{
+"id": 43,
+"display_name": "David Lisnard",
+"aliases": [
+"Lisnard"
+],
+"youtube_channel_id": "UC2XZY-bjIEmyLZ9MPJQytZg"
+},
+{
+"id": 44,
+"display_name": "Yaël Braun-Pivet",
+"aliases": [
+"Braun-Pivet"
+],
+"youtube_channel_id": "UCmGGbm7h1E2W3YPYttyLPKA"
+},
+{
+"id": 45,
+"display_name": "Gérard Larcher",
+"aliases": [
+"Larcher"
+],
+"youtube_channel_id": null
+},
+{
+"id": 46,
+"display_name": "Élisabeth Borne",
+"aliases": [
+"Borne"
+],
+"youtube_channel_id": null
+},
+{
+"id": 47,
+"display_name": "Rachida Dati",
+"aliases": [
+"Dati"
+],
+"youtube_channel_id": "UCw3waV6T2mhLC3BG8q0W55w"
+},
+{
+"id": 48,
+"display_name": "Bruno Le Maire",
+"aliases": [
+"Le Maire"
+],
+"youtube_channel_id": "UCFmUAFg2tFaRSttT4vMpBNg"
+},
+{
+"id": 49,
+"display_name": "Michel Barnier",
+"aliases": [
+"Barnier"
+],
+"youtube_channel_id": "UCbrxgk7y0DZpK3v94FgHIPw"
+},
+{
+"id": 50,
+"display_name": "Aurore Bergé",
+"aliases": [
+"Bergé",
+"Berge"
+],
+"youtube_channel_id": "UCiT4UyKh-cF8qBaBQP4p1ow"
+},
+{
+"id": 51,
+"display_name": "Marie Toussaint",
+"aliases": [
+"Marie Toussaint"
+],
+"youtube_channel_id": null
+},
+{
+"id": 52,
+"display_name": "Cyrielle Chatelain",
+"aliases": [
+"Chatelain"
+],
+"youtube_channel_id": null
+},
+{
+"id": 53,
+"display_name": "Philippe Poutou",
+"aliases": [
+"Poutou"
+],
+"youtube_channel_id": null
+},
+{
+"id": 54,
+"display_name": "Jean Lassalle",
+"aliases": [
+"Lassalle"
+],
+"youtube_channel_id": "UCdUat4f2yol7iMpCYoFUmNg"
+},
+{
+"id": 55,
+"display_name": "Philippe de Villiers",
+"aliases": [
+"Villiers"
+],
+"youtube_channel_id": "UCC9-paBZnwA6Bp-oNZUioWA"
+},
+{
+"id": 56,
+"display_name": "Clémence Guetté",
+"aliases": [
+"Guetté",
+"Guette"
+],
+"youtube_channel_id": "UCpU9riAixpc1Xn9Q4i7AkOw"
+},
+{
+"id": 57,
+"display_name": "Benoît Hamon",
+"aliases": [
+"Hamon"
+],
+"youtube_channel_id": "UCcMryUp6ME3BvP2alkS1dKg"
+}
+]
