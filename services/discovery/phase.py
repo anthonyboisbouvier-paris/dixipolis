@@ -92,7 +92,8 @@ def main():
     else:
         kinds = set(a.kind.split(","))
         targets = [(c["youtube_channel_id"], c.get("title") or c["youtube_channel_id"]) for c in channels
-                   if c["kind"] in kinds and (a.priority is None or c.get("priority") == a.priority)]
+                   if c["kind"] in kinds and (a.priority is None or c.get("priority") == a.priority)
+                   and not c.get("person_id")]   # les chaînes perso du registre sont couvertes par own-channels
     if a.only:
         keep = set(a.only.split(",")); targets = [t for t in targets if t[0] in keep]
     work = os.path.join(a.work, a.phase); os.makedirs(work, exist_ok=True)
