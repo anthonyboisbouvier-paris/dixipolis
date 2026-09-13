@@ -298,8 +298,18 @@ def cmd_score(a):
     for i in range(a.rounds):
         req = urllib.request.Request(url, data=json.dumps({"p_token": token, "limit": a.limit}).encode(),
                                      headers={"Content-Type": "application/json", "X-Harvest-Token": token}, method="POST")
-        with urllib.request.urlopen(req, timeout=900) as r:
-            res = json.load(r)
+        res = None
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=900) as r:
+                    res = json.load(r)
+                break
+            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+                print(f"lot {i + 1}: tentative {attempt + 1} échouée ({type(e).__name__}) — attente {15 * (attempt + 1)} s", file=sys.stderr)
+                time.sleep(15 * (attempt + 1))
+        if res is None:
+            print(f"lot {i + 1}: abandon après 4 tentatives", file=sys.stderr)
+            break
         for k in tot:
             tot[k] += int(res.get(k, 0) or 0)
         print(f"lot {i + 1}: {res}", file=sys.stderr)
