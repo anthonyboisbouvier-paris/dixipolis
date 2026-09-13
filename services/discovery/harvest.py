@@ -20,6 +20,8 @@ Commandes :
   to-sql    --in matched.jsonl            → SQL d'upsert prêt pour execute_sql
   push      --in matched.jsonl [--run '{json}'] → envoi par lots au relais n8n (DISCOVERY_RELAY_TOKEN)
   score     --limit 50 --rounds N          → qualification LLM (gpt-4o-mini via n8n) des candidates de chaînes tierces
+  ops       --action status|coverage|sync_ingested|set_channel_active|add_channel|add_person|report [--args '{json}'] | --sql 'select …'
+  registry                                → régénère registry_persons.* / registry_channels.* depuis la base
 
 Aucune dépendance hors bibliothèque standard. Clé : variable YOUTUBE_API_KEY.
 """
@@ -318,6 +320,61 @@ def cmd_score(a):
     print(json.dumps(tot), file=sys.stderr)
 
 
+def _relay_token(a):
+    token = getattr(a, "token", None) or os.environ.get("DISCOVERY_RELAY_TOKEN")
+    if not token:
+        sys.exit("DISCOVERY_RELAY_TOKEN manquant")
+    return token
+
+
+def ops(action, args=None, token=None):
+    """Appelle public.discovery_ops via le relais n8n (status, coverage, registry, sync_ingested, set_channel_active, add_channel, add_person, report, sql_read)."""
+    token = token or os.environ.get("DISCOVERY_RELAY_TOKEN")
+    url = os.environ.get("DISCOVERY_OPS_URL", "https://n8n.srv1810171.hstgr.cloud/webhook/discovery-ops")
+    req = urllib.request.Request(url, data=json.dumps({"p_token": token, "p_action": action, "p_args": args or {}}, ensure_ascii=False).encode("utf-8"),
+                                 headers={"Content-Type": "application/json", "X-Harvest-Token": token}, method="POST")
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                out = json.load(r)
+            # le relais renvoie {"error": {...}} (HTTP 200) quand Supabase répond en erreur ; on ne rejoue
+            # que les 5xx (504 Gateway Timeout fréquent sous charge) et seulement pour les actions idempotentes
+            err = out.get("error") if isinstance(out, dict) else None
+            if err and attempt < 3 and action in ("status", "coverage", "registry", "sql_read", "sync_ingested") \
+               and str(err.get("status") or err.get("message", "")).lstrip().startswith("5"):
+                time.sleep(5 * (attempt + 1)); continue
+            return out
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+            if isinstance(e, urllib.error.HTTPError) and e.code < 500:
+                sys.exit(f"ops {action}: HTTP {e.code} {e.read().decode('utf-8', 'replace')[:300]}")
+            if attempt == 3:
+                raise
+            time.sleep(5 * (attempt + 1))
+
+
+def cmd_ops(a):
+    args = json.loads(a.args) if a.args else {}
+    if a.sql:
+        a.action, args = "sql_read", {"query": a.sql}
+    print(json.dumps(ops(a.action, args, _relay_token(a)), ensure_ascii=False, indent=1))
+
+
+def cmd_registry(a):
+    """Régénère registry_persons.* et registry_channels.* depuis la base (via ops registry)."""
+    reg = ops("registry", {}, _relay_token(a))
+    here = os.path.dirname(os.path.abspath(__file__))
+    P, C = reg.get("persons", []), reg.get("channels", [])
+    json.dump(P, open(os.path.join(here, "registry_persons.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    json.dump(C, open(os.path.join(here, "registry_channels.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    with open(os.path.join(here, "registry_persons.txt"), "w", encoding="utf-8") as f:
+        for p in P:
+            f.write(f"{p['id']}|{p['display_name']}|{';'.join(p.get('aliases') or [])}|{p.get('youtube_channel_id') or ''}\n")
+    with open(os.path.join(here, "registry_channels.txt"), "w", encoding="utf-8") as f:
+        for c in C:
+            f.write(f"{c['youtube_channel_id']}|{c['kind']}|{c.get('person_id') or ''}|{c.get('priority', 2)}|{(c.get('title') or '').replace('|', '/')}\n")
+    print(json.dumps({"persons": len(P), "channels": len(C)}), file=sys.stderr)
+
+
 def parse_duration(iso_d):
     m = re.match(r"P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", iso_d or "")
     if not m:
@@ -348,8 +405,10 @@ def main():
     ps = sp.add_parser("push"); ps.add_argument("--in", dest="inp", required=True); ps.add_argument("--batch", type=int, default=150)
     ps.add_argument("--run"); ps.add_argument("--token"); ps.add_argument("--url"); ps.add_argument("--no-raw", action="store_true")
     sc = sp.add_parser("score"); sc.add_argument("--limit", type=int, default=50); sc.add_argument("--rounds", type=int, default=1); sc.add_argument("--token")
+    op = sp.add_parser("ops"); op.add_argument("--action", default="status"); op.add_argument("--args"); op.add_argument("--sql"); op.add_argument("--token")
+    rg = sp.add_parser("registry"); rg.add_argument("--token")
     a = p.parse_args()
-    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push, "score": cmd_score}[a.cmd](a)
+    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push, "score": cmd_score, "ops": cmd_ops, "registry": cmd_registry}[a.cmd](a)
 
 
 if __name__ == "__main__":

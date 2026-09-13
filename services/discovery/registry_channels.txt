@@ -64,7 +64,7 @@ UCb4UAZwZqS4a35FrBcLlMXA|media||2|CANAL+
 UCLSoWZjCGrdZo7ltIR3lEHg|media||2|Causeur
 UCyamXi0qEQJghCjJbj__aWQ|media||2|Chaîne officielle TVL
 UCFZSV_So_OaXgXVzgu58tJQ|media||2|cpac
-UC46uLyumV-YFu43QyYQRVjw|media||2|Croix & Patrie Officiel
+UC46uLyumV-YFu43QyYQRVjw|media||2|Croix & Patrie Officiel 
 UC48e1bQSz_FYKSqIPjZW_BA|media||2|Député Didier Le Gac
 UCc0ugW1l2Y8B8GD1Kw8ImFA|media||2|Dorian mamona- France conquérante du peuple
 UCrvG04V6wbOau6fVJI01OlQ|media||2|DRM News
@@ -110,7 +110,7 @@ UCm-ftC1IP5k_YwxwyEmWiBA|media||2|La Dépêche du Midi
 UC2i-BljAg1w_MMMA1JuFm7w|media||2|La Provence
 UCmHw3H5Eq05tksL0Df-XP_A|media||2|La Voix du Nord
 UCbXWhsd805LfcbAy7xL9d-A|media||2|Le Crayon
-UCTdoBpACYnRL-Hb5pTvfnsg|media||2|Le Département de l'Hérault
+UCTdoBpACYnRL-Hb5pTvfnsg|media||2|Le Département de l'Hérault 
 UCb0xB4NwoAANhxikOjw3Tnw|media||2|Le JDD
 UCT67YOMntJxfRnO_9bXDpvw|media||2|Le Média
 UCYpRDnhk5H8h16jpS84uqsA|media||2|Le Monde
@@ -132,7 +132,7 @@ UC6bn_ABjeTwbJFGFMQbZFlw|media||2|Loopsider
 UC3Sk_YpjPd_Lz_oPQfhPQXQ|media||2|M6 Info
 UCTXDgOedpu82TKpdcoBt5iA|media||2|Magjournal 77
 UC4V5osIDMjFwtCRxMm2e0LA|media||2|Marianne
-UCD3CQpAYhDWPyIqzvqv9Fow|media||2|Maxime LAISNEY
+UCD3CQpAYhDWPyIqzvqv9Fow|media||2|Maxime LAISNEY 
 UCdnaDhU-LDQrIEEmSIfq0-Q|media||2|Mediapart
 UCrc5iD627cYVES64dODUoDA|media||2|Ministère de la Communication et Des Médias
 UC-0kfhensYKGFYvXpyVxmOQ|media||2|Moe Media
@@ -153,10 +153,10 @@ UCGvjUWz3mGV9cssraATuEsw|media||2|Radio Nova
 UCBmUTlXAkTU1pi56O76FYZA|media||2|Radio One
 UCuYN15i2J_gETGamUAjEIWA|media||2|RADIO RCJ
 UC45NsEyqTGMtOeEM-UvlTuQ|media||2|Regards
-UCDn6zvBZNEWUv44xjgELicA|media||2|Reporterre - le média de l'écologie
+UCDn6zvBZNEWUv44xjgELicA|media||2|Reporterre 🌍/ le média de l'écologie
 UCihYCHXhm3X3qgk0L-hBZxw|media||2|Revue Conflits
 UCm4fSpMpPIZ9z6KHoezLUAg|media||2|RFI
-UCzBoVtUqSyAyr0kF5ABW7gQ|media||2|RTL (2)
+UCzBoVtUqSyAyr0kF5ABW7gQ|media||2|RTL  
 UCip2DNtZUPC82a_xLLTFcgA|media||2|RTNC
 UCbLkrHoMcA0fA4-Egu-LbJQ|media||2|Séances Publics
 UCw3RBtxhFWr0ahJ6XzliMRQ|media||2|Senegal5
@@ -194,7 +194,7 @@ UC3Ma4tRFxx85oZI_XKVTPwg|party||1|les Républicains
 UCwGBtRyFgWH9l0zGIF8eh3Q|party||1|Les Républicains Sénat
 UCUzk9hBisz4aSMVTl37pWgw|party||1|Lutte ouvrière
 UCfHWZNJQ7wZpG_cL9ukYX1Q|party||1|MoDem
-UCAKzgWr5laB3Yf44hvqqZZQ|party||1|NPA - L'Anticapitaliste
+UCAKzgWr5laB3Yf44hvqqZZQ|party||1|NPA - L’Anticapitaliste
 UCSwPcnzaMTuDcTgjRiJvZnw|party||1|PCF - Parti communiste français (PCF)
 UCixe3VYdKvKavOyopBxsKCw|party||1|Place publique
 UCo7xGEOV-RfxOAxRfhlR3Ww|party||1|PS - Parti socialiste
