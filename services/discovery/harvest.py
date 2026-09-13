@@ -17,7 +17,8 @@ Commandes :
   channel   --handle @Bruno_Retailleau    → id UC... (channels.list forHandle, 1 u)
   match     --persons persons.json --channels channels.json --in videos.jsonl
             → JSONL enrichi (matched_person_ids, matched_names, match_sources, rule score)
-  to-sql    --in matched.jsonl --run-id N  → SQL d'upsert prêt pour execute_sql
+  to-sql    --in matched.jsonl            → SQL d'upsert prêt pour execute_sql
+  push      --in matched.jsonl [--run '{json}'] → envoi par lots au relais n8n (DISCOVERY_RELAY_TOKEN)
 
 Aucune dépendance hors bibliothèque standard. Clé : variable YOUTUBE_API_KEY.
 """
@@ -241,6 +242,54 @@ on conflict (youtube_video_id) do update set
   status = case when discovery.videos.status in ('ingested','exported','relevant','rejected') then discovery.videos.status else excluded.status end;""")
 
 
+# ----------------------------------------------------------------------------- push (relais n8n -> Supabase)
+def cmd_push(a):
+    """Envoie les vidéos (JSONL enrichi par `match`) par lots au relais n8n, qui appelle
+    public.discovery_upsert_videos. Jeton : env DISCOVERY_RELAY_TOKEN (ou --token). Journalise
+    la passe (p_run) avec le premier lot si --run est fourni (JSON)."""
+    token = a.token or os.environ.get("DISCOVERY_RELAY_TOKEN")
+    if not token:
+        sys.exit("DISCOVERY_RELAY_TOKEN manquant")
+    url = a.url or os.environ.get("DISCOVERY_RELAY_URL", "https://n8n.srv1810171.hstgr.cloud/webhook/discovery-ingest")
+    items = [json.loads(l) for l in open(a.inp, encoding="utf-8") if l.strip()]
+    keep = ["youtube_video_id","title","description","tags","channel_youtube_id","channel_title","published_at","duration_sec",
+            "live_broadcast","default_audio_language","category_id","view_count","like_count","has_captions","thumbnail_url",
+            "matched_person_ids","matched_names","match_sources","relevance_score","relevance_reason","scored_by","status","raw"]
+    items = [{k: v.get(k) for k in keep if k in v} for v in items]
+    if a.no_raw:
+        for v in items: v.pop("raw", None)
+    run = json.loads(a.run) if a.run else None
+    tot_ins = tot_upd = 0
+    for i in range(0, max(len(items), 1), a.batch):
+        chunk = items[i:i + a.batch]
+        if not chunk and not run:
+            break
+        payload = {"p_token": token, "p_items": chunk, "p_run": run if i == 0 else None}
+        req = urllib.request.Request(url, data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                                     headers={"Content-Type": "application/json", "X-Harvest-Token": token}, method="POST")
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=180) as r:
+                    res = json.load(r)
+                break
+            except urllib.error.HTTPError as e:
+                body = e.read().decode("utf-8", "replace")
+                if attempt == 3 or e.code < 500:
+                    sys.exit(f"push HTTP {e.code}: {body[:300]}")
+            except (urllib.error.URLError, TimeoutError):
+                if attempt == 3:
+                    raise
+            time.sleep(2 ** attempt)
+        if isinstance(res, dict) and "inserted" in res:
+            tot_ins += res.get("inserted", 0); tot_upd += res.get("updated", 0)
+            print(f"lot {i // a.batch + 1}: +{res.get('inserted', 0)} insérées, {res.get('updated', 0)} mises à jour, run_id={res.get('run_id')}", file=sys.stderr)
+        else:
+            sys.exit(f"push: réponse inattendue {str(res)[:300]}")
+        if not chunk:
+            break
+    print(json.dumps({"pushed": len(items), "inserted": tot_ins, "updated": tot_upd}), file=sys.stderr)
+
+
 def parse_duration(iso_d):
     m = re.match(r"P(?:(\d+)D)?T?(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", iso_d or "")
     if not m:
@@ -268,8 +317,10 @@ def main():
     c = sp.add_parser("channel"); c.add_argument("--handle", required=True); c.add_argument("--report")
     m = sp.add_parser("match"); m.add_argument("--persons", required=True); m.add_argument("--channels", required=True); m.add_argument("--in", dest="inp", required=True); m.add_argument("--out", required=True)
     t = sp.add_parser("to-sql"); t.add_argument("--in", dest="inp", required=True)
+    ps = sp.add_parser("push"); ps.add_argument("--in", dest="inp", required=True); ps.add_argument("--batch", type=int, default=150)
+    ps.add_argument("--run"); ps.add_argument("--token"); ps.add_argument("--url"); ps.add_argument("--no-raw", action="store_true")
     a = p.parse_args()
-    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql}[a.cmd](a)
+    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push}[a.cmd](a)
 
 
 if __name__ == "__main__":
