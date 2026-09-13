@@ -21,6 +21,7 @@ Commandes :
   push      --in matched.jsonl [--run '{json}'] → envoi par lots au relais n8n (DISCOVERY_RELAY_TOKEN)
   score     --limit 50 --rounds N          → qualification LLM (gpt-4o-mini via n8n) des candidates de chaînes tierces
   ops       --action status|coverage|sync_ingested|set_channel_active|add_channel|add_person|report [--args '{json}'] | --sql 'select …'
+  bilan     tableau du jour (vidéos / heures à transcrire, par personne, quota, coût Runpod estimé) en markdown
   registry                                → régénère registry_persons.* / registry_channels.* depuis la base
 
 Aucune dépendance hors bibliothèque standard. Clé : variable YOUTUBE_API_KEY.
@@ -359,6 +360,55 @@ def cmd_ops(a):
     print(json.dumps(ops(a.action, args, _relay_token(a)), ensure_ascii=False, indent=1))
 
 
+RUNPOD_RATIO, RUNPOD_USD_PER_GPU_HOUR = 0.07, 0.576   # benchmark services/README.md : large-v3-turbo + pyannote, GPU 16 GB
+
+
+def cmd_bilan(a):
+    """Bilan lisible : ce que Loïc doit transcrire, par personne, quota consommé, coût Runpod estimé."""
+    tok = _relay_token(a)
+    q = lambda sql: ops("sql_read", {"query": sql}, tok)
+    by_status = q("select status, count(*) as n, round(coalesce(sum(duration_sec),0)/3600.0, 1) as h from discovery.videos group by status")
+    per_person = q("select p.display_name as nom, p.tier, count(*) as n, round(coalesce(sum(v.duration_sec),0)/3600.0, 1) as h, "
+                   "count(*) filter (where v.status = 'ingested') as chez_loic "
+                   "from discovery.videos v join lateral unnest(v.matched_person_ids) pid on true join discovery.persons p on p.id = pid "
+                   "where v.status in ('relevant','exported','ingested') group by 1, 2 order by 4 desc")
+    quota = q("select coalesce(sum(units_used),0) as total, coalesce(sum(units_used) filter (where day = current_date),0) as jour, "
+              "min(day) as depuis from discovery.quota_ledger")
+    chans = q("select count(*) filter (where active) as actives, count(*) filter (where active and scanned_from is not null and scanned_from <= '2005-01-02') as finies, "
+              "count(*) filter (where active and scanned_from is null) as jamais from discovery.channels")
+    for r in (by_status, per_person, quota, chans):
+        if isinstance(r, dict) and r.get("error"):
+            sys.exit(f"bilan: relais en erreur {json.dumps(r)[:300]}")
+    st = {r["status"]: r for r in by_status}
+    g = lambda k, f="n": float(st.get(k, {}).get(f) or 0)
+    a_transcrire_n = g("relevant") + g("exported"); a_transcrire_h = g("relevant", "h") + g("exported", "h")
+    total_n = a_transcrire_n + g("ingested"); total_h = a_transcrire_h + g("ingested", "h")
+    gpu_h = total_h * RUNPOD_RATIO; usd = gpu_h * RUNPOD_USD_PER_GPU_HOUR
+    qu, ch = quota[0], chans[0]
+    F = lambda x: format(int(round(float(x))), ",").replace(",", " ")
+    out = []
+    out.append(f"### Bilan discovery — {datetime.now(timezone.utc).strftime('%Y-%m-%d')}")
+    out.append("")
+    out.append("| | Vidéos | Heures |")
+    out.append("|---|---:|---:|")
+    out.append(f"| À transcrire (prêtes pour Loïc) | {F(a_transcrire_n)} | {F(a_transcrire_h)} |")
+    out.append(f"| Déjà ingérées par Loïc | {F(g('ingested'))} | {F(g('ingested', 'h'))} |")
+    out.append(f"| Total retenu depuis le début | {F(total_n)} | {F(total_h)} |")
+    out.append(f"| En attente de qualification IA | {F(g('candidate'))} | {F(g('candidate', 'h'))} |")
+    out.append(f"| Rejetées | {F(g('rejected'))} | {F(g('rejected', 'h'))} |")
+    out.append("")
+    out.append(f"**Quota YouTube** : {F(qu['jour'])} u aujourd'hui, {F(qu['total'])} u depuis le {qu['depuis']}. "
+               f"**Chaînes** : {ch['actives']} actives, {ch['finies']} remontées jusqu'à 2005, {ch['jamais']} jamais scannées.")
+    out.append(f"**Runpod (estimation)** : {F(total_h)} h d'audio ≈ {F(gpu_h)} h de GPU ≈ {F(usd)} $ pour tout transcrire "
+               f"(ratio {RUNPOD_RATIO}, {RUNPOD_USD_PER_GPU_HOUR} $/h GPU 16 Go ; reste à faire : {F(a_transcrire_h * RUNPOD_RATIO)} h GPU ≈ {F(a_transcrire_h * RUNPOD_RATIO * RUNPOD_USD_PER_GPU_HOUR)} $).")
+    out.append("")
+    out.append("| Personne | Tier | Vidéos | Heures | Chez Loïc |")
+    out.append("|---|:-:|---:|---:|---:|")
+    for r in per_person:
+        out.append(f"| {r['nom']} | {r['tier']} | {F(r['n'])} | {F(float(r['h']))} | {F(r['chez_loic'])} |")
+    print("\n".join(out))
+
+
 def cmd_registry(a):
     """Régénère registry_persons.* et registry_channels.* depuis la base (via ops registry)."""
     reg = ops("registry", {}, _relay_token(a))
@@ -407,8 +457,9 @@ def main():
     sc = sp.add_parser("score"); sc.add_argument("--limit", type=int, default=50); sc.add_argument("--rounds", type=int, default=1); sc.add_argument("--token")
     op = sp.add_parser("ops"); op.add_argument("--action", default="status"); op.add_argument("--args"); op.add_argument("--sql"); op.add_argument("--token")
     rg = sp.add_parser("registry"); rg.add_argument("--token")
+    bl = sp.add_parser("bilan"); bl.add_argument("--token")
     a = p.parse_args()
-    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push, "score": cmd_score, "ops": cmd_ops, "registry": cmd_registry}[a.cmd](a)
+    {"uploads": cmd_uploads, "details": cmd_details, "search": cmd_search, "channel": cmd_channel, "match": cmd_match, "to-sql": cmd_to_sql, "push": cmd_push, "score": cmd_score, "ops": cmd_ops, "registry": cmd_registry, "bilan": cmd_bilan}[a.cmd](a)
 
 
 if __name__ == "__main__":

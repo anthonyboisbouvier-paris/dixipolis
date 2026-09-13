@@ -128,8 +128,13 @@ Dans cet ordre, en gardant les mêmes règles de budget :
 ```bash
 python3 harvest.py ops --action sync_ingested     # rapprochement avec ce que Loïc a ingéré
 python3 harvest.py ops --action status
+python3 harvest.py bilan                           # tableau du jour (à recopier tel quel dans le bilan final)
 python3 harvest.py ops --action report --args '{"summary":"<bilan du jour en 3-6 lignes>"}'
 ```
+
+Le message final de la session (celui qu'Anthony reçoit en notification) contient, dans cet ordre :
+5 lignes de résumé humain (unités consommées, ce qui a été remonté, étape atteinte, anomalies), puis
+la sortie complète de `harvest.py bilan` (vidéos et heures à transcrire, par personne, quota, coût Runpod).
 
 - Ajoute une entrée datée en tête de `JOURNAL.md` (unités consommées, vidéos nouvelles / retenues /
   rejetées, étape de reprise atteinte, anomalies ; une ligne par point, en français).
