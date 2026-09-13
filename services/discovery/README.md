@@ -18,7 +18,8 @@ reste indépendant et inchangé.
 | Vidéos trouvées, qualifiées, dédupliquées | `discovery.videos` (clé `youtube_video_id`) |
 | Journal des passes et unités consommées | `discovery.harvest_runs`, `discovery.quota_ledger` |
 | Sortie pour Loïc | vue `discovery.v_ready_for_ingestion` + fonction `discovery.export_to_public(n)` |
-| Outils | `harvest.py` (stdlib Python, clé `YOUTUBE_API_KEY`) |
+| Outils | `harvest.py` (stdlib Python, clé `YOUTUBE_API_KEY`), `phase.py` (orchestration canal par canal) |
+| Écriture en base depuis le sandbox | relais n8n `POST /webhook/discovery-ingest` (en-tête `X-Harvest-Token`) → RPC `public.discovery_upsert_videos` |
 
 ## Métadonnées conservées par vidéo
 
@@ -92,15 +93,28 @@ personnes détectées) ; un score LLM ou humain n'est jamais écrasé par un sco
 - `seed_persons.sql`, `seed_channels.sql` — état initial des registres (13/09/2026).
 - `subscriptions_2026-09-13.json` — les 193 abonnements du compte YouTube du pipeline quotidien
   (propriétaire : chaîne `UCzmA4tuxmbOyvNo-nW-vwdQ`).
-- `harvest.py` — outils : `uploads`, `details`, `search`, `channel`, `match`, `to-sql`.
+- `harvest.py` — outils : `uploads`, `details`, `search`, `channel`, `match`, `to-sql`, `push`.
+- `phase.py` — passe complète canal par canal (`own-channels`, `channels --kind ... --priority ...`),
+  préfiltre de noms sur la playlist pour les chaînes tierces, push au fil de l'eau, journal `work/<phase>/log.jsonl`.
+- `registry_persons.json`, `registry_channels.json` — export du registre pour le matching hors ligne
+  (à régénérer après toute modification de `discovery.persons` / `discovery.channels`).
+
+## Chemin d'écriture (le sandbox ne joint pas Supabase en direct)
+
+`harvest.py push` envoie les lots au workflow n8n « Discovery — relais Supabase (harvester) »
+(`R7NZyTtk0UBJTnIu`, webhook `discovery-ingest`, authentifié par l'en-tête `X-Harvest-Token`),
+qui appelle la RPC `public.discovery_upsert_videos(p_token, p_items, p_run)` avec la clé anon du projet.
+La fonction vérifie le jeton (`discovery.settings.relay_token`), upsert les vidéos, journalise la passe
+dans `harvest_runs`, incrémente `quota_ledger` et met à jour `channels.scanned_from/to`.
+Variables d'environnement côté agent : `YOUTUBE_API_KEY`, `DISCOVERY_RELAY_TOKEN`
+(optionnel : `DISCOVERY_RELAY_URL`).
 
 ## À faire / points ouverts
 
-- Clé `YOUTUBE_API_KEY` (nouveau projet Google Cloud → quota indépendant du pipeline quotidien).
-- Chaînes perso à ajouter aux abonnements YouTube (pipeline quotidien) : Retailleau, Édouard Philippe
-  (« Avec Édouard »), Fabien Roussel, Villepin, Xavier Bertrand, Bayrou (FB Direct), Bompard, Asselineau.
-  Sans chaîne perso trouvée : Tondelier, Faure, Hollande, Bouamrane, Cazeneuve, Lecornu.
-- `public.persons` (référentiel Loïc) ne contient ni François Hollande ni Mathilde Panot → à ajouter
-  côté Loïc, sinon la speaker resolution ne peut pas leur attribuer de prise de parole.
+- Fait le 13/09 : clé `YOUTUBE_API_KEY` en place (projet Google Cloud `dixipolis-harvester`), 45 chaînes
+  ajoutées aux abonnements (238), Hollande et Panot ajoutés à `public.persons` (ids 2450, 2451),
+  « Avec Édouard » = ancienne chaîne « Horizons » (`UCoDttl6w1T-Stuw_pvNOvLA`, renommée).
+- Sans chaîne perso trouvée : Tondelier, Faure, Hollande, Bouamrane, Cazeneuve, Lecornu, Delga, Fesneau, Borne.
+- Ajouter `DISCOVERY_RELAY_TOKEN` aux variables d'environnement Claude Code (valeur = `discovery.settings.relay_token`).
 - Le schéma `discovery` n'est pas exposé par l'API REST Supabase (seul `public` l'est) : l'accès se fait
   en SQL (SQLAlchemy côté Loïc, connecteur côté agent). À exposer dans les réglages API si besoin.
