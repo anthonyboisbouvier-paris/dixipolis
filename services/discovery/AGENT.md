@@ -71,7 +71,7 @@ python3 phase.py channels --kind media --priority 1 --from $(date -u -d '3 days 
 ### 3b. Recul complet — tout le reste du quota
 
 ```bash
-python3 phase.py backfill --day-cap 8500 --budget 9000 --max-pages 5000
+python3 phase.py backfill --day-cap 8000 --budget 9000 --max-pages 5000
 ```
 
 `backfill` lit la couverture en base (`ops coverage`), prend les chaînes non finies dans l'ordre de
