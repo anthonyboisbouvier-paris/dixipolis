@@ -2,6 +2,13 @@
 
 Une entrée par session, la plus récente en tête. Unités = quota YouTube consommé (clé harvester).
 
+## 2026-09-14 — 08:45 UTC, incident scoring (session Anthony + Claude)
+
+- Vers 00:00 UTC le compte OpenAI est tombé à zéro crédit : le workflow de scoring a transformé chaque erreur en « rejeté, score 0, raison vide » → 22 985 vidéos rejetées à tort entre 00:00 et 02:41.
+- Corrigé : (1) workflow n8n « Discovery — scoring LLM » : une erreur OpenAI ou un JSON illisible ne produit plus de verdict (la vidéo reste candidate) et le nombre d'erreurs est renvoyé ; (2) `harvest.py score` s'arrête (`SCORING BLOQUÉ`) dès qu'un lot n'a que des erreurs ; (3) les 22 985 vidéos remises en `candidate` / `rule` avec leur score de règle recalculé.
+- Bilan avant incident (13/09 23:30) : 23 700 relevant. Après remise en état : 35 352 relevant, 23 017 à scorer, 4 023 rejetées (vrais rejets du LLM).
+- Action requise : recharger le compte OpenAI, puis relancer `harvest.py score --limit 30 --rounds 300`.
+
 ## 2026-09-13 — session initiale (Anthony + Claude)
 
 - Schéma `discovery` créé, 57 personnes (tier 1/2), 275 chaînes actives, relais n8n (ingest / score / ops) en place.

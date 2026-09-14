@@ -86,7 +86,9 @@ chaîne (réseau), il passe à la suivante ; la chaîne sera reprise le lendemai
 python3 harvest.py score --limit 30 --rounds 300
 ```
 
-Tourne jusqu'à épuisement des candidates `scored_by = 'rule'` (le script s'arrête seul) ; relance-le
+Tourne jusqu'à épuisement des candidates `scored_by = 'rule'` (le script s'arrête seul). S'il affiche
+`SCORING BLOQUÉ` (crédits OpenAI épuisés, 429…), n'insiste pas : les vidéos restent candidates, note la
+cause dans `JOURNAL.md` et dans le bilan final (Anthony doit recharger le compte OpenAI) ; relance-le
 après le backfill s'il reste des candidates (`ops status` → `to_score`). Relis ensuite 10 vidéos au
 hasard passées `relevant` et 10 `rejected` :
 
