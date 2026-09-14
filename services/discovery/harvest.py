@@ -316,9 +316,17 @@ def cmd_score(a):
         for k in tot:
             tot[k] += int(res.get(k, 0) or 0)
         print(f"lot {i + 1}: {res}", file=sys.stderr)
-        if not res.get("scored"):
+        errors = int(res.get("errors", 0) or 0)
+        if errors and errors >= int(res.get("scored", 0) or 0):
+            # coupe-circuit : OpenAI en erreur (crédits épuisés, 429…) — les vidéos restent candidates, on s'arrête
+            print(f"SCORING BLOQUÉ : {errors} erreurs OpenAI sur le lot — {res.get('error_sample', '')}", file=sys.stderr)
+            tot["blocked"] = res.get("error_sample", "")
             break
-    print(json.dumps(tot), file=sys.stderr)
+        if not res.get("scored") and not errors:
+            break
+        if errors:
+            time.sleep(30)   # erreurs partielles : on laisse respirer avant le lot suivant
+    print(json.dumps(tot, ensure_ascii=False), file=sys.stderr)
 
 
 def _relay_token(a):
