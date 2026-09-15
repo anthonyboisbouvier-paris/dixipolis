@@ -418,3 +418,8 @@ begin
 end
 $function$;
 
+-- ===== Index file de scoring (15/09) =====
+create index if not exists videos_to_score_idx
+  on discovery.videos (relevance_score desc nulls last, published_at desc)
+  where status = 'candidate' and scored_by = 'rule';
+create index if not exists videos_status_idx on discovery.videos (status);
