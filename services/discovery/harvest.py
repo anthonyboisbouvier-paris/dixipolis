@@ -307,7 +307,7 @@ def cmd_score(a):
                 with urllib.request.urlopen(req, timeout=900) as r:
                     res = json.load(r)
                 break
-            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+            except Exception as e:   # HTTPError, URLError, RemoteDisconnected, timeout, JSON illisible… : on rejoue
                 print(f"lot {i + 1}: tentative {attempt + 1} échouée ({type(e).__name__}) — attente {15 * (attempt + 1)} s", file=sys.stderr)
                 time.sleep(15 * (attempt + 1))
         if res is None:
@@ -353,7 +353,7 @@ def ops(action, args=None, token=None):
                and str(err.get("status") or err.get("message", "")).lstrip().startswith("5"):
                 time.sleep(5 * (attempt + 1)); continue
             return out
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
+        except Exception as e:   # idem : réseau, RemoteDisconnected, JSON illisible
             if isinstance(e, urllib.error.HTTPError) and e.code < 500:
                 sys.exit(f"ops {action}: HTTP {e.code} {e.read().decode('utf-8', 'replace')[:300]}")
             if attempt == 3:
