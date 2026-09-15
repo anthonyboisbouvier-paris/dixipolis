@@ -38,7 +38,7 @@ python3 harvest.py ops --sql "select day, units_used from discovery.quota_ledger
 python3 harvest.py ops --sql "select youtube_channel_id, title, scanned_from, scanned_to from discovery.channels where active and kind='media' and priority=1 order by scanned_from nulls first"
 ```
 
-`--sql` n'accepte que des `select` (lecture seule). Budget quotidien : **9 000 unités** (10 000 − marge).
+`--sql` n'accepte que des `select` (lecture seule, 500 lignes max, `limit` autorisé). Budget quotidien : **9 000 unités** (10 000 − marge).
 Le quota YouTube se remet à zéro à 07:00 UTC. `quota_ledger` fait foi pour ce que l'agent a dépensé.
 
 ## 2. Le plan, en une phrase
@@ -137,10 +137,9 @@ Le message final de la session (celui qu'Anthony reçoit en notification) contie
 5 lignes de résumé humain (unités consommées, ce qui a été remonté, étape atteinte, anomalies), puis
 la sortie complète de `harvest.py bilan` (vidéos et heures à transcrire, par personne, quota, coût Runpod).
 
-- Ajoute une entrée datée en tête de `JOURNAL.md` (unités consommées, vidéos nouvelles / retenues /
-  rejetées, étape de reprise atteinte, anomalies ; une ligne par point, en français).
-- Commit + push sur `main` : `JOURNAL.md` et les fichiers de registre modifiés (jamais `work/`).
-  Message : `discovery: journal <date>`.
+- Le rapport `ops report` fait foi (table `discovery.daily_reports`) : la session routine n'a pas de
+  droit de push sur GitHub (dépôt hors des sources autorisées). N'essaie ni commit ni push : le journal
+  `JOURNAL.md` du dépôt est mis à jour depuis `daily_reports` par la session d'Anthony.
 - Si un outil Linear est disponible dans la session, poste le même bilan en commentaire sur DIX-57 ;
   sinon `daily_reports` (action `report`) et `JOURNAL.md` font foi.
 
