@@ -420,6 +420,6 @@ $function$;
 
 -- ===== Index file de scoring (15/09) =====
 create index if not exists videos_to_score_idx
-  on discovery.videos (relevance_score desc nulls last, published_at desc)
+  on discovery.videos (relevance_score desc, published_at desc)   -- même ordre que la requête de discovery_fetch_to_score
   where status = 'candidate' and scored_by = 'rule';
 create index if not exists videos_status_idx on discovery.videos (status);
