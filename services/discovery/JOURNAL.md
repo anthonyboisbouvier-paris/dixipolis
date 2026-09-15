@@ -2,6 +2,13 @@
 
 Une entrée par session, la plus récente en tête. Unités = quota YouTube consommé (clé harvester).
 
+## 2026-09-15 — 02:20 UTC, scoring déplacé dans n8n (session Anthony + Claude)
+
+- OpenAI rechargé le 14/09 vers 23:00 UTC ; scoring relancé depuis la session, mais le processus est mort deux fois (redémarrages du conteneur) et une coupure réseau non rattrapée.
+- Deux défauts corrigés au passage : (1) le modèle recopiait mal ~50 % des ids vidéo → le nœud « Parse scores » prend désormais l'id du prompt ; (2) `discovery_fetch_to_score` dépassait le statement timeout sous charge → index partiel `videos_to_score_idx` (status='candidate', scored_by='rule').
+- Nouveau workflow n8n « Discovery — scoring auto » (`L2UV2bLfHCOS3yl4`) : 1 lot de 60 par minute, en continu, indépendant des sessions. Depuis : 60/60 vidéos qualifiées par exécution.
+- État : 36 700 relevant, 45 800 à scorer (~13 h), 52 ingérées par Loïc. La routine quotidienne ne lance plus `harvest.py score`.
+
 ## 2026-09-14 — 08:45 UTC, incident scoring (session Anthony + Claude)
 
 - Vers 00:00 UTC le compte OpenAI est tombé à zéro crédit : le workflow de scoring a transformé chaque erreur en « rejeté, score 0, raison vide » → 22 985 vidéos rejetées à tort entre 00:00 et 02:41.

@@ -80,17 +80,16 @@ match → push) et s'arrête seul quand `quota_ledger` du jour atteint `--day-ca
 reprend à la chaîne suivante. Ne le lance jamais deux fois en parallèle. En cas d'erreur sur une
 chaîne (réseau), il passe à la suivante ; la chaîne sera reprise le lendemain.
 
-### 3c. Qualification LLM (en parallèle du recul, ne coûte pas de quota YouTube)
+### 3c. Qualification LLM — automatique côté n8n, ne rien lancer
 
-```bash
-python3 harvest.py score --limit 30 --rounds 300
-```
+Le scoring tourne en continu dans n8n : workflow « Discovery — scoring auto (harvester, 1 lot/min) »
+(`L2UV2bLfHCOS3yl4`) qui appelle chaque minute le webhook `discovery-score` avec un lot de 60
+(≈ 3 600 vidéos/h). **Ne lance pas `harvest.py score`** (doublons de coût OpenAI). Vérifie seulement
+que `ops status` → `to_score` baisse d'un jour sur l'autre. S'il stagne ou monte alors que des
+candidates existent : cause probable crédits OpenAI épuisés → note-le dans `JOURNAL.md` et dans le
+bilan (Anthony recharge). `harvest.py score` reste utile en dépannage manuel.
 
-Tourne jusqu'à épuisement des candidates `scored_by = 'rule'` (le script s'arrête seul). S'il affiche
-`SCORING BLOQUÉ` (crédits OpenAI épuisés, 429…), n'insiste pas : les vidéos restent candidates, note la
-cause dans `JOURNAL.md` et dans le bilan final (Anthony doit recharger le compte OpenAI) ; relance-le
-après le backfill s'il reste des candidates (`ops status` → `to_score`). Relis ensuite 10 vidéos au
-hasard passées `relevant` et 10 `rejected` :
+Relis ensuite 10 vidéos au hasard passées `relevant` et 10 `rejected` :
 
 ```bash
 python3 harvest.py ops --sql "select youtube_video_id, title, relevance_score, relevance_reason from discovery.videos where status='relevant' and scored_by like 'llm%' order by random() limit 10"
