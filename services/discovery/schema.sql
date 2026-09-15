@@ -317,7 +317,7 @@ begin
     if p_args->>'query' !~* '^\s*select' or p_args->>'query' ~* '(insert|update|delete|drop|alter|create|grant|truncate|;)' then
       raise exception 'read_only_select_only';
     end if;
-    execute format('select coalesce(jsonb_agg(t), ''[]'') from (%s limit 500) t', p_args->>'query') into v_out;
+    execute format('select coalesce(jsonb_agg(discovery_row), ''[]'') from (select * from (%s) discovery_q limit 500) discovery_row', p_args->>'query') into v_out;
     return v_out;
   end if;
 
